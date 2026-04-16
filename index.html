@@ -112,7 +112,7 @@
             flex: 1;
             display: grid;
             grid-template-columns: 2fr 1fr;
-            grid-template-rows: auto 1fr;
+            grid-template-rows: auto auto 1fr;
             gap: 10px;
             padding: 10px;
             min-height: 0;
@@ -183,10 +183,124 @@
         
         .kpi-sub { font-size: 10px; color: var(--text-muted); }
         
+        /* ============ SCENARIO CHIP BAR ============ */
+        .scenario-bar {
+            grid-column: 1 / -1;
+            grid-row: 2;
+            background: linear-gradient(90deg, #EFF6FF 0%, #F0F9FF 100%);
+            border: 1px solid #BFDBFE;
+            border-radius: 10px;
+            padding: 7px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+            min-height: 38px;
+            transition: background 0.3s;
+        }
+        
+        .scenario-bar.has-filters {
+            background: linear-gradient(90deg, #DBEAFE 0%, #E0F2FE 100%);
+            border-color: var(--primary);
+        }
+        
+        .scenario-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.7px;
+            white-space: nowrap;
+            padding-right: 8px;
+            border-right: 1px solid #BFDBFE;
+        }
+        
+        .scenario-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .scenario-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 4px 4px 10px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            animation: chipIn 0.25s ease-out;
+        }
+        
+        .scenario-chip.drug { border-color: var(--primary); color: var(--primary); }
+        .scenario-chip.insurer { border-color: #1E40AF; color: #1E40AF; background: #EFF6FF; }
+        .scenario-chip.country { border-color: var(--success); color: var(--success); background: #ECFDF5; }
+        
+        .scenario-chip-x {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.06);
+            cursor: pointer;
+            font-size: 11px;
+            line-height: 1;
+            transition: background 0.15s;
+        }
+        .scenario-chip-x:hover { background: rgba(239,68,68,0.2); color: var(--danger); }
+        
+        @keyframes chipIn {
+            from { opacity: 0; transform: translateY(-4px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .scenario-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        .scenario-clear {
+            margin-left: auto;
+            padding: 4px 10px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .scenario-clear:hover { background: var(--danger); color: white; border-color: var(--danger); }
+        
+        /* Personalized KPI highlight */
+        .kpi-item.kpi-personal {
+            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+            border-radius: 8px;
+            padding: 4px 12px;
+            border: 1px solid var(--primary);
+            border-right: 1px solid var(--primary) !important;
+            animation: chipIn 0.3s ease-out;
+        }
+        .kpi-item.kpi-personal .kpi-label { color: var(--primary); font-weight: 700; }
+        .kpi-item.kpi-personal .kpi-value { color: var(--primary); }
+        
+        /* ============ CROSS-FILTER STATES ============ */
+        .is-dimmed { opacity: 0.35 !important; filter: saturate(0.6); transition: opacity 0.3s, filter 0.3s; }
+        .is-selected { transition: all 0.3s; }
+        .is-hover-linked { filter: brightness(1.08) drop-shadow(0 0 4px rgba(37,99,235,0.35)); }
+        
         /* ============ MAIN PANEL (LEFT) ============ */
         .main-panel {
             grid-column: 1;
-            grid-row: 2;
+            grid-row: 3;
             background: var(--bg-card);
             border-radius: 10px;
             box-shadow: var(--shadow-sm);
@@ -292,6 +406,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            cursor: pointer;
+            padding: 3px 6px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .insurer-row:hover { background: #F9FAFB; }
+        .insurer-row.is-selected {
+            background: #EFF6FF;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px rgba(37,99,235,0.2);
+        }
+        .insurer-row.is-selected .insurer-name {
+            color: var(--primary);
+            font-weight: 700;
         }
         
         .insurer-name {
@@ -376,7 +505,7 @@
         /* ============ SIDEBAR (RIGHT) ============ */
         .sidebar {
             grid-column: 2;
-            grid-row: 2;
+            grid-row: 3;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -538,6 +667,27 @@
         .plan-card.rank-last {
             background: linear-gradient(90deg, #FEF2F2, #FFFFFF);
             border-color: var(--danger);
+        }
+        
+        .plan-card.is-selected {
+            background: linear-gradient(90deg, #DBEAFE, #EFF6FF) !important;
+            border: 2px solid var(--primary) !important;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.15), var(--shadow-sm);
+            animation: yourPlanPulse 2.4s ease-in-out infinite;
+        }
+        .plan-card.is-selected .plan-rank::after {
+            content: 'YOU';
+            display: block;
+            font-size: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-top: 2px;
+        }
+        @keyframes yourPlanPulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(37,99,235,0.15), var(--shadow-sm); }
+            50% { box-shadow: 0 0 0 4px rgba(37,99,235,0.25), var(--shadow-md); }
         }
         
         .plan-rank {
@@ -845,7 +995,20 @@
                     <div class="kpi-value" id="kpi-retail">$---</div>
                     <div class="kpi-sub">per month</div>
                 </div>
+                <div class="kpi-item kpi-personal" id="kpi-your" style="display:none;">
+                    <div class="kpi-label">Your Annual Cost</div>
+                    <div class="kpi-value" id="kpi-your-value">$---</div>
+                    <div class="kpi-sub" id="kpi-your-sub">select insurer</div>
+                </div>
             </div>
+        </div>
+        
+        <!-- SCENARIO CONTEXT CHIP BAR -->
+        <div class="scenario-bar" id="scenario-bar">
+            <div class="scenario-label">YOUR SCENARIO</div>
+            <div class="scenario-chips" id="scenario-chips"></div>
+            <div class="scenario-hint" id="scenario-hint">Click any insurer or country below to filter the whole dashboard</div>
+            <button class="scenario-clear" id="scenario-clear" style="display:none;">Clear filters</button>
         </div>
         
         <!-- MAIN PANEL WITH TABS -->
@@ -1016,6 +1179,51 @@
         let selectedInsurers = new Set();
         let selectedCountries = new Set();
         
+        // ============ SCENARIO (coordinated state) ============
+        const scenario = {
+            drug: null,           // drug id (mirrors selectedDrug)
+            insurer: null,        // insurer name or null
+            country: null,        // country name or null
+        };
+        
+        function setScenario(patch) {
+            Object.assign(scenario, patch);
+            if (patch.drug !== undefined) selectedDrug = patch.drug;
+            renderAll();
+        }
+        
+        function clearFilters() {
+            scenario.insurer = null;
+            scenario.country = null;
+            renderAll();
+        }
+        
+        function renderAll() {
+            const drug = drugs.find(d => d.id === selectedDrug);
+            if (!drug) return;
+            renderDrugStrip(drug);
+            renderScenarioBar();
+            renderPersonalizedKPI(drug);
+            renderGlobalSnapshot(drug);
+            renderSavings(drug);
+            renderActiveView();
+            renderDrugSelector();
+        }
+        
+        // Hover broadcaster: apply linked-highlight class across all panels
+        function setHoverTarget(type, id) {
+            document.querySelectorAll('[data-hover-type]').forEach(el => {
+                if (el.dataset.hoverType === type && el.dataset.hoverId === id) {
+                    el.classList.add('is-hover-linked');
+                } else {
+                    el.classList.remove('is-hover-linked');
+                }
+            });
+        }
+        function clearHoverTarget() {
+            document.querySelectorAll('.is-hover-linked').forEach(el => el.classList.remove('is-hover-linked'));
+        }
+        
         // Realistic monthly premium estimates (2023 Medicare Part D average ~$56)
         const INSURER_PREMIUMS = {
             'UnitedHealthcare':       {premium: 62, rating: 4.5},
@@ -1039,6 +1247,27 @@
             'Australia': '#06B6D4',
             'Switzerland': '#EF4444',
         };
+        
+        // ============ ESCAPE AFFORDANCES ============
+        function attachEscapeHandlers() {
+            // Clear button
+            d3.select('#scenario-clear').on('click', clearFilters);
+            
+            // Esc key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && (scenario.insurer || scenario.country)) clearFilters();
+            });
+            
+            // Background click (clicks on dashboard container that aren't stopped)
+            document.querySelector('.dashboard').addEventListener('click', (e) => {
+                // Only clear if click target is literally the dashboard/panel background
+                if (e.target.classList.contains('dashboard') ||
+                    e.target.classList.contains('panel-content') ||
+                    e.target.classList.contains('view')) {
+                    if (scenario.insurer || scenario.country) clearFilters();
+                }
+            });
+        }
         
         // ============ LOAD DATA ============
         Promise.all([
@@ -1072,6 +1301,7 @@
             renderDrugSelector();
             attachTabHandlers();
             attachToggleHandlers();
+            attachEscapeHandlers();
         }).catch(err => console.error('Data load error:', err));
         
         // ============ SELECTOR & TABS ============
@@ -1147,12 +1377,13 @@
         }
         
         // ============ MAIN SELECT ============
+        // Called from drug selector pills. Switching drug clears cross-filters to avoid stale selections.
         function selectDrug(drugId) {
-            selectedDrug = drugId;
-            const drug = drugs.find(d => d.id === drugId);
-            const latest = drug.yearly_data[drug.yearly_data.length - 1];
-            
-            // Drug strip
+            setScenario({ drug: drugId, insurer: null, country: null });
+        }
+        
+        // Renders the header strip + KPIs only (pulled out of old selectDrug)
+        function renderDrugStrip(drug) {
             d3.select('#drug-name').text(drug.brand_name);
             d3.select('#drug-generic').text(drug.generic_name);
             
@@ -1161,7 +1392,6 @@
             tags.append('span').attr('class', 'tag tag-therapeutic').text(drug.therapeutic_class);
             tags.append('span').attr('class', 'tag tag-condition').text(drug.condition);
             
-            // KPIs
             d3.select('#kpi-spending').text(`$${drug.latest_spending_b}B`);
             d3.select('#kpi-benes').text(`${drug.latest_beneficiaries_m}M`);
             d3.select('#kpi-benes-sub').text(`${drug.latest_claims_m}M claims`);
@@ -1179,14 +1409,81 @@
                 .classed('down', cagr < 0);
             
             d3.select('#kpi-retail').text(`$${drug.retail_price}`);
+        }
+        
+        // ============ SCENARIO CHIP BAR ============
+        function renderScenarioBar() {
+            const drug = drugs.find(d => d.id === selectedDrug);
+            const bar = d3.select('#scenario-bar');
+            const chips = d3.select('#scenario-chips');
+            const hint = d3.select('#scenario-hint');
+            const clearBtn = d3.select('#scenario-clear');
             
-            // Sidebar
-            renderGlobalSnapshot(drug);
-            renderSavings(drug);
+            chips.html('');
             
-            // Active view
-            renderActiveView();
-            renderDrugSelector();
+            // Drug chip (always present)
+            if (drug) {
+                chips.append('div').attr('class', 'scenario-chip drug')
+                    .html(`<span>💊 ${drug.brand_name}</span>`);
+            }
+            
+            // Insurer chip
+            if (scenario.insurer) {
+                const chip = chips.append('div').attr('class', 'scenario-chip insurer');
+                chip.append('span').html(`🏥 ${scenario.insurer}`);
+                chip.append('span').attr('class', 'scenario-chip-x').html('×')
+                    .on('click', () => setScenario({ insurer: null }));
+            }
+            
+            // Country chip
+            if (scenario.country) {
+                const country = globalData.find(c => c.country === scenario.country);
+                const chip = chips.append('div').attr('class', 'scenario-chip country');
+                chip.append('span').html(`${country ? country.flag : '🌍'} ${scenario.country}`);
+                chip.append('span').attr('class', 'scenario-chip-x').html('×')
+                    .on('click', () => setScenario({ country: null }));
+            }
+            
+            const hasFilters = !!(scenario.insurer || scenario.country);
+            bar.classed('has-filters', hasFilters);
+            hint.style('display', hasFilters ? 'none' : '');
+            clearBtn.style('display', hasFilters ? '' : 'none');
+        }
+        
+        // ============ PERSONALIZED KPI ============
+        function renderPersonalizedKPI(drug) {
+            const slot = d3.select('#kpi-your');
+            if (!scenario.insurer && !scenario.country) {
+                slot.style('display', 'none');
+                return;
+            }
+            slot.style('display', '');
+            
+            if (scenario.insurer) {
+                const p = insurerPricing.find(x => x.drug_id === selectedDrug && x.insurer === scenario.insurer);
+                if (p) {
+                    const prem = (INSURER_PREMIUMS[p.insurer] || {premium: 50}).premium;
+                    const annual = (prem + p.patient_copay) * 12;
+                    const retailAnnual = drug.retail_price * 12;
+                    const savings = retailAnnual - annual;
+                    d3.select('#kpi-your .kpi-label').text('Your Annual Cost');
+                    d3.select('#kpi-your-value').text(`$${annual.toLocaleString()}`);
+                    d3.select('#kpi-your-sub').html(`<span style="color:var(--success);font-weight:700;">save $${savings.toLocaleString()}</span> vs retail`);
+                }
+            } else if (scenario.country) {
+                const country = globalData.find(c => c.country === scenario.country);
+                const countryRatios = {
+                    'United States': 1.0, 'Canada': 0.55, 'United Kingdom': 0.35,
+                    'Germany': 0.50, 'France': 0.45, 'Japan': 0.40,
+                    'Australia': 0.42, 'Switzerland': 0.70
+                };
+                const ratio = countryRatios[scenario.country] || 0.5;
+                const monthly = Math.round(drug.retail_price * ratio * (country && country.iso_code === 'USA' ? 1 : 0.15));
+                const annual = monthly * 12;
+                d3.select('#kpi-your .kpi-label').text(`Cost in ${country.flag} ${country.iso_code}`);
+                d3.select('#kpi-your-value').text(`$${annual.toLocaleString()}`);
+                d3.select('#kpi-your-sub').text(`per year (${country.system})`);
+            }
         }
         
         function renderActiveView() {
@@ -1209,6 +1506,10 @@
             if (selectedCountries.size === 0) {
                 globalData.forEach(c => selectedCountries.add(c.country));
             }
+            
+            // Sync with global scenario: ensure scenario.insurer/country are part of selection if set
+            if (scenario.insurer) selectedInsurers.add(scenario.insurer);
+            if (scenario.country) selectedCountries.add(scenario.country);
             
             // Update header based on scope
             if (compareScope === 'provider') {
@@ -1406,10 +1707,24 @@
             const list = d3.select('#insurer-list');
             list.selectAll('.insurer-row').remove();
             
+            const anyFilter = !!(scenario.insurer || scenario.country);
             const rows = list.selectAll('.insurer-row')
                 .data(sorted)
                 .join('div')
-                .attr('class', 'insurer-row');
+                .attr('class', d => {
+                    let cls = 'insurer-row';
+                    if (scenario.insurer === d.insurer) cls += ' is-selected';
+                    else if (anyFilter && scenario.insurer) cls += ' is-dimmed';
+                    return cls;
+                })
+                .attr('data-hover-type', 'insurer')
+                .attr('data-hover-id', d => d.insurer)
+                .on('click', (e, d) => {
+                    e.stopPropagation();
+                    setScenario({ insurer: scenario.insurer === d.insurer ? null : d.insurer });
+                })
+                .on('mouseenter', (e, d) => setHoverTarget('insurer', d.insurer))
+                .on('mouseleave', clearHoverTarget);
             
             rows.append('div').attr('class', 'insurer-name').text(d => d.insurer);
             
@@ -1599,7 +1914,15 @@
             svg.selectAll('.country-bar')
                 .data(data)
                 .join('rect')
-                .attr('class', 'country-bar')
+                .attr('class', d => {
+                    let cls = 'country-bar';
+                    if (scenario.country === d.country) cls += ' is-selected';
+                    else if (scenario.country) cls += ' is-dimmed';
+                    return cls;
+                })
+                .attr('data-hover-type', 'country')
+                .attr('data-hover-id', d => d.country)
+                .style('cursor', 'pointer')
                 .attr('x', margin.left)
                 .attr('y', d => y(d.country))
                 .attr('height', y.bandwidth())
@@ -1607,16 +1930,24 @@
                 .attr('rx', 4)
                 .attr('fill', d => countryColors[d.country] || '#6B7280')
                 .attr('opacity', 0.85)
+                .attr('stroke', d => scenario.country === d.country ? '#111827' : 'none')
+                .attr('stroke-width', d => scenario.country === d.country ? 2 : 0)
+                .on('click', (e, d) => {
+                    e.stopPropagation();
+                    setScenario({ country: scenario.country === d.country ? null : d.country });
+                })
                 .on('mousemove', (e, d) => {
+                    setHoverTarget('country', d.country);
                     showTooltip(e, `
                         <div class="tooltip-title">${d.flag} ${d.country}</div>
                         <div class="tooltip-row"><span>${d.latest_year}:</span><span>$${d.latest_spending}</span></div>
                         <div class="tooltip-row"><span>${d.first_year}:</span><span>$${d.first_spending}</span></div>
                         <div class="tooltip-row"><span>Growth:</span><span>${d.growth_pct > 0 ? '+' : ''}${d.growth_pct}%</span></div>
                         <div class="tooltip-row"><span>System:</span><span style="text-align:right;">${d.system}</span></div>
+                        <div style="margin-top:4px;font-style:italic;opacity:0.7;">Click to filter the whole dashboard</div>
                     `);
                 })
-                .on('mouseout', hideTooltip);
+                .on('mouseout', () => { clearHoverTarget(); hideTooltip(); });
             
             // Labels (country names)
             svg.selectAll('.country-label')
@@ -1687,12 +2018,23 @@
             const sorted = [...globalData].sort((a, b) => (a.iso_code === 'USA' ? 1 : 0) - (b.iso_code === 'USA' ? 1 : 0));
             
             sorted.forEach(country => {
+                const isSel = scenario.country === country.country;
+                const isDimmed = scenario.country && !isSel;
                 svg.append('path')
                     .datum(country.yearly_data)
                     .attr('fill', 'none')
                     .attr('stroke', countryColors[country.country] || '#6B7280')
-                    .attr('stroke-width', country.iso_code === 'USA' ? 3 : 2)
-                    .attr('opacity', country.iso_code === 'USA' ? 1 : 0.7)
+                    .attr('stroke-width', isSel ? 4 : (country.iso_code === 'USA' ? 3 : 2))
+                    .attr('opacity', isDimmed ? 0.2 : (country.iso_code === 'USA' ? 1 : 0.8))
+                    .style('cursor', 'pointer')
+                    .attr('data-hover-type', 'country')
+                    .attr('data-hover-id', country.country)
+                    .on('click', (e) => {
+                        e.stopPropagation();
+                        setScenario({ country: scenario.country === country.country ? null : country.country });
+                    })
+                    .on('mouseenter', () => setHoverTarget('country', country.country))
+                    .on('mouseleave', clearHoverTarget)
                     .attr('d', line);
                 
                 // End label
@@ -1786,8 +2128,17 @@
                 const savingsVsWorst = worstTotal - plan.annual_total;
                 const savingsVsRetail = retailAnnual - plan.annual_total;
                 
+                const isSelected = scenario.insurer === plan.insurer;
                 const card = grid.append('div')
-                    .attr('class', `plan-card ${isBest ? 'rank-1' : ''} ${isWorst ? 'rank-last' : ''}`);
+                    .attr('class', `plan-card ${isBest ? 'rank-1' : ''} ${isWorst ? 'rank-last' : ''} ${isSelected ? 'is-selected' : ''} ${scenario.insurer && !isSelected ? 'is-dimmed' : ''}`)
+                    .attr('data-hover-type', 'insurer')
+                    .attr('data-hover-id', plan.insurer)
+                    .on('click', (e) => {
+                        e.stopPropagation();
+                        setScenario({ insurer: scenario.insurer === plan.insurer ? null : plan.insurer });
+                    })
+                    .on('mouseenter', () => setHoverTarget('insurer', plan.insurer))
+                    .on('mouseleave', clearHoverTarget);
                 
                 card.append('div').attr('class', 'plan-rank').text(`#${i + 1}`);
                 
@@ -1876,8 +2227,21 @@
             const barGroup = svg.selectAll('.snap-group')
                 .data(data)
                 .join('g')
-                .attr('class', 'snap-group')
-                .style('cursor', 'pointer');
+                .attr('class', d => {
+                    let cls = 'snap-group';
+                    if (scenario.country === d.country) cls += ' is-selected';
+                    else if (scenario.country) cls += ' is-dimmed';
+                    return cls;
+                })
+                .attr('data-hover-type', 'country')
+                .attr('data-hover-id', d => d.country)
+                .style('cursor', 'pointer')
+                .on('click', (e, d) => {
+                    e.stopPropagation();
+                    setScenario({ country: scenario.country === d.country ? null : d.country });
+                })
+                .on('mouseenter', (e, d) => setHoverTarget('country', d.country))
+                .on('mouseleave', clearHoverTarget);
             
             barGroup.append('rect')
                 .attr('x', margin.left)
@@ -1887,6 +2251,8 @@
                 .attr('rx', 3)
                 .attr('fill', d => countryColors[d.country] || '#6B7280')
                 .attr('opacity', 0.85)
+                .attr('stroke', d => scenario.country === d.country ? '#111827' : 'none')
+                .attr('stroke-width', d => scenario.country === d.country ? 1.5 : 0)
                 .transition().duration(600)
                 .attr('width', d => x(d.latest_spending) - margin.left);
             
@@ -1959,10 +2325,50 @@
             const best = Math.min(...pricing.map(p => p.patient_copay)) * 12;
             const worst = Math.max(...pricing.map(p => p.patient_copay)) * 12;
             const retail = drug.retail_price * 12;
-            const savings = retail - best;
             
-            d3.select('#savings-amount').text(`$${savings.toLocaleString()}`);
-            d3.select('#savings-desc').text(`Best US coverage vs paying $${retail.toLocaleString()} retail`);
+            // Default headline: max annual savings
+            let headline = retail - best;
+            let label = 'Max Annual Savings';
+            let desc = `Best US coverage vs paying $${retail.toLocaleString()} retail`;
+            
+            // If user selected an insurer → personalize as "Your Savings"
+            if (scenario.insurer) {
+                const p = pricing.find(x => x.insurer === scenario.insurer);
+                if (p) {
+                    const prem = (INSURER_PREMIUMS[p.insurer] || {premium: 50}).premium;
+                    const yourAnnual = (prem + p.patient_copay) * 12;
+                    headline = retail - yourAnnual;
+                    label = `Your Savings · ${scenario.insurer}`;
+                    desc = `With ${scenario.insurer}: <strong>$${yourAnnual.toLocaleString()}/yr</strong> vs $${retail.toLocaleString()} retail`;
+                }
+            } else if (scenario.country) {
+                // If a country is selected, show the delta vs US retail
+                const country = globalData.find(c => c.country === scenario.country);
+                if (country && country.iso_code !== 'USA') {
+                    const countryRatios = {
+                        'Canada': 0.55, 'United Kingdom': 0.35, 'Germany': 0.50,
+                        'France': 0.45, 'Japan': 0.40, 'Australia': 0.42, 'Switzerland': 0.70
+                    };
+                    const ratio = countryRatios[scenario.country] || 0.5;
+                    const countryAnnual = Math.round(drug.retail_price * ratio * 0.15) * 12;
+                    headline = retail - countryAnnual;
+                    label = `Savings vs US Retail`;
+                    desc = `In ${country.flag} ${country.country}: <strong>$${countryAnnual.toLocaleString()}/yr</strong> (${country.system})`;
+                }
+            }
+            
+            // Animate headline number
+            const amountEl = d3.select('#savings-amount');
+            const current = parseInt(amountEl.text().replace(/[^\d]/g, '')) || 0;
+            amountEl.transition().duration(450).tween('text', function() {
+                const interp = d3.interpolateNumber(current, headline);
+                return function(t) {
+                    this.textContent = `$${Math.round(interp(t)).toLocaleString()}`;
+                };
+            });
+            
+            d3.select('.savings-label').text(label);
+            d3.select('#savings-desc').html(desc);
             d3.select('#savings-best').text(`$${best.toLocaleString()}`);
             d3.select('#savings-worst').text(`$${worst.toLocaleString()}`);
             d3.select('#savings-retail').text(`$${retail.toLocaleString()}`);
