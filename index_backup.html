@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthLens | Executive Health Insurance Analytics</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-panel-hover: #334155;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --tier-1: #10b981;
+            --tier-2: #84cc16;
+            --tier-3: #eab308;
+            --tier-4: #f97316;
+            --tier-5: #dc2626;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            font-size: 13px;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-panel);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-brand h1 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-tagline {
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding-left: 16px;
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .filter-pill {
+            background: rgba(14, 165, 233, 0.15);
+            color: var(--accent-primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+        
+        .btn {
+            background: var(--bg-panel-hover);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+        
+        /* Dashboard Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr 1fr;
+            height: calc(100vh - 64px);
+            gap: 16px;
+            padding: 16px;
+        }
+        
+        /* KPI Cards Row */
+        .kpi-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .kpi-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .kpi-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .kpi-delta {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .kpi-delta.positive { color: var(--accent-secondary); }
+        .kpi-delta.negative { color: var(--accent-danger); }
+        
+        /* Panels */
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .panel-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .panel-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .panel-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .panel-content {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+        
+        .panel-footer {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 280px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+        }
+        
+        .tooltip-header {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 6px;
+        }
+        
+        .tooltip-label {
+            color: var(--text-secondary);
+        }
+        
+        .tooltip-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        /* Chart Elements */
+        .axis text {
+            fill: var(--text-muted);
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .axis path, .axis line {
+            stroke: var(--border-color);
+        }
+        
+        .grid line {
+            stroke: var(--border-color);
+            stroke-opacity: 0.4;
+            stroke-dasharray: 2,2;
+        }
+        
+        .chart-label {
+            fill: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 11px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        /* Interactive Elements */
+        .interactive {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .interactive:hover {
+            filter: brightness(1.2);
+        }
+        
+        .dimmed {
+            opacity: 0.25;
+            filter: grayscale(0.5);
+        }
+        
+        .highlighted {
+            stroke: var(--accent-primary);
+            stroke-width: 2px;
+            filter: drop-shadow(0 0 4px rgba(14, 165, 233, 0.5));
+        }
+        
+        /* Brush */
+        .brush .selection {
+            fill: var(--accent-primary);
+            fill-opacity: 0.2;
+            stroke: var(--accent-primary);
+            stroke-width: 1;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-brand">
+            <h1>HealthLens</h1>
+            <span class="header-tagline">Medicare Part D & Marketplace Plan Analytics</span>
+        </div>
+        <div class="header-controls">
+            <span id="active-filter" class="filter-pill" style="display:none">Filter Active</span>
+            <button class="btn" onclick="resetFilters()">Reset All Filters</button>
+        </div>
+    </div>
+    
+    <div class="dashboard">
+        <!-- KPI Cards -->
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">Plans Analyzed</div>
+                <div class="kpi-value" id="kpi-plans">200</div>
+                <div class="kpi-delta positive">Across 4 Metal Tiers</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Top Drug Annual Cost</div>
+                <div class="kpi-value" id="kpi-drug-cost">$877M</div>
+                <div class="kpi-delta negative">Eliquis (Apixaban)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Insurers Compared</div>
+                <div class="kpi-value" id="kpi-insurers">8</div>
+                <div class="kpi-delta positive">Major Part D Providers</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">US Pharma Spending</div>
+                <div class="kpi-value" id="kpi-us-spend">$1,400</div>
+                <div class="kpi-delta negative">Per Capita PPP</div>
+            </div>
+        </div>
+        
+        <!-- P1: Plan Cost Overview -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-title">Plan Cost by Metal Tier</div>
+                    <div class="panel-subtitle">Annual premium + deductible comparison</div>
+                </div>
+            </div>
+            <div class="panel-content" id="panel-plans"></div>
+        </div>
+        
+        <!-- P2: Drug Coverage Analysis -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-title">Insurer Formulary Positioning</div>
+                    <div class="panel-subtitle">Average tier placement vs copay requirements</div>
+                </div>
+            </div>
+            <div class="panel-content" id="panel-coverage"></div>
+        </div>
+        
+        <!-- P3: Plan Comparison Matrix -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-title">Cost Structure Comparison</div>
+                    <div class="panel-subtitle">Sample plans across key dimensions</div>
+                </div>
+            </div>
+            <div class="panel-content" id="panel-matrix"></div>
+        </div>
+        
+        <!-- P4: Formulary Tier Heatmap -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-title">Top Drug Formulary Tiers</div>
+                    <div class="panel-subtitle">Coverage placement by insurer (illustrative)</div>
+                </div>
+            </div>
+            <div class="panel-content" id="panel-heatmap"></div>
+            <div class="panel-footer">
+                Tier colors: <span style="color:var(--tier-1)">Tier 1</span> (Preferred) → 
+                <span style="color:var(--tier-5)">Tier 5</span> (Specialty)
+            </div>
+        </div>
+        
+        <!-- P5: Global Benchmark -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-title">Global Pharmaceutical Spending</div>
+                    <div class="panel-subtitle">Per capita PPP-adjusted (OECD data)</div>
+                </div>
+            </div>
+            <div class="panel-content" id="panel-global"></div>
+        </div>
+        
+        <!-- P6: Patient Cost Projection -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <div class="panel-title">Patient OOP Cost Projection</div>
+                    <div class="panel-subtitle">Annual spending by formulary tier (Jardiance example)</div>
+                </div>
+            </div>
+            <div class="panel-content" id="panel-projection"></div>
+        </div>
+    </div>
+    
+    <div id="tooltip" class="tooltip" style="display:none"></div>
+
+    <script>
+        // Professional color palette
+        const colors = {
+            metal: {
+                Bronze: '#b45309',
+                Silver: '#64748b', 
+                Gold: '#eab308',
+                Platinum: '#94a3b8'
+            },
+            tier: ['#10b981', '#84cc16', '#eab308', '#f97316', '#dc2626'],
+            primary: '#0ea5e9',
+            grid: '#334155',
+            text: '#94a3b8'
+        };
+        
+        // State management
+        const state = {
+            selectedMetal: null,
+            selectedInsurers: [],
+            selectedDrug: null,
+            hoveredElement: null
+        };
+        
+        // Load data
+        Promise.all([
+            d3.json('data/plans.json'),
+            d3.json('data/partd_spending.json'),
+            d3.json('data/formulary.json'),
+            d3.json('data/countries.json'),
+            d3.json('data/spending_tracker.json'),
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+        ]).then(([plans, drugs, formulary, countries, tracker, worldData]) => {
+            initDashboard(plans, drugs, formulary, countries, tracker, worldData);
+        }).catch(err => {
+            console.error('Data loading error:', err);
+        });
+        
+        function initDashboard(plans, drugs, formulary, countries, tracker, worldData) {
+            // Update KPIs
+            d3.select('#kpi-plans').text(plans.length);
+            d3.select('#kpi-insurers').text([...new Set(formulary.map(d => d.insurer))].length);
+            
+            const topDrug = drugs.reduce((max, d) => d.total_spending_2023 > max.total_spending_2023 ? d : max, drugs[0]);
+            d3.select('#kpi-drug-cost').text('$' + (topDrug.total_spending_2023 / 1000000).toFixed(0) + 'M');
+            
+            const usData = countries.find(c => c.iso_code === 'USA');
+            if (usData) d3.select('#kpi-us-spend').text('$' + Math.round(usData.spending_ppp).toLocaleString());
+            
+            // Render panels
+            renderPlanOverview(plans);
+            renderCoverageAnalysis(formulary);
+            renderCostMatrix(plans);
+            renderFormularyHeatmap(formulary, drugs);
+            renderGlobalMap(countries, worldData);
+            renderCostProjection(tracker);
+        }
+        
+        // P1: Enhanced Plan Cost Overview
+        function renderPlanOverview(plans) {
+            const container = d3.select('#panel-plans');
+            const width = container.node().clientWidth;
+            const height = container.node().clientHeight;
+            const margin = {top: 20, right: 120, bottom: 50, left: 60};
+            
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Aggregate data
+            const metalData = ['Bronze', 'Silver', 'Gold', 'Platinum'].map(metal => {
+                const tierPlans = plans.filter(p => p.metal_level === metal);
+                return {
+                    metal,
+                    count: tierPlans.length,
+                    avgPremium: d3.mean(tierPlans, p => p.premium_annual) || 0,
+                    avgDeductible: d3.mean(tierPlans, p => p.deductible) || 0,
+                    avgMOOP: d3.mean(tierPlans, p => p.MOOP) || 0
+                };
+            });
+            
+            const x = d3.scaleBand()
+                .domain(metalData.map(d => d.metal))
+                .range([margin.left, width - margin.right])
+                .padding(0.4);
+            
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(metalData, d => d.avgPremium + d.avgDeductible) * 1.1])
+                .range([height - margin.bottom, margin.top]);
+            
+            // Grid
+            svg.append('g')
+                .attr('class', 'grid')
+                .attr('transform', `translate(${margin.left},0)`)
+                .call(d3.axisLeft(y).tickSize(-(width - margin.left - margin.right)).tickFormat(''));
+            
+            // Stacked bars with rounded tops
+            const barGroups = svg.selectAll('.bar-group')
+                .data(metalData)
+                .join('g')
+                .attr('class', 'bar-group interactive')
+                .on('click', (e, d) => {
+                    state.selectedMetal = state.selectedMetal === d.metal ? null : d.metal;
+                    updateDashboard();
+                });
+            
+            // Premium (bottom)
+            barGroups.append('rect')
+                .attr('x', d => x(d.metal))
+                .attr('y', d => y(d.avgPremium))
+                .attr('width', x.bandwidth())
+                .attr('height', d => y(0) - y(d.avgPremium))
+                .attr('fill', d => colors.metal[d.metal])
+                .attr('rx', 4);
+            
+            // Deductible (top)
+            barGroups.append('rect')
+                .attr('x', d => x(d.metal))
+                .attr('y', d => y(d.avgPremium + d.avgDeductible))
+                .attr('width', x.bandwidth())
+                .attr('height', d => y(d.avgPremium) - y(d.avgPremium + d.avgDeductible))
+                .attr('fill', d => d3.color(colors.metal[d.metal]).darker(0.3))
+                .attr('rx', 4);
+            
+            // Value labels on bars
+            barGroups.append('text')
+                .attr('x', d => x(d.metal) + x.bandwidth()/2)
+                .attr('y', d => y(d.avgPremium + d.avgDeductible) - 8)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '12px')
+                .attr('font-weight', '600')
+                .text(d => `$${Math.round((d.avgPremium + d.avgDeductible)/1000)}K`);
+            
+            // Count labels
+            barGroups.append('text')
+                .attr('x', d => x(d.metal) + x.bandwidth()/2)
+                .attr('y', height - margin.bottom + 20)
+                .attr('text-anchor', 'middle')
+                .attr('fill', colors.text)
+                .attr('font-size', '11px')
+                .text(d => `${d.count} plans`);
+            
+            // Axes
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height - margin.bottom})`)
+                .call(d3.axisBottom(x).tickSize(0))
+                .selectAll('text')
+                .attr('font-size', '13px')
+                .attr('font-weight', '500')
+                .attr('fill', 'white');
+            
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(${margin.left},0)`)
+                .call(d3.axisLeft(y).ticks(5).tickFormat(d => `$${d/1000}K`));
+            
+            // Legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(${width - 110}, ${margin.top})`);
+            
+            [['Premium', d => colors.metal[d.metal]], ['Deductible', d => d3.color(colors.metal[d.metal]).darker(0.3)]]
+                .forEach(([label, colorFn], i) => {
+                    legend.append('rect')
+                        .attr('y', i * 22)
+                        .attr('width', 14)
+                        .attr('height', 14)
+                        .attr('rx', 2)
+                        .attr('fill', colorFn({metal: 'Gold'}));
+                    
+                    legend.append('text')
+                        .attr('x', 20)
+                        .attr('y', i * 22 + 11)
+                        .attr('fill', colors.text)
+                        .attr('font-size', '11px')
+                        .text(label);
+                });
+            
+            // Tooltip
+            barGroups.on('mousemove', (e, d) => {
+                showTooltip(e, `
+                    <div class="tooltip-header">${d.metal} Plans</div>
+                    <div class="tooltip-row"><span class="tooltip-label">Avg Premium:</span><span class="tooltip-value">$${Math.round(d.avgPremium).toLocaleString()}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Avg Deductible:</span><span class="tooltip-value">$${Math.round(d.avgDeductible).toLocaleString()}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Avg MOOP:</span><span class="tooltip-value">$${Math.round(d.avgMOOP).toLocaleString()}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Plan Count:</span><span class="tooltip-value">${d.count}</span></div>
+                `);
+            }).on('mouseout', hideTooltip);
+        }
+        
+        // P2: Coverage Analysis (beeswarm instead of scatter)
+        function renderCoverageAnalysis(formulary) {
+            const container = d3.select('#panel-coverage');
+            const width = container.node().clientWidth;
+            const height = container.node().clientHeight;
+            const margin = {top: 30, right: 150, bottom: 50, left: 60};
+            
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Aggregate by insurer
+            const insurerData = d3.rollups(formulary,
+                v => ({
+                    name: v[0].insurer,
+                    avgTier: d3.mean(v, d => d.tier),
+                    avgCopay: d3.mean(v, d => d.copay),
+                    drugs: v.length,
+                    paRate: d3.mean(v, d => d.prior_auth_required ? 1 : 0),
+                    stepRate: d3.mean(v, d => d.step_therapy ? 1 : 0)
+                }),
+                d => d.insurer
+            ).map(([name, stats]) => stats).sort((a, b) => a.avgCopay - b.avgCopay);
+            
+            const x = d3.scaleLinear()
+                .domain([0, d3.max(insurerData, d => d.avgCopay) * 1.1])
+                .range([margin.left, width - margin.right]);
+            
+            const y = d3.scaleBand()
+                .domain(insurerData.map(d => d.name))
+                .range([margin.top, height - margin.bottom])
+                .padding(0.3);
+            
+            // Grid
+            svg.append('g')
+                .attr('class', 'grid')
+                .attr('transform', `translate(0,${height - margin.bottom})`)
+                .call(d3.axisBottom(x).tickSize(-(height - margin.top - margin.bottom)).tickFormat(''));
+            
+            // Bars instead of bubbles for clarity
+            const bars = svg.selectAll('.coverage-bar')
+                .data(insurerData)
+                .join('rect')
+                .attr('class', 'coverage-bar interactive')
+                .attr('x', margin.left)
+                .attr('y', d => y(d.name))
+                .attr('width', d => x(d.avgCopay) - margin.left)
+                .attr('height', y.bandwidth())
+                .attr('fill', d => colors.tier[Math.round(d.avgTier) - 1])
+                .attr('rx', 4)
+                .on('click', (e, d) => {
+                    state.selectedInsurers = state.selectedInsurers.includes(d.name) 
+                        ? state.selectedInsurers.filter(i => i !== d.name)
+                        : [...state.selectedInsurers, d.name];
+                    updateDashboard();
+                });
+            
+            // Insurer labels
+            svg.selectAll('.insurer-label')
+                .data(insurerData)
+                .join('text')
+                .attr('class', 'insurer-label')
+                .attr('x', margin.left - 10)
+                .attr('y', d => y(d.name) + y.bandwidth()/2 + 4)
+                .attr('text-anchor', 'end')
+                .attr('fill', 'white')
+                .attr('font-size', '11px')
+                .text(d => d.name.length > 15 ? d.name.slice(0, 15) + '...' : d.name);
+            
+            // Value labels
+            svg.selectAll('.value-label')
+                .data(insurerData)
+                .join('text')
+                .attr('class', 'value-label')
+                .attr('x', d => x(d.avgCopay) + 8)
+                .attr('y', d => y(d.name) + y.bandwidth()/2 + 4)
+                .attr('fill', colors.text)
+                .attr('font-size', '11px')
+                .attr('font-weight', '500')
+                .text(d => `$${d.avgCopay.toFixed(0)}`);
+            
+            // Axes
+            svg.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${height - margin.bottom})`)
+                .call(d3.axisBottom(x).ticks(5).tickFormat(d => `$${d}`));
+            
+            svg.append('text')
+                .attr('x', (width - margin.left - margin.right) / 2 + margin.left)
+                .attr('y', height - 12)
+                .attr('text-anchor', 'middle')
+                .attr('fill', colors.text)
+                .attr('font-size', '12px')
+                .text('Average Copay ($)');
+            
+            // Tooltip
+            bars.on('mousemove', (e, d) => {
+                showTooltip(e, `
+                    <div class="tooltip-header">${d.name}</div>
+                    <div class="tooltip-row"><span class="tooltip-label">Avg Copay:</span><span class="tooltip-value">$${d.avgCopay.toFixed(0)}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Avg Tier:</span><span class="tooltip-value">${d.avgTier.toFixed(1)}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Formulary Drugs:</span><span class="tooltip-value">${d.drugs}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Prior Auth Rate:</span><span class="tooltip-value">${(d.paRate * 100).toFixed(0)}%</span></div>
+                `);
+            }).on('mouseout', hideTooltip);
+        }
+        
+        // P3: Cost Structure Matrix (dot plot instead of parallel coords)
+        function renderCostMatrix(plans) {
+            const container = d3.select('#panel-matrix');
+            const width = container.node().clientWidth;
+            const height = container.node().clientHeight;
+            const margin = {top: 20, right: 30, bottom: 50, left: 100};
+            
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Sample plans for display
+            const sample = plans.filter(p => ['Gold', 'Silver', 'Bronze'].includes(p.metal_level))
+                .slice(0, 40);
+            
+            const metrics = [
+                {key: 'premium_annual', label: 'Annual Premium', max: 12000},
+                {key: 'deductible', label: 'Deductible', max: 10000},
+                {key: 'MOOP', label: 'MOOP', max: 10000}
+            ];
+            
+            const x = d3.scaleBand()
+                .domain(metrics.map(m => m.label))
+                .range([margin.left, width - margin.right])
+                .padding(0.4);
+            
+            const yScales = {};
+            metrics.forEach(m => {
+                yScales[m.key] = d3.scaleLinear()
+                    .domain([0, m.max])
+                    .range([height - margin.bottom, margin.top]);
+            });
+            
+            // Grid lines
+            metrics.forEach(m => {
+                const axis = d3.axisLeft(yScales[m.key]).tickSize(-x.bandwidth()).tickFormat('');
+                svg.append('g')
+                    .attr('class', 'grid')
+                    .attr('transform', `translate(${x(m.label)},0)`)
+                    .call(axis);
+            });
+            
+            // Draw dots for each metric
+            metrics.forEach(m => {
+                const metricX = x(m.label) + x.bandwidth()/2;
+                
+                svg.selectAll(`.dot-${m.key}`)
+                    .data(sample)
+                    .join('circle')
+                    .attr('class', d => `dot-${m.key} plan-dot metal-${d.metal_level}`)
+                    .attr('cx', metricX + (Math.random() - 0.5) * 20) // Jitter
+                    .attr('cy', d => yScales[m.key](d[m.key]))
+                    .attr('r', 5)
+                    .attr('fill', d => colors.metal[d.metal_level])
+                    .attr('opacity', 0.7)
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 1);
+            });
+            
+            // X axis labels
+            svg.selectAll('.metric-label')
+                .data(metrics)
+                .join('text')
+                .attr('class', 'metric-label')
+                .attr('x', d => x(d.label) + x.bandwidth()/2)
+                .attr('y', height - margin.bottom + 25)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '12px')
+                .attr('font-weight', '500')
+                .text(d => d.label);
+            
+            // Y axes
+            metrics.forEach(m => {
+                svg.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', `translate(${x(m.label)},0)`)
+                    .call(d3.axisLeft(yScales[m.key]).ticks(4).tickFormat(d => `$${d/1000}K`));
+            });
+            
+            // Legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(${width - 80}, ${margin.top})`);
+            
+            ['Gold', 'Silver', 'Bronze'].forEach((metal, i) => {
+                legend.append('circle')
+                    .attr('cx', 0)
+                    .attr('cy', i * 20)
+                    .attr('r', 6)
+                    .attr('fill', colors.metal[metal]);
+                
+                legend.append('text')
+                    .attr('x', 12)
+                    .attr('y', i * 20 + 4)
+                    .attr('fill', colors.text)
+                    .attr('font-size', '11px')
+                    .text(metal);
+            });
+        }
+        
+        // P4: Improved Formulary Heatmap
+        function renderFormularyHeatmap(formulary, drugs) {
+            const container = d3.select('#panel-heatmap');
+            const width = container.node().clientWidth;
+            const height = container.node().clientHeight;
+            const margin = {top: 45, right: 80, bottom: 10, left: 130};
+            
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Get data
+            const topDrugs = drugs.slice(0, 12).map(d => d.brand_name);
+            const insurers = [...new Set(formulary.map(d => d.insurer))].slice(0, 6);
+            
+            const filtered = formulary.filter(d => topDrugs.includes(d.drug_brand));
+            const formularyMap = new Map(filtered.map(d => [`${d.drug_brand}|${d.insurer}`, d]));
+            
+            const x = d3.scaleBand()
+                .domain(insurers)
+                .range([margin.left, width - margin.right])
+                .padding(0.08);
+            
+            const y = d3.scaleBand()
+                .domain(topDrugs)
+                .range([margin.top, height - margin.bottom])
+                .padding(0.1);
+            
+            // Cells with tier numbers inside
+            const cells = svg.selectAll('.cell')
+                .data(topDrugs.flatMap(drug => 
+                    insurers.map(insurer => {
+                        const key = `${drug}|${insurer}`;
+                        return formularyMap.get(key) || {drug_brand: drug, insurer, tier: 3, copay: 25};
+                    })
+                ))
+                .join('g')
+                .attr('class', 'cell interactive')
+                .on('click', (e, d) => {
+                    state.selectedDrug = state.selectedDrug === d.drug_brand ? null : d.drug_brand;
+                    updateDashboard();
+                });
+            
+            // Cell background
+            cells.append('rect')
+                .attr('x', d => x(d.insurer))
+                .attr('y', d => y(d.drug_brand))
+                .attr('width', x.bandwidth())
+                .attr('height', y.bandwidth())
+                .attr('fill', d => colors.tier[d.tier - 1])
+                .attr('rx', 3);
+            
+            // Tier number
+            cells.append('text')
+                .attr('x', d => x(d.insurer) + x.bandwidth()/2)
+                .attr('y', d => y(d.drug_brand) + y.bandwidth()/2 + 4)
+                .attr('text-anchor', 'middle')
+                .attr('fill', d => d.tier >= 4 ? 'white' : '#1e293b')
+                .attr('font-size', '11px')
+                .attr('font-weight', '600')
+                .text(d => d.tier);
+            
+            // X labels
+            svg.selectAll('.x-label')
+                .data(insurers)
+                .join('text')
+                .attr('class', 'x-label')
+                .attr('x', d => x(d) + x.bandwidth()/2)
+                .attr('y', margin.top - 10)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '10px')
+                .text(d => d.split(' ')[0]);
+            
+            // Y labels
+            svg.selectAll('.y-label')
+                .data(topDrugs)
+                .join('text')
+                .attr('class', 'y-label')
+                .attr('x', margin.left - 8)
+                .attr('y', d => y(d) + y.bandwidth()/2 + 4)
+                .attr('text-anchor', 'end')
+                .attr('fill', 'white')
+                .attr('font-size', '11px')
+                .text(d => d.length > 18 ? d.slice(0, 18) + '...' : d);
+            
+            // Legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(${width - 70}, ${margin.top})`);
+            
+            [1, 2, 3, 4, 5].forEach((tier, i) => {
+                legend.append('rect')
+                    .attr('y', i * 20)
+                    .attr('width', 14)
+                    .attr('height', 14)
+                    .attr('rx', 2)
+                    .attr('fill', colors.tier[tier - 1]);
+                
+                legend.append('text')
+                    .attr('x', 20)
+                    .attr('y', i * 20 + 11)
+                    .attr('fill', colors.text)
+                    .attr('font-size', '10px')
+                    .text(`T${tier}`);
+            });
+            
+            // Tooltip
+            cells.on('mousemove', (e, d) => {
+                showTooltip(e, `
+                    <div class="tooltip-header">${d.drug_brand}</div>
+                    <div class="tooltip-row"><span class="tooltip-label">Insurer:</span><span class="tooltip-value">${d.insurer}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Tier:</span><span class="tooltip-value">${d.tier}</span></div>
+                    <div class="tooltip-row"><span class="tooltip-label">Copay:</span><span class="tooltip-value">$${d.copay}</span></div>
+                    ${d.prior_auth_required ? '<div style="color:#ef4444;margin-top:6px;font-size:11px;">⚠ Prior Authorization Required</div>' : ''}
+                    ${d.step_therapy ? '<div style="color:#f59e0b;margin-top:4px;font-size:11px;">⚠ Step Therapy Applies</div>' : ''}
+                `);
+            }).on('mouseout', hideTooltip);
+        }
+        
+        // P5: Global Map
+        function renderGlobalMap(countries, worldData) {
+            const container = d3.select('#panel-global');
+            const width = container.node().clientWidth;
+            const height = container.node().clientHeight;
+            
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const countryMap = new Map(countries.map(c => [c.iso_code, c]));
+            const usData = countryMap.get('USA');
+            
+            const projection = d3.geoNaturalEarth1()
+                .scale(width / 4.5)
+                .translate([width / 2, height / 2 + 10]);
+            
+            const path = d3.geoPath().projection(projection);
+            
+            const maxSpend = d3.max(countries, d => d.spending_ppp);
+            const colorScale = d3.scaleSequential(d3.interpolateBlues)
+                .domain([0, maxSpend * 1.1]);
+            
+            const countriesGeo = topojson.feature(worldData, worldData.objects.countries).features;
+            
+            // Draw countries
+            svg.selectAll('.country')
+                .data(countriesGeo)
+                .join('path')
+                .attr('class', 'country interactive')
+                .attr('d', path)
+                .attr('fill', d => {
+                    const data = countryMap.get(d.id);
+                    return data ? colorScale(data.spending_ppp) : '#1e293b';
+                })
+                .attr('stroke', d => d.id === 'USA' ? colors.primary : 'var(--border-color)')
+                .attr('stroke-width', d => d.id === 'USA' ? 2 : 0.5)
+                .on('click', (e, d) => {
+                    const data = countryMap.get(d.id);
+                    if (data) {
+                        state.selectedCountry = data;
+                        updateDashboard();
+                    }
+                });
+            
+            // Legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(20, ${height - 50})`);
+            
+            const gradientId = 'map-gradient';
+            const defs = svg.append('defs');
+            const gradient = defs.append('linearGradient')
+                .attr('id', gradientId)
+                .attr('x1', '0%')
+                .attr('x2', '100%');
+            
+            gradient.selectAll('stop')
+                .data(d3.range(0, 1.01, 0.1))
+                .join('stop')
+                .attr('offset', d => `${d * 100}%`)
+                .attr('stop-color', d => colorScale(d * maxSpend * 1.1));
+            
+            legend.append('rect')
+                .attr('width', 150)
+                .attr('height', 12)
+                .attr('fill', `url(#${gradientId})`)
+                .attr('rx', 2);
+            
+            legend.append('text')
+                .attr('x', 0)
+                .attr('y', -5)
+                .attr('fill', colors.text)
+                .attr('font-size', '10px')
+                .text('$0');
+            
+            legend.append('text')
+                .attr('x', 150)
+                .attr('y', -5)
+                .attr('text-anchor', 'end')
+                .attr('fill', colors.text)
+                .attr('font-size', '10px')
+                .text(`$${Math.round(maxSpend)}+`);
+            
+            // US comparison text
+            if (usData) {
+                svg.append('text')
+                    .attr('x', width - 20)
+                    .attr('y', height - 20)
+                    .attr('text-anchor', 'end')
+                    .attr('fill', colors.primary)
+                    .attr('font-size', '11px')
+                    .attr('font-weight', '500')
+                    .text(`US: $${Math.round(usData.spending_ppp)} PPP`);
+            }
+        }
+        
+        // P6: Cost Projection
+        function renderCostProjection(tracker) {
+            const container = d3.select('#panel-projection');
+            const width = container.node().clientWidth;
+            const height = container.node().clientHeight;
+            const margin = {top: 20, right: 100, bottom: 40, left: 60};
+            
+            const svg = container.append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+            
+            const x = d3.scalePoint()
+                .domain(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+                .range([0, chartWidth]);
+            
+            const allValues = tracker.flatMap(t => t.monthly_data.map(d => d.cumulative_cost));
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(allValues) * 1.1])
+                .range([chartHeight, 0]);
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            // Grid
+            g.append('g')
+                .attr('class', 'grid')
+                .call(d3.axisLeft(y).tickSize(-chartWidth).tickFormat(''));
+            
+            // Lines for each scenario
+            const line = d3.line()
+                .x(d => x(d.month))
+                .y(d => y(d.cumulative_cost))
+                .curve(d3.curveMonotoneX);
+            
+            tracker.forEach(scenario => {
+                // Area under line
+                const area = d3.area()
+                    .x(d => x(d.month))
+                    .y0(chartHeight)
+                    .y1(d => y(d.cumulative_cost))
+                    .curve(d3.curveMonotoneX);
+                
+                g.append('path')
+                    .datum(scenario.monthly_data)
+                    .attr('fill', scenario.color)
+                    .attr('fill-opacity', 0.15)
+                    .attr('d', area);
+                
+                // Line
+                g.append('path')
+                    .datum(scenario.monthly_data)
+                    .attr('fill', 'none')
+                    .attr('stroke', scenario.color)
+                    .attr('stroke-width', 2.5)
+                    .attr('d', line);
+                
+                // End point
+                const last = scenario.monthly_data[scenario.monthly_data.length - 1];
+                g.append('circle')
+                    .attr('cx', x(last.month))
+                    .attr('cy', y(last.cumulative_cost))
+                    .attr('r', 5)
+                    .attr('fill', scenario.color)
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 2);
+            });
+            
+            // Axes
+            g.append('g')
+                .attr('class', 'axis')
+                .attr('transform', `translate(0,${chartHeight})`)
+                .call(d3.axisBottom(x).tickSize(0).tickPadding(10));
+            
+            g.append('g')
+                .attr('class', 'axis')
+                .call(d3.axisLeft(y).ticks(5).tickFormat(d => `$${d}`));
+            
+            // Y label
+            g.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -45)
+                .attr('x', -chartHeight/2)
+                .attr('text-anchor', 'middle')
+                .attr('fill', colors.text)
+                .attr('font-size', '11px')
+                .text('Cumulative Cost ($)');
+            
+            // Legend
+            const legend = g.append('g')
+                .attr('transform', `translate(${chartWidth + 15}, 0)`);
+            
+            tracker.forEach((scenario, i) => {
+                const last = scenario.monthly_data[scenario.monthly_data.length - 1];
+                
+                legend.append('circle')
+                    .attr('cy', i * 28)
+                    .attr('r', 6)
+                    .attr('fill', scenario.color);
+                
+                legend.append('text')
+                    .attr('x', 12)
+                    .attr('y', i * 28 + 4)
+                    .attr('fill', 'white')
+                    .attr('font-size', '11px')
+                    .attr('font-weight', '500')
+                    .text(`Tier ${scenario.tier}`);
+                
+                legend.append('text')
+                    .attr('x', 12)
+                    .attr('y', i * 28 + 16)
+                    .attr('fill', colors.text)
+                    .attr('font-size', '10px')
+                    .text(`$${last.cumulative_cost} total`);
+            });
+        }
+        
+        // Tooltip functions
+        function showTooltip(event, html) {
+            const tooltip = d3.select('#tooltip');
+            const x = event.clientX + 15;
+            const y = event.clientY - 10;
+            
+            tooltip.html(html)
+                .style('display', 'block')
+                .style('left', Math.min(x, window.innerWidth - 300) + 'px')
+                .style('top', Math.min(y, window.innerHeight - 200) + 'px');
+        }
+        
+        function hideTooltip() {
+            d3.select('#tooltip').style('display', 'none');
+        }
+        
+        // Update dashboard on filter change
+        function updateDashboard() {
+            const badge = d3.select('#active-filter');
+            const filters = [];
+            if (state.selectedMetal) filters.push(state.selectedMetal);
+            if (state.selectedDrug) filters.push(state.selectedDrug.slice(0, 12));
+            if (state.selectedInsurers.length) filters.push(`${state.selectedInsurers.length} insurers`);
+            
+            if (filters.length) {
+                badge.text(filters.join(' + ')).style('display', 'inline-block');
+            } else {
+                badge.style('display', 'none');
+            }
+            
+            // Apply dimming/highlighting
+            d3.selectAll('.plan-dot, .coverage-bar, .cell')
+                .classed('dimmed', false)
+                .classed('highlighted', false);
+            
+            if (state.selectedMetal) {
+                d3.selectAll('.plan-dot').classed('dimmed', d => d.metal_level !== state.selectedMetal);
+            }
+            
+            if (state.selectedInsurers.length) {
+                d3.selectAll('.coverage-bar').classed('dimmed', d => !state.selectedInsurers.includes(d.name));
+            }
+            
+            if (state.selectedDrug) {
+                d3.selectAll('.cell').classed('dimmed', d => d.drug_brand !== state.selectedDrug);
+            }
+        }
+        
+        function resetFilters() {
+            state.selectedMetal = null;
+            state.selectedDrug = null;
+            state.selectedInsurers = [];
+            updateDashboard();
+        }
+    </script>
+</body>
+</html>

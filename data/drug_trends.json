@@ -1,0 +1,342 @@
+[
+  {
+    "id": "eliquis",
+    "brand_name": "Eliquis",
+    "generic_name": "Apixaban",
+    "therapeutic_class": "Anticoagulant",
+    "condition": "AFib, DVT/PE",
+    "retail_price": 550,
+    "monthly_supply": "60 tablets",
+    "yearly_data": [
+      {
+        "year": 2019,
+        "total_spending": 7304981234.5,
+        "total_spending_billions": 7.3,
+        "claims": 12126472,
+        "beneficiaries": 2168489,
+        "cost_per_unit": 7.45,
+        "cost_per_claim": 602.4,
+        "cost_per_beneficiary": 3368.7
+      },
+      {
+        "year": 2020,
+        "total_spending": 9936069813.8,
+        "total_spending_billions": 9.94,
+        "claims": 14847081,
+        "beneficiaries": 2641941,
+        "cost_per_unit": 7.9,
+        "cost_per_claim": 669.23,
+        "cost_per_beneficiary": 3760.9
+      },
+      {
+        "year": 2021,
+        "total_spending": 12575145852.0,
+        "total_spending_billions": 12.58,
+        "claims": 17015798,
+        "beneficiaries": 3125087,
+        "cost_per_unit": 8.51,
+        "cost_per_claim": 739.03,
+        "cost_per_beneficiary": 4023.93
+      },
+      {
+        "year": 2022,
+        "total_spending": 15219812294.0,
+        "total_spending_billions": 15.22,
+        "claims": 18973041,
+        "beneficiaries": 3505142,
+        "cost_per_unit": 9.12,
+        "cost_per_claim": 802.18,
+        "cost_per_beneficiary": 4342.14
+      },
+      {
+        "year": 2023,
+        "total_spending": 18273451967.0,
+        "total_spending_billions": 18.27,
+        "claims": 21195452,
+        "beneficiaries": 3927848,
+        "cost_per_unit": 9.74,
+        "cost_per_claim": 862.14,
+        "cost_per_beneficiary": 4652.28
+      }
+    ],
+    "cagr_cost_per_unit": 6.93,
+    "yoy_change_22_23": 6.88,
+    "total_spending_growth_pct": 150.2,
+    "beneficiary_growth_pct": 81.1,
+    "latest_spending_b": 18.27,
+    "latest_beneficiaries_m": 3.93,
+    "latest_claims_m": 21.2
+  },
+  {
+    "id": "ozempic",
+    "brand_name": "Ozempic",
+    "generic_name": "Semaglutide",
+    "therapeutic_class": "GLP-1 Agonist",
+    "condition": "T2 Diabetes, Weight Mgmt",
+    "retail_price": 936,
+    "monthly_supply": "1 injection pen",
+    "yearly_data": [
+      {
+        "year": 2019,
+        "total_spending": 552401781.35,
+        "total_spending_billions": 0.55,
+        "claims": 523508,
+        "beneficiaries": 142494,
+        "cost_per_unit": 422.34,
+        "cost_per_claim": 1055.19,
+        "cost_per_beneficiary": 3876.67
+      },
+      {
+        "year": 2020,
+        "total_spending": 1455812267.1,
+        "total_spending_billions": 1.46,
+        "claims": 1204138,
+        "beneficiaries": 269663,
+        "cost_per_unit": 433.67,
+        "cost_per_claim": 1209.01,
+        "cost_per_beneficiary": 5398.64
+      },
+      {
+        "year": 2021,
+        "total_spending": 2621694348.3,
+        "total_spending_billions": 2.62,
+        "claims": 2016177,
+        "beneficiaries": 458643,
+        "cost_per_unit": 452.72,
+        "cost_per_claim": 1300.33,
+        "cost_per_beneficiary": 5716.2
+      },
+      {
+        "year": 2022,
+        "total_spending": 4628160643.4,
+        "total_spending_billions": 4.63,
+        "claims": 3410839,
+        "beneficiaries": 780253,
+        "cost_per_unit": 468.24,
+        "cost_per_claim": 1356.9,
+        "cost_per_beneficiary": 5931.62
+      },
+      {
+        "year": 2023,
+        "total_spending": 9194048435.1,
+        "total_spending_billions": 9.19,
+        "claims": 6927972,
+        "beneficiaries": 1464468,
+        "cost_per_unit": 355.9,
+        "cost_per_claim": 1327.09,
+        "cost_per_beneficiary": 6278.08
+      }
+    ],
+    "cagr_cost_per_unit": -4.19,
+    "yoy_change_22_23": -23.99,
+    "total_spending_growth_pct": 1564.4,
+    "beneficiary_growth_pct": 927.7,
+    "latest_spending_b": 9.19,
+    "latest_beneficiaries_m": 1.46,
+    "latest_claims_m": 6.93
+  },
+  {
+    "id": "jardiance",
+    "brand_name": "Jardiance",
+    "generic_name": "Empagliflozin",
+    "therapeutic_class": "SGLT2 Inhibitor",
+    "condition": "T2 Diabetes, Heart Failure",
+    "retail_price": 600,
+    "monthly_supply": "30 tablets",
+    "yearly_data": [
+      {
+        "year": 2019,
+        "total_spending": 1447618561.9,
+        "total_spending_billions": 1.45,
+        "claims": 1812087,
+        "beneficiaries": 421682,
+        "cost_per_unit": 16.4,
+        "cost_per_claim": 798.87,
+        "cost_per_beneficiary": 3432.96
+      },
+      {
+        "year": 2020,
+        "total_spending": 2376166292.5,
+        "total_spending_billions": 2.38,
+        "claims": 2677192,
+        "beneficiaries": 594859,
+        "cost_per_unit": 17.44,
+        "cost_per_claim": 887.56,
+        "cost_per_beneficiary": 3994.5
+      },
+      {
+        "year": 2021,
+        "total_spending": 3735773560.2,
+        "total_spending_billions": 3.74,
+        "claims": 3824726,
+        "beneficiaries": 884516,
+        "cost_per_unit": 18.61,
+        "cost_per_claim": 976.74,
+        "cost_per_beneficiary": 4223.52
+      },
+      {
+        "year": 2022,
+        "total_spending": 5851720782.0,
+        "total_spending_billions": 5.85,
+        "claims": 5653254,
+        "beneficiaries": 1321067,
+        "cost_per_unit": 19.51,
+        "cost_per_claim": 1035.11,
+        "cost_per_beneficiary": 4429.54
+      },
+      {
+        "year": 2023,
+        "total_spending": 8839935063.3,
+        "total_spending_billions": 8.84,
+        "claims": 8153238,
+        "beneficiaries": 1882768,
+        "cost_per_unit": 20.32,
+        "cost_per_claim": 1084.22,
+        "cost_per_beneficiary": 4695.18
+      }
+    ],
+    "cagr_cost_per_unit": 5.5,
+    "yoy_change_22_23": 4.15,
+    "total_spending_growth_pct": 510.7,
+    "beneficiary_growth_pct": 346.5,
+    "latest_spending_b": 8.84,
+    "latest_beneficiaries_m": 1.88,
+    "latest_claims_m": 8.15
+  },
+  {
+    "id": "trulicity",
+    "brand_name": "Trulicity",
+    "generic_name": "Dulaglutide",
+    "therapeutic_class": "GLP-1 Agonist",
+    "condition": "T2 Diabetes",
+    "retail_price": 984,
+    "monthly_supply": "4 injections",
+    "yearly_data": [
+      {
+        "year": 2019,
+        "total_spending": 2272876283.7,
+        "total_spending_billions": 2.27,
+        "claims": 2138442,
+        "beneficiaries": 392939,
+        "cost_per_unit": 381.47,
+        "cost_per_claim": 1062.87,
+        "cost_per_beneficiary": 5784.3
+      },
+      {
+        "year": 2020,
+        "total_spending": 3284873061.9,
+        "total_spending_billions": 3.28,
+        "claims": 2823185,
+        "beneficiaries": 497327,
+        "cost_per_unit": 400.68,
+        "cost_per_claim": 1163.53,
+        "cost_per_beneficiary": 6605.06
+      },
+      {
+        "year": 2021,
+        "total_spending": 4702174723.6,
+        "total_spending_billions": 4.7,
+        "claims": 3704201,
+        "beneficiaries": 663858,
+        "cost_per_unit": 432.43,
+        "cost_per_claim": 1269.42,
+        "cost_per_beneficiary": 7083.1
+      },
+      {
+        "year": 2022,
+        "total_spending": 6225291667.6,
+        "total_spending_billions": 6.23,
+        "claims": 4610823,
+        "beneficiaries": 840163,
+        "cost_per_unit": 459.01,
+        "cost_per_claim": 1350.15,
+        "cost_per_beneficiary": 7409.62
+      },
+      {
+        "year": 2023,
+        "total_spending": 7363856224.3,
+        "total_spending_billions": 7.36,
+        "claims": 5316020,
+        "beneficiaries": 938731,
+        "cost_per_unit": 483.21,
+        "cost_per_claim": 1385.22,
+        "cost_per_beneficiary": 7844.48
+      }
+    ],
+    "cagr_cost_per_unit": 6.09,
+    "yoy_change_22_23": 5.27,
+    "total_spending_growth_pct": 224.0,
+    "beneficiary_growth_pct": 138.9,
+    "latest_spending_b": 7.36,
+    "latest_beneficiaries_m": 0.94,
+    "latest_claims_m": 5.32
+  },
+  {
+    "id": "xarelto",
+    "brand_name": "Xarelto",
+    "generic_name": "Rivaroxaban",
+    "therapeutic_class": "Anticoagulant",
+    "condition": "AFib, DVT/PE",
+    "retail_price": 520,
+    "monthly_supply": "30 tablets",
+    "yearly_data": [
+      {
+        "year": 2019,
+        "total_spending": 4076953903.0,
+        "total_spending_billions": 4.08,
+        "claims": 6315952,
+        "beneficiaries": 1134089,
+        "cost_per_unit": 14.85,
+        "cost_per_claim": 645.5,
+        "cost_per_beneficiary": 3594.92
+      },
+      {
+        "year": 2020,
+        "total_spending": 4701314805.0,
+        "total_spending_billions": 4.7,
+        "claims": 6491930,
+        "beneficiaries": 1184718,
+        "cost_per_unit": 15.45,
+        "cost_per_claim": 724.18,
+        "cost_per_beneficiary": 3968.3
+      },
+      {
+        "year": 2021,
+        "total_spending": 5225547771.9,
+        "total_spending_billions": 5.23,
+        "claims": 6458283,
+        "beneficiaries": 1258010,
+        "cost_per_unit": 16.4,
+        "cost_per_claim": 809.12,
+        "cost_per_beneficiary": 4153.82
+      },
+      {
+        "year": 2022,
+        "total_spending": 5772682547.9,
+        "total_spending_billions": 5.77,
+        "claims": 6524784,
+        "beneficiaries": 1311333,
+        "cost_per_unit": 17.26,
+        "cost_per_claim": 884.73,
+        "cost_per_beneficiary": 4402.15
+      },
+      {
+        "year": 2023,
+        "total_spending": 6309246822.6,
+        "total_spending_billions": 6.31,
+        "claims": 6654162,
+        "beneficiaries": 1324165,
+        "cost_per_unit": 18.23,
+        "cost_per_claim": 948.17,
+        "cost_per_beneficiary": 4764.7
+      }
+    ],
+    "cagr_cost_per_unit": 5.26,
+    "yoy_change_22_23": 5.58,
+    "total_spending_growth_pct": 54.8,
+    "beneficiary_growth_pct": 16.8,
+    "latest_spending_b": 6.31,
+    "latest_beneficiaries_m": 1.32,
+    "latest_claims_m": 6.65
+  }
+]

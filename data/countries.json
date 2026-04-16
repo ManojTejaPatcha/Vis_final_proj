@@ -1,0 +1,194 @@
+[
+  {
+    "country": "Australia",
+    "iso_code": "AUS",
+    "spending_ppp": 551.6,
+    "year": 2022
+  },
+  {
+    "country": "Austria",
+    "iso_code": "AUT",
+    "spending_ppp": 636.5,
+    "year": 2023
+  },
+  {
+    "country": "Belgium",
+    "iso_code": "BEL",
+    "spending_ppp": 1154.3,
+    "year": 2024
+  },
+  {
+    "country": "Canada",
+    "iso_code": "CAN",
+    "spending_ppp": 958.4,
+    "year": 2023
+  },
+  {
+    "country": "Chile",
+    "iso_code": "CHL",
+    "spending_ppp": 308.2,
+    "year": 2024
+  },
+  {
+    "country": "Colombia",
+    "iso_code": "COL",
+    "spending_ppp": 331.5,
+    "year": 2023
+  },
+  {
+    "country": "Denmark",
+    "iso_code": "DNK",
+    "spending_ppp": 793.0,
+    "year": 2024
+  },
+  {
+    "country": "Estonia",
+    "iso_code": "EST",
+    "spending_ppp": 621.6,
+    "year": 2024
+  },
+  {
+    "country": "Finland",
+    "iso_code": "FIN",
+    "spending_ppp": 663.6,
+    "year": 2022
+  },
+  {
+    "country": "France",
+    "iso_code": "FRA",
+    "spending_ppp": 557.5,
+    "year": 2023
+  },
+  {
+    "country": "Germany",
+    "iso_code": "DEU",
+    "spending_ppp": 971.8,
+    "year": 2023
+  },
+  {
+    "country": "Hungary",
+    "iso_code": "HUN",
+    "spending_ppp": 414.7,
+    "year": 2024
+  },
+  {
+    "country": "Iceland",
+    "iso_code": "ISL",
+    "spending_ppp": 849.2,
+    "year": 2021
+  },
+  {
+    "country": "Ireland",
+    "iso_code": "IRL",
+    "spending_ppp": 750.8,
+    "year": 2023
+  },
+  {
+    "country": "Italy",
+    "iso_code": "ITA",
+    "spending_ppp": 752.5,
+    "year": 2024
+  },
+  {
+    "country": "Japan",
+    "iso_code": "JPN",
+    "spending_ppp": 846.9,
+    "year": 2023
+  },
+  {
+    "country": "Korea",
+    "iso_code": "KOR",
+    "spending_ppp": 968.9,
+    "year": 2023
+  },
+  {
+    "country": "Latvia",
+    "iso_code": "LVA",
+    "spending_ppp": 662.2,
+    "year": 2024
+  },
+  {
+    "country": "Luxembourg",
+    "iso_code": "LUX",
+    "spending_ppp": 651.9,
+    "year": 2024
+  },
+  {
+    "country": "Mexico",
+    "iso_code": "MEX",
+    "spending_ppp": 195.2,
+    "year": 2018
+  },
+  {
+    "country": "Netherlands",
+    "iso_code": "NLD",
+    "spending_ppp": 392.1,
+    "year": 2023
+  },
+  {
+    "country": "New Zealand",
+    "iso_code": "NZL",
+    "spending_ppp": 308.8,
+    "year": 2024
+  },
+  {
+    "country": "Norway",
+    "iso_code": "NOR",
+    "spending_ppp": 833.1,
+    "year": 2024
+  },
+  {
+    "country": "Poland",
+    "iso_code": "POL",
+    "spending_ppp": 242.0,
+    "year": 2024
+  },
+  {
+    "country": "Portugal",
+    "iso_code": "PRT",
+    "spending_ppp": 605.1,
+    "year": 2024
+  },
+  {
+    "country": "Slovak Republic",
+    "iso_code": "SVK",
+    "spending_ppp": 710.3,
+    "year": 2023
+  },
+  {
+    "country": "Slovenia",
+    "iso_code": "SVN",
+    "spending_ppp": 637.9,
+    "year": 2023
+  },
+  {
+    "country": "Spain",
+    "iso_code": "ESP",
+    "spending_ppp": 898.8,
+    "year": 2024
+  },
+  {
+    "country": "Sweden",
+    "iso_code": "SWE",
+    "spending_ppp": 745.8,
+    "year": 2024
+  },
+  {
+    "country": "Switzerland",
+    "iso_code": "CHE",
+    "spending_ppp": 932.1,
+    "year": 2024
+  },
+  {
+    "country": "United Kingdom",
+    "iso_code": "GBR",
+    "spending_ppp": 780.3,
+    "year": 2024
+  },
+  {
+    "country": "United States",
+    "iso_code": "USA",
+    "spending_ppp": 1400.0,
+    "year": 2023
+  }
+]

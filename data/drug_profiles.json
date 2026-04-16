@@ -1,0 +1,57 @@
+[
+  {
+    "id": "eliquis",
+    "brand_name": "Eliquis",
+    "generic_name": "Apixaban",
+    "therapeutic_class": "Anticoagulant",
+    "condition": "Atrial Fibrillation, DVT/PE",
+    "avg_claim_cost": 862,
+    "retail_price": 550,
+    "monthly_supply": 60,
+    "description": "Blood thinner to prevent stroke and blood clots"
+  },
+  {
+    "id": "ozempic",
+    "brand_name": "Ozempic",
+    "generic_name": "Semaglutide",
+    "therapeutic_class": "GLP-1 Agonist",
+    "condition": "Type 2 Diabetes, Weight Management",
+    "avg_claim_cost": 1327,
+    "retail_price": 936,
+    "monthly_supply": 1,
+    "description": "Weekly injection for blood sugar control and weight loss"
+  },
+  {
+    "id": "jardiance",
+    "brand_name": "Jardiance",
+    "generic_name": "Empagliflozin",
+    "therapeutic_class": "SGLT2 Inhibitor",
+    "condition": "Type 2 Diabetes, Heart Failure",
+    "avg_claim_cost": 570,
+    "retail_price": 600,
+    "monthly_supply": 30,
+    "description": "Oral medication for diabetes with heart benefits"
+  },
+  {
+    "id": "trulicity",
+    "brand_name": "Trulicity",
+    "generic_name": "Dulaglutide",
+    "therapeutic_class": "GLP-1 Agonist",
+    "condition": "Type 2 Diabetes",
+    "avg_claim_cost": 1385,
+    "retail_price": 984,
+    "monthly_supply": 4,
+    "description": "Weekly injection for type 2 diabetes management"
+  },
+  {
+    "id": "xarelto",
+    "brand_name": "Xarelto",
+    "generic_name": "Rivaroxaban",
+    "therapeutic_class": "Anticoagulant",
+    "condition": "Atrial Fibrillation, DVT/PE",
+    "avg_claim_cost": 948,
+    "retail_price": 520,
+    "monthly_supply": 30,
+    "description": "Once-daily blood thinner for stroke prevention"
+  }
+]

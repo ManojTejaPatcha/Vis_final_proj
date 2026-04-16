@@ -1,0 +1,292 @@
+[
+  {
+    "brand_name": "Eliquis",
+    "generic_name": "Apixaban",
+    "total_spending_2023": 18273451967.0,
+    "dosage_units_2023": 1875283428.8,
+    "claims_2023": 21195452.0,
+    "beneficiaries_2023": 3927848.0,
+    "avg_cost_per_unit": 9.7446967132,
+    "avg_cost_per_claim": 862.14023496
+  },
+  {
+    "brand_name": "Ozempic",
+    "generic_name": "Semaglutide",
+    "total_spending_2023": 9194048435.1,
+    "dosage_units_2023": 26990261.403,
+    "claims_2023": 6927972.0,
+    "beneficiaries_2023": 1464468.0,
+    "avg_cost_per_unit": 355.90270351,
+    "avg_cost_per_claim": 1327.0908767
+  },
+  {
+    "brand_name": "Jardiance",
+    "generic_name": "Empagliflozin",
+    "total_spending_2023": 8839935063.3,
+    "dosage_units_2023": 435253096.37,
+    "claims_2023": 8153238.0,
+    "beneficiaries_2023": 1882768.0,
+    "avg_cost_per_unit": 20.317966064,
+    "avg_cost_per_claim": 1084.2238462
+  },
+  {
+    "brand_name": "Trulicity",
+    "generic_name": "Dulaglutide",
+    "total_spending_2023": 7363856224.3,
+    "dosage_units_2023": 15240416.417,
+    "claims_2023": 5316020.0,
+    "beneficiaries_2023": 938731.0,
+    "avg_cost_per_unit": 483.20525328,
+    "avg_cost_per_claim": 1385.2198119
+  },
+  {
+    "brand_name": "Xarelto",
+    "generic_name": "Rivaroxaban",
+    "total_spending_2023": 6309246822.6,
+    "dosage_units_2023": 353267092.74,
+    "claims_2023": 6654162.0,
+    "beneficiaries_2023": 1324165.0,
+    "avg_cost_per_unit": 18.225776573,
+    "avg_cost_per_claim": 948.16549741
+  },
+  {
+    "brand_name": "Trelegy Ellipta",
+    "generic_name": "Fluticasone/Umeclidin/Vilanter",
+    "total_spending_2023": 4455884009.7,
+    "dosage_units_2023": 398579165.99,
+    "claims_2023": 5009961.0,
+    "beneficiaries_2023": 1050583.0,
+    "avg_cost_per_unit": 11.179466384,
+    "avg_cost_per_claim": 889.40492945
+  },
+  {
+    "brand_name": "Humira(Cf) Pen",
+    "generic_name": "Adalimumab",
+    "total_spending_2023": 4419828188.3,
+    "dosage_units_2023": 1182524.4,
+    "claims_2023": 478808.0,
+    "beneficiaries_2023": 61474.0,
+    "avg_cost_per_unit": 3750.063537,
+    "avg_cost_per_claim": 9230.8987909
+  },
+  {
+    "brand_name": "Farxiga",
+    "generic_name": "Dapagliflozin Propanediol",
+    "total_spending_2023": 4342182307.3,
+    "dosage_units_2023": 222129205.0,
+    "claims_2023": 4298827.0,
+    "beneficiaries_2023": 993909.0,
+    "avg_cost_per_unit": 19.547871688,
+    "avg_cost_per_claim": 1010.0853808
+  },
+  {
+    "brand_name": "Januvia",
+    "generic_name": "Sitagliptin Phosphate",
+    "total_spending_2023": 4090836820.7,
+    "dosage_units_2023": 216685586.11,
+    "claims_2023": 4029094.0,
+    "beneficiaries_2023": 843391.0,
+    "avg_cost_per_unit": 18.88030265,
+    "avg_cost_per_claim": 1015.3242443
+  },
+  {
+    "brand_name": "Revlimid",
+    "generic_name": "Lenalidomide",
+    "total_spending_2023": 3859804788.6,
+    "dosage_units_2023": 4395154.0,
+    "claims_2023": 216207.0,
+    "beneficiaries_2023": 36967.0,
+    "avg_cost_per_unit": 878.21219633,
+    "avg_cost_per_claim": 17852.358104
+  },
+  {
+    "brand_name": "Entresto",
+    "generic_name": "Sacubitril/Valsartan",
+    "total_spending_2023": 3430441590.4,
+    "dosage_units_2023": 294653475.5,
+    "claims_2023": 3200200.0,
+    "beneficiaries_2023": 663587.0,
+    "avg_cost_per_unit": 11.641913547,
+    "avg_cost_per_claim": 1071.9460004
+  },
+  {
+    "brand_name": "Lantus Solostar",
+    "generic_name": "Insulin Glargine,Hum.Rec.Anlog",
+    "total_spending_2023": 3157233281.8,
+    "dosage_units_2023": 104272932.8,
+    "claims_2023": 4936965.0,
+    "beneficiaries_2023": 1198294.0,
+    "avg_cost_per_unit": 30.278550695,
+    "avg_cost_per_claim": 639.50894563
+  },
+  {
+    "brand_name": "Biktarvy",
+    "generic_name": "Bictegrav/Emtricit/Tenofov Ala",
+    "total_spending_2023": 3152256268.6,
+    "dosage_units_2023": 23678920.5,
+    "claims_2023": 756486.0,
+    "beneficiaries_2023": 83843.0,
+    "avg_cost_per_unit": 133.12517433,
+    "avg_cost_per_claim": 4166.972381
+  },
+  {
+    "brand_name": "Stelara*",
+    "generic_name": "Ustekinumab",
+    "total_spending_2023": 2987778599.9,
+    "dosage_units_2023": 238312.01,
+    "claims_2023": 117068.0,
+    "beneficiaries_2023": 22930.0,
+    "avg_cost_per_unit": 26818.031631,
+    "avg_cost_per_claim": 25521.736084
+  },
+  {
+    "brand_name": "Xtandi",
+    "generic_name": "Enzalutamide",
+    "total_spending_2023": 2601510278.2,
+    "dosage_units_2023": 19311687.0,
+    "claims_2023": 191657.0,
+    "beneficiaries_2023": 28658.0,
+    "avg_cost_per_unit": 146.13091367,
+    "avg_cost_per_claim": 13573.781695
+  },
+  {
+    "brand_name": "Myrbetriq",
+    "generic_name": "Mirabegron",
+    "total_spending_2023": 2510288599.9,
+    "dosage_units_2023": 162854788.1,
+    "claims_2023": 3651587.0,
+    "beneficiaries_2023": 769978.0,
+    "avg_cost_per_unit": 15.427808724,
+    "avg_cost_per_claim": 687.45140124
+  },
+  {
+    "brand_name": "Imbruvica",
+    "generic_name": "Ibrutinib",
+    "total_spending_2023": 2371893291.7,
+    "dosage_units_2023": 5656766.0,
+    "claims_2023": 152032.0,
+    "beneficiaries_2023": 17100.0,
+    "avg_cost_per_unit": 486.62507369,
+    "avg_cost_per_claim": 15601.27665
+  },
+  {
+    "brand_name": "Mounjaro",
+    "generic_name": "Tirzepatide",
+    "total_spending_2023": 2361384157.1,
+    "dosage_units_2023": 4374599.5,
+    "claims_2023": 1821486.0,
+    "beneficiaries_2023": 370203.0,
+    "avg_cost_per_unit": 539.81748741,
+    "avg_cost_per_claim": 1296.405329
+  },
+  {
+    "brand_name": "Enbrel Sureclick",
+    "generic_name": "Etanercept",
+    "total_spending_2023": 2054858498.8,
+    "dosage_units_2023": 1133801.14,
+    "claims_2023": 263299.0,
+    "beneficiaries_2023": 34287.0,
+    "avg_cost_per_unit": 1812.3623502,
+    "avg_cost_per_claim": 7804.2776417
+  },
+  {
+    "brand_name": "Ibrance",
+    "generic_name": "Palbociclib",
+    "total_spending_2023": 2020903604.2,
+    "dosage_units_2023": 2683726.0,
+    "claims_2023": 128974.0,
+    "beneficiaries_2023": 16015.0,
+    "avg_cost_per_unit": 753.01593912,
+    "avg_cost_per_claim": 15669.077521
+  },
+  {
+    "brand_name": "1st Tier Unifine Pentips",
+    "generic_name": "Pen Needle, Diabetic",
+    "total_spending_2023": 44355.04,
+    "dosage_units_2023": 195672.0,
+    "claims_2023": 1613.0,
+    "beneficiaries_2023": 699.0,
+    "avg_cost_per_unit": 0.2271618646,
+    "avg_cost_per_claim": 27.498474892
+  },
+  {
+    "brand_name": "1st Tier Unifine Pentips Plus",
+    "generic_name": "Pen Needle, Diabetic",
+    "total_spending_2023": 97951.18,
+    "dosage_units_2023": 406617.0,
+    "claims_2023": 3269.0,
+    "beneficiaries_2023": 1267.0,
+    "avg_cost_per_unit": 0.2409322287,
+    "avg_cost_per_claim": 29.963652493
+  },
+  {
+    "brand_name": "Actoplus Met",
+    "generic_name": "Pioglitazone HCl/Metformin HCl",
+    "total_spending_2023": 131484.67,
+    "dosage_units_2023": 12857.0,
+    "claims_2023": 143.0,
+    "beneficiaries_2023": 27.0,
+    "avg_cost_per_unit": 10.226699074,
+    "avg_cost_per_claim": 919.47321678
+  },
+  {
+    "brand_name": "Admelog",
+    "generic_name": "Insulin Lispro",
+    "total_spending_2023": 1393723.53,
+    "dosage_units_2023": 129533.14,
+    "claims_2023": 10933.0,
+    "beneficiaries_2023": 4971.0,
+    "avg_cost_per_unit": 10.759590403,
+    "avg_cost_per_claim": 127.47859965
+  },
+  {
+    "brand_name": "Admelog Solostar",
+    "generic_name": "Insulin Lispro",
+    "total_spending_2023": 4074926.77,
+    "dosage_units_2023": 304125.3,
+    "claims_2023": 24807.0,
+    "beneficiaries_2023": 11113.0,
+    "avg_cost_per_unit": 13.39884176,
+    "avg_cost_per_claim": 164.26519813
+  },
+  {
+    "brand_name": "Advocate Pen Needle",
+    "generic_name": "Pen Needle, Diabetic",
+    "total_spending_2023": 210908.62,
+    "dosage_units_2023": 284560.0,
+    "claims_2023": 1803.0,
+    "beneficiaries_2023": 809.0,
+    "avg_cost_per_unit": 0.741174515,
+    "avg_cost_per_claim": 116.97649473
+  },
+  {
+    "brand_name": "Advocate Pen Needles",
+    "generic_name": "Pen Needle, Diabetic",
+    "total_spending_2023": 1797604.62,
+    "dosage_units_2023": 2528681.999,
+    "claims_2023": 19094.0,
+    "beneficiaries_2023": 7160.0,
+    "avg_cost_per_unit": 0.7104687648,
+    "avg_cost_per_claim": 94.144999476
+  },
+  {
+    "brand_name": "Advocate Syringes",
+    "generic_name": "Syringe And Needle,Insulin,1ml",
+    "total_spending_2023": 517878.97,
+    "dosage_units_2023": 702615.0,
+    "claims_2023": 7860.0,
+    "beneficiaries_2023": 2200.0,
+    "avg_cost_per_unit": 0.7370601835,
+    "avg_cost_per_claim": 65.887909669
+  },
+  {
+    "brand_name": "Afrezza",
+    "generic_name": "Insulin Regular, Human",
+    "total_spending_2023": 22608793.54,
+    "dosage_units_2023": 2260531.0,
+    "claims_2023": 10538.0,
+    "beneficiaries_2023": 2623.0,
+    "avg_cost_per_unit": 9.8381581672,
+    "avg_cost_per_claim": 2145.4539324
+  }
+]

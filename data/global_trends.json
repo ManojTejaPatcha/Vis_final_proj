@@ -1,0 +1,481 @@
+[
+  {
+    "country": "Germany",
+    "iso_code": "DEU",
+    "flag": "\ud83c\udde9\ud83c\uddea",
+    "system": "Statutory Insurance",
+    "yearly_data": [
+      {
+        "year": 2010,
+        "spending_per_capita": 451.4
+      },
+      {
+        "year": 2011,
+        "spending_per_capita": 469.3
+      },
+      {
+        "year": 2012,
+        "spending_per_capita": 480.8
+      },
+      {
+        "year": 2013,
+        "spending_per_capita": 504.5
+      },
+      {
+        "year": 2014,
+        "spending_per_capita": 539.0
+      },
+      {
+        "year": 2015,
+        "spending_per_capita": 556.3
+      },
+      {
+        "year": 2016,
+        "spending_per_capita": 582.8
+      },
+      {
+        "year": 2017,
+        "spending_per_capita": 604.1
+      },
+      {
+        "year": 2018,
+        "spending_per_capita": 725.4
+      },
+      {
+        "year": 2019,
+        "spending_per_capita": 785.6
+      },
+      {
+        "year": 2020,
+        "spending_per_capita": 836.2
+      },
+      {
+        "year": 2021,
+        "spending_per_capita": 906.5
+      },
+      {
+        "year": 2022,
+        "spending_per_capita": 964.9
+      },
+      {
+        "year": 2023,
+        "spending_per_capita": 971.8
+      }
+    ],
+    "latest_year": 2023,
+    "latest_spending": 971.8,
+    "first_year": 2010,
+    "first_spending": 451.4,
+    "growth_pct": 115.3
+  },
+  {
+    "country": "Canada",
+    "iso_code": "CAN",
+    "flag": "\ud83c\udde8\ud83c\udde6",
+    "system": "Public + Private",
+    "yearly_data": [
+      {
+        "year": 2012,
+        "spending_per_capita": 562.4
+      },
+      {
+        "year": 2013,
+        "spending_per_capita": 572.4
+      },
+      {
+        "year": 2014,
+        "spending_per_capita": 585.3
+      },
+      {
+        "year": 2015,
+        "spending_per_capita": 608.8
+      },
+      {
+        "year": 2016,
+        "spending_per_capita": 650.1
+      },
+      {
+        "year": 2017,
+        "spending_per_capita": 672.1
+      },
+      {
+        "year": 2018,
+        "spending_per_capita": 684.2
+      },
+      {
+        "year": 2019,
+        "spending_per_capita": 694.8
+      },
+      {
+        "year": 2020,
+        "spending_per_capita": 749.7
+      },
+      {
+        "year": 2021,
+        "spending_per_capita": 828.0
+      },
+      {
+        "year": 2022,
+        "spending_per_capita": 890.8
+      },
+      {
+        "year": 2023,
+        "spending_per_capita": 958.4
+      }
+    ],
+    "latest_year": 2023,
+    "latest_spending": 958.4,
+    "first_year": 2012,
+    "first_spending": 562.4,
+    "growth_pct": 70.4
+  },
+  {
+    "country": "Switzerland",
+    "iso_code": "CHE",
+    "flag": "\ud83c\udde8\ud83c\udded",
+    "system": "Mandatory Private",
+    "yearly_data": [
+      {
+        "year": 2010,
+        "spending_per_capita": 500.6
+      },
+      {
+        "year": 2011,
+        "spending_per_capita": 522.4
+      },
+      {
+        "year": 2012,
+        "spending_per_capita": 548.3
+      },
+      {
+        "year": 2013,
+        "spending_per_capita": 558.6
+      },
+      {
+        "year": 2014,
+        "spending_per_capita": 565.1
+      },
+      {
+        "year": 2015,
+        "spending_per_capita": 604.3
+      },
+      {
+        "year": 2016,
+        "spending_per_capita": 633.9
+      },
+      {
+        "year": 2017,
+        "spending_per_capita": 649.5
+      },
+      {
+        "year": 2018,
+        "spending_per_capita": 658.0
+      },
+      {
+        "year": 2019,
+        "spending_per_capita": 688.7
+      },
+      {
+        "year": 2020,
+        "spending_per_capita": 716.3
+      },
+      {
+        "year": 2021,
+        "spending_per_capita": 773.6
+      },
+      {
+        "year": 2022,
+        "spending_per_capita": 876.9
+      },
+      {
+        "year": 2023,
+        "spending_per_capita": 895.9
+      },
+      {
+        "year": 2024,
+        "spending_per_capita": 932.1
+      }
+    ],
+    "latest_year": 2024,
+    "latest_spending": 932.1,
+    "first_year": 2010,
+    "first_spending": 500.6,
+    "growth_pct": 86.2
+  },
+  {
+    "country": "Japan",
+    "iso_code": "JPN",
+    "flag": "\ud83c\uddef\ud83c\uddf5",
+    "system": "Universal Statutory",
+    "yearly_data": [
+      {
+        "year": 2010,
+        "spending_per_capita": 473.9
+      },
+      {
+        "year": 2011,
+        "spending_per_capita": 508.7
+      },
+      {
+        "year": 2012,
+        "spending_per_capita": 524.4
+      },
+      {
+        "year": 2013,
+        "spending_per_capita": 534.1
+      },
+      {
+        "year": 2014,
+        "spending_per_capita": 502.6
+      },
+      {
+        "year": 2015,
+        "spending_per_capita": 513.2
+      },
+      {
+        "year": 2016,
+        "spending_per_capita": 494.1
+      },
+      {
+        "year": 2017,
+        "spending_per_capita": 503.9
+      },
+      {
+        "year": 2018,
+        "spending_per_capita": 523.2
+      },
+      {
+        "year": 2019,
+        "spending_per_capita": 725.3
+      },
+      {
+        "year": 2020,
+        "spending_per_capita": 729.0
+      },
+      {
+        "year": 2021,
+        "spending_per_capita": 736.8
+      },
+      {
+        "year": 2022,
+        "spending_per_capita": 845.3
+      },
+      {
+        "year": 2023,
+        "spending_per_capita": 846.9
+      }
+    ],
+    "latest_year": 2023,
+    "latest_spending": 846.9,
+    "first_year": 2010,
+    "first_spending": 473.9,
+    "growth_pct": 78.7
+  },
+  {
+    "country": "United Kingdom",
+    "iso_code": "GBR",
+    "flag": "\ud83c\uddec\ud83c\udde7",
+    "system": "NHS (single-payer)",
+    "yearly_data": [
+      {
+        "year": 2010,
+        "spending_per_capita": 298.5
+      },
+      {
+        "year": 2011,
+        "spending_per_capita": 290.6
+      },
+      {
+        "year": 2012,
+        "spending_per_capita": 308.1
+      },
+      {
+        "year": 2013,
+        "spending_per_capita": 327.5
+      },
+      {
+        "year": 2014,
+        "spending_per_capita": 354.4
+      },
+      {
+        "year": 2015,
+        "spending_per_capita": 392.5
+      },
+      {
+        "year": 2016,
+        "spending_per_capita": 410.7
+      },
+      {
+        "year": 2017,
+        "spending_per_capita": 432.4
+      },
+      {
+        "year": 2018,
+        "spending_per_capita": 448.5
+      },
+      {
+        "year": 2019,
+        "spending_per_capita": 536.8
+      },
+      {
+        "year": 2020,
+        "spending_per_capita": 598.1
+      },
+      {
+        "year": 2021,
+        "spending_per_capita": 648.6
+      },
+      {
+        "year": 2022,
+        "spending_per_capita": 725.4
+      },
+      {
+        "year": 2023,
+        "spending_per_capita": 749.0
+      },
+      {
+        "year": 2024,
+        "spending_per_capita": 780.3
+      }
+    ],
+    "latest_year": 2024,
+    "latest_spending": 780.3,
+    "first_year": 2010,
+    "first_spending": 298.5,
+    "growth_pct": 161.4
+  },
+  {
+    "country": "France",
+    "iso_code": "FRA",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "system": "Universal + Supplementary",
+    "yearly_data": [
+      {
+        "year": 2010,
+        "spending_per_capita": 385.5
+      },
+      {
+        "year": 2011,
+        "spending_per_capita": 391.2
+      },
+      {
+        "year": 2012,
+        "spending_per_capita": 378.3
+      },
+      {
+        "year": 2013,
+        "spending_per_capita": 382.3
+      },
+      {
+        "year": 2014,
+        "spending_per_capita": 373.5
+      },
+      {
+        "year": 2015,
+        "spending_per_capita": 372.3
+      },
+      {
+        "year": 2016,
+        "spending_per_capita": 385.5
+      },
+      {
+        "year": 2017,
+        "spending_per_capita": 390.2
+      },
+      {
+        "year": 2018,
+        "spending_per_capita": 405.9
+      },
+      {
+        "year": 2019,
+        "spending_per_capita": 441.9
+      },
+      {
+        "year": 2020,
+        "spending_per_capita": 468.8
+      },
+      {
+        "year": 2021,
+        "spending_per_capita": 476.9
+      },
+      {
+        "year": 2022,
+        "spending_per_capita": 530.7
+      },
+      {
+        "year": 2023,
+        "spending_per_capita": 557.5
+      }
+    ],
+    "latest_year": 2023,
+    "latest_spending": 557.5,
+    "first_year": 2010,
+    "first_spending": 385.5,
+    "growth_pct": 44.6
+  },
+  {
+    "country": "Australia",
+    "iso_code": "AUS",
+    "flag": "\ud83c\udde6\ud83c\uddfa",
+    "system": "Medicare + PBS",
+    "yearly_data": [
+      {
+        "year": 2010,
+        "spending_per_capita": 295.7
+      },
+      {
+        "year": 2011,
+        "spending_per_capita": 304.0
+      },
+      {
+        "year": 2012,
+        "spending_per_capita": 295.8
+      },
+      {
+        "year": 2013,
+        "spending_per_capita": 353.2
+      },
+      {
+        "year": 2014,
+        "spending_per_capita": 348.6
+      },
+      {
+        "year": 2015,
+        "spending_per_capita": 349.9
+      },
+      {
+        "year": 2016,
+        "spending_per_capita": 436.5
+      },
+      {
+        "year": 2017,
+        "spending_per_capita": 406.6
+      },
+      {
+        "year": 2018,
+        "spending_per_capita": 406.1
+      },
+      {
+        "year": 2019,
+        "spending_per_capita": 420.9
+      },
+      {
+        "year": 2020,
+        "spending_per_capita": 452.6
+      },
+      {
+        "year": 2021,
+        "spending_per_capita": 489.7
+      },
+      {
+        "year": 2022,
+        "spending_per_capita": 551.6
+      }
+    ],
+    "latest_year": 2022,
+    "latest_spending": 551.6,
+    "first_year": 2010,
+    "first_spending": 295.7,
+    "growth_pct": 86.5
+  }
+]

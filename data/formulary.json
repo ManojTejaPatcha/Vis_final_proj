@@ -1,0 +1,1442 @@
+[
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "Humana",
+    "tier": 1,
+    "copay": 2,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "WellCare",
+    "tier": 2,
+    "copay": 9,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "UnitedHealthcare",
+    "tier": 2,
+    "copay": 15,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "Aetna",
+    "tier": 1,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "Cigna",
+    "tier": 1,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 1,
+    "copay": 4,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "Kaiser Permanente",
+    "tier": 1,
+    "copay": 1,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Eliquis",
+    "drug_generic": "Apixaban",
+    "insurer": "CVS Caremark",
+    "tier": 1,
+    "copay": 2,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "Humana",
+    "tier": 2,
+    "copay": 12,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "WellCare",
+    "tier": 4,
+    "copay": 76,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "UnitedHealthcare",
+    "tier": 2,
+    "copay": 13,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "Cigna",
+    "tier": 2,
+    "copay": 15,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 2,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "Kaiser Permanente",
+    "tier": 4,
+    "copay": 70,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ozempic",
+    "drug_generic": "Semaglutide",
+    "insurer": "CVS Caremark",
+    "tier": 4,
+    "copay": 47,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "Humana",
+    "tier": 1,
+    "copay": 0,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "WellCare",
+    "tier": 3,
+    "copay": 38,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "UnitedHealthcare",
+    "tier": 2,
+    "copay": 15,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 12,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "Cigna",
+    "tier": 3,
+    "copay": 28,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 3,
+    "copay": 31,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "Kaiser Permanente",
+    "tier": 2,
+    "copay": 8,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Jardiance",
+    "drug_generic": "Empagliflozin",
+    "insurer": "CVS Caremark",
+    "tier": 2,
+    "copay": 7,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "Humana",
+    "tier": 2,
+    "copay": 15,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "WellCare",
+    "tier": 2,
+    "copay": 14,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "UnitedHealthcare",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "Aetna",
+    "tier": 4,
+    "copay": 74,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "Cigna",
+    "tier": 3,
+    "copay": 36,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 3,
+    "copay": 29,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "Kaiser Permanente",
+    "tier": 4,
+    "copay": 63,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trulicity",
+    "drug_generic": "Dulaglutide",
+    "insurer": "CVS Caremark",
+    "tier": 3,
+    "copay": 36,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "Humana",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "WellCare",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "UnitedHealthcare",
+    "tier": 1,
+    "copay": 2,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "Aetna",
+    "tier": 1,
+    "copay": 2,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "Cigna",
+    "tier": 3,
+    "copay": 41,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "Kaiser Permanente",
+    "tier": 3,
+    "copay": 33,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Xarelto",
+    "drug_generic": "Rivaroxaban",
+    "insurer": "CVS Caremark",
+    "tier": 3,
+    "copay": 37,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "Humana",
+    "tier": 1,
+    "copay": 0,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "WellCare",
+    "tier": 3,
+    "copay": 41,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "UnitedHealthcare",
+    "tier": 3,
+    "copay": 35,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 15,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "Cigna",
+    "tier": 1,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 3,
+    "copay": 33,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "Kaiser Permanente",
+    "tier": 1,
+    "copay": 1,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Trelegy Ellipta",
+    "drug_generic": "Fluticasone/Umeclidin/Vilanter",
+    "insurer": "CVS Caremark",
+    "tier": 3,
+    "copay": 32,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "Humana",
+    "tier": 5,
+    "copay": 109,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "WellCare",
+    "tier": 5,
+    "copay": 122,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "UnitedHealthcare",
+    "tier": 5,
+    "copay": 110,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "Aetna",
+    "tier": 5,
+    "copay": 142,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "Cigna",
+    "tier": 5,
+    "copay": 199,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 5,
+    "copay": 149,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "Kaiser Permanente",
+    "tier": 5,
+    "copay": 164,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Humira(Cf) Pen",
+    "drug_generic": "Adalimumab",
+    "insurer": "CVS Caremark",
+    "tier": 4,
+    "copay": 56,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "Humana",
+    "tier": 1,
+    "copay": 3,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "WellCare",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "UnitedHealthcare",
+    "tier": 1,
+    "copay": 1,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 10,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "Cigna",
+    "tier": 3,
+    "copay": 37,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 3,
+    "copay": 29,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "Kaiser Permanente",
+    "tier": 1,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Farxiga",
+    "drug_generic": "Dapagliflozin Propanediol",
+    "insurer": "CVS Caremark",
+    "tier": 3,
+    "copay": 40,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "Humana",
+    "tier": 1,
+    "copay": 1,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "WellCare",
+    "tier": 1,
+    "copay": 1,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "UnitedHealthcare",
+    "tier": 3,
+    "copay": 42,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "Aetna",
+    "tier": 3,
+    "copay": 45,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "Cigna",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 1,
+    "copay": 3,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "Kaiser Permanente",
+    "tier": 3,
+    "copay": 32,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Januvia",
+    "drug_generic": "Sitagliptin Phosphate",
+    "insurer": "CVS Caremark",
+    "tier": 1,
+    "copay": 3,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "Humana",
+    "tier": 3,
+    "copay": 25,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "WellCare",
+    "tier": 5,
+    "copay": 132,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "UnitedHealthcare",
+    "tier": 3,
+    "copay": 32,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "Aetna",
+    "tier": 5,
+    "copay": 139,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "Cigna",
+    "tier": 5,
+    "copay": 192,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 4,
+    "copay": 53,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "Kaiser Permanente",
+    "tier": 4,
+    "copay": 71,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Revlimid",
+    "drug_generic": "Lenalidomide",
+    "insurer": "CVS Caremark",
+    "tier": 4,
+    "copay": 50,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "Humana",
+    "tier": 1,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "WellCare",
+    "tier": 3,
+    "copay": 42,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "UnitedHealthcare",
+    "tier": 1,
+    "copay": 0,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 12,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "Cigna",
+    "tier": 1,
+    "copay": 1,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 3,
+    "copay": 31,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "Kaiser Permanente",
+    "tier": 2,
+    "copay": 15,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Entresto",
+    "drug_generic": "Sacubitril/Valsartan",
+    "insurer": "CVS Caremark",
+    "tier": 1,
+    "copay": 0,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "Humana",
+    "tier": 3,
+    "copay": 30,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "WellCare",
+    "tier": 2,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "UnitedHealthcare",
+    "tier": 3,
+    "copay": 25,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 5,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "Cigna",
+    "tier": 3,
+    "copay": 32,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 1,
+    "copay": 0,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "Kaiser Permanente",
+    "tier": 2,
+    "copay": 14,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Lantus Solostar",
+    "drug_generic": "Insulin Glargine,Hum.Rec.Anlog",
+    "insurer": "CVS Caremark",
+    "tier": 2,
+    "copay": 11,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "Humana",
+    "tier": 3,
+    "copay": 39,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "WellCare",
+    "tier": 2,
+    "copay": 9,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "UnitedHealthcare",
+    "tier": 4,
+    "copay": 70,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "Cigna",
+    "tier": 4,
+    "copay": 78,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 3,
+    "copay": 41,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "Kaiser Permanente",
+    "tier": 2,
+    "copay": 12,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Biktarvy",
+    "drug_generic": "Bictegrav/Emtricit/Tenofov Ala",
+    "insurer": "CVS Caremark",
+    "tier": 2,
+    "copay": 8,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "Humana",
+    "tier": 5,
+    "copay": 124,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "WellCare",
+    "tier": 5,
+    "copay": 185,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "UnitedHealthcare",
+    "tier": 5,
+    "copay": 166,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "Aetna",
+    "tier": 5,
+    "copay": 172,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "Cigna",
+    "tier": 4,
+    "copay": 54,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 5,
+    "copay": 115,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "Kaiser Permanente",
+    "tier": 4,
+    "copay": 64,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Stelara*",
+    "drug_generic": "Ustekinumab",
+    "insurer": "CVS Caremark",
+    "tier": 5,
+    "copay": 155,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "Humana",
+    "tier": 4,
+    "copay": 60,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "WellCare",
+    "tier": 4,
+    "copay": 46,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "UnitedHealthcare",
+    "tier": 4,
+    "copay": 69,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 12,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "Cigna",
+    "tier": 4,
+    "copay": 55,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 2,
+    "copay": 13,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "Kaiser Permanente",
+    "tier": 3,
+    "copay": 40,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Xtandi",
+    "drug_generic": "Enzalutamide",
+    "insurer": "CVS Caremark",
+    "tier": 2,
+    "copay": 10,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "Humana",
+    "tier": 3,
+    "copay": 35,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "WellCare",
+    "tier": 3,
+    "copay": 26,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "UnitedHealthcare",
+    "tier": 3,
+    "copay": 37,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "Aetna",
+    "tier": 1,
+    "copay": 2,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "Cigna",
+    "tier": 3,
+    "copay": 26,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 1,
+    "copay": 3,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "Kaiser Permanente",
+    "tier": 2,
+    "copay": 14,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Myrbetriq",
+    "drug_generic": "Mirabegron",
+    "insurer": "CVS Caremark",
+    "tier": 1,
+    "copay": 1,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "Humana",
+    "tier": 4,
+    "copay": 48,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "WellCare",
+    "tier": 2,
+    "copay": 5,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "UnitedHealthcare",
+    "tier": 4,
+    "copay": 68,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "Aetna",
+    "tier": 2,
+    "copay": 6,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "Cigna",
+    "tier": 2,
+    "copay": 14,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 2,
+    "copay": 5,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "Kaiser Permanente",
+    "tier": 3,
+    "copay": 26,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Imbruvica",
+    "drug_generic": "Ibrutinib",
+    "insurer": "CVS Caremark",
+    "tier": 3,
+    "copay": 35,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "Humana",
+    "tier": 4,
+    "copay": 73,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "WellCare",
+    "tier": 3,
+    "copay": 39,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "UnitedHealthcare",
+    "tier": 5,
+    "copay": 179,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "Aetna",
+    "tier": 3,
+    "copay": 34,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "Cigna",
+    "tier": 3,
+    "copay": 41,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 5,
+    "copay": 154,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "Kaiser Permanente",
+    "tier": 4,
+    "copay": 47,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Mounjaro",
+    "drug_generic": "Tirzepatide",
+    "insurer": "CVS Caremark",
+    "tier": 3,
+    "copay": 39,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "Humana",
+    "tier": 4,
+    "copay": 75,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "WellCare",
+    "tier": 4,
+    "copay": 53,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "UnitedHealthcare",
+    "tier": 5,
+    "copay": 180,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "Aetna",
+    "tier": 4,
+    "copay": 50,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "Cigna",
+    "tier": 4,
+    "copay": 70,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 4,
+    "copay": 51,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "Kaiser Permanente",
+    "tier": 4,
+    "copay": 45,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Enbrel Sureclick",
+    "drug_generic": "Etanercept",
+    "insurer": "CVS Caremark",
+    "tier": 5,
+    "copay": 121,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "Humana",
+    "tier": 3,
+    "copay": 32,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "WellCare",
+    "tier": 3,
+    "copay": 44,
+    "prior_auth_required": false,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "UnitedHealthcare",
+    "tier": 4,
+    "copay": 49,
+    "prior_auth_required": true,
+    "step_therapy": true
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "Aetna",
+    "tier": 3,
+    "copay": 32,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "Cigna",
+    "tier": 4,
+    "copay": 55,
+    "prior_auth_required": true,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "Blue Cross Blue Shield",
+    "tier": 3,
+    "copay": 34,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "Kaiser Permanente",
+    "tier": 3,
+    "copay": 27,
+    "prior_auth_required": false,
+    "step_therapy": false
+  },
+  {
+    "drug_brand": "Ibrance",
+    "drug_generic": "Palbociclib",
+    "insurer": "CVS Caremark",
+    "tier": 5,
+    "copay": 145,
+    "prior_auth_required": true,
+    "step_therapy": true
+  }
+]

@@ -1,0 +1,217 @@
+[
+  {
+    "drug_id": "eliquis",
+    "drug_name": "Eliquis",
+    "scenarios": [
+      {
+        "name": "Best US Coverage",
+        "annual": 960,
+        "type": "best",
+        "currency": "USD"
+      },
+      {
+        "name": "Worst US Coverage",
+        "annual": 1200,
+        "type": "worst",
+        "currency": "USD"
+      },
+      {
+        "name": "Medicare Average",
+        "annual": 4652,
+        "type": "avg",
+        "currency": "USD"
+      },
+      {
+        "name": "No Insurance",
+        "annual": 6600,
+        "type": "retail",
+        "currency": "USD"
+      },
+      {
+        "name": "Canada (typical)",
+        "annual": 594,
+        "type": "global",
+        "currency": "USD"
+      },
+      {
+        "name": "UK (NHS)",
+        "annual": 115,
+        "type": "global",
+        "currency": "GBP"
+      }
+    ],
+    "max_savings": 5640
+  },
+  {
+    "drug_id": "ozempic",
+    "drug_name": "Ozempic",
+    "scenarios": [
+      {
+        "name": "Best US Coverage",
+        "annual": 960,
+        "type": "best",
+        "currency": "USD"
+      },
+      {
+        "name": "Worst US Coverage",
+        "annual": 1200,
+        "type": "worst",
+        "currency": "USD"
+      },
+      {
+        "name": "Medicare Average",
+        "annual": 6278,
+        "type": "avg",
+        "currency": "USD"
+      },
+      {
+        "name": "No Insurance",
+        "annual": 11232,
+        "type": "retail",
+        "currency": "USD"
+      },
+      {
+        "name": "Canada (typical)",
+        "annual": 1010,
+        "type": "global",
+        "currency": "USD"
+      },
+      {
+        "name": "UK (NHS)",
+        "annual": 115,
+        "type": "global",
+        "currency": "GBP"
+      }
+    ],
+    "max_savings": 10272
+  },
+  {
+    "drug_id": "jardiance",
+    "drug_name": "Jardiance",
+    "scenarios": [
+      {
+        "name": "Best US Coverage",
+        "annual": 960,
+        "type": "best",
+        "currency": "USD"
+      },
+      {
+        "name": "Worst US Coverage",
+        "annual": 1200,
+        "type": "worst",
+        "currency": "USD"
+      },
+      {
+        "name": "Medicare Average",
+        "annual": 4695,
+        "type": "avg",
+        "currency": "USD"
+      },
+      {
+        "name": "No Insurance",
+        "annual": 7200,
+        "type": "retail",
+        "currency": "USD"
+      },
+      {
+        "name": "Canada (typical)",
+        "annual": 648,
+        "type": "global",
+        "currency": "USD"
+      },
+      {
+        "name": "UK (NHS)",
+        "annual": 115,
+        "type": "global",
+        "currency": "GBP"
+      }
+    ],
+    "max_savings": 6240
+  },
+  {
+    "drug_id": "trulicity",
+    "drug_name": "Trulicity",
+    "scenarios": [
+      {
+        "name": "Best US Coverage",
+        "annual": 960,
+        "type": "best",
+        "currency": "USD"
+      },
+      {
+        "name": "Worst US Coverage",
+        "annual": 1200,
+        "type": "worst",
+        "currency": "USD"
+      },
+      {
+        "name": "Medicare Average",
+        "annual": 7844,
+        "type": "avg",
+        "currency": "USD"
+      },
+      {
+        "name": "No Insurance",
+        "annual": 11808,
+        "type": "retail",
+        "currency": "USD"
+      },
+      {
+        "name": "Canada (typical)",
+        "annual": 1062,
+        "type": "global",
+        "currency": "USD"
+      },
+      {
+        "name": "UK (NHS)",
+        "annual": 115,
+        "type": "global",
+        "currency": "GBP"
+      }
+    ],
+    "max_savings": 10848
+  },
+  {
+    "drug_id": "xarelto",
+    "drug_name": "Xarelto",
+    "scenarios": [
+      {
+        "name": "Best US Coverage",
+        "annual": 960,
+        "type": "best",
+        "currency": "USD"
+      },
+      {
+        "name": "Worst US Coverage",
+        "annual": 1200,
+        "type": "worst",
+        "currency": "USD"
+      },
+      {
+        "name": "Medicare Average",
+        "annual": 4764,
+        "type": "avg",
+        "currency": "USD"
+      },
+      {
+        "name": "No Insurance",
+        "annual": 6240,
+        "type": "retail",
+        "currency": "USD"
+      },
+      {
+        "name": "Canada (typical)",
+        "annual": 561,
+        "type": "global",
+        "currency": "USD"
+      },
+      {
+        "name": "UK (NHS)",
+        "annual": 115,
+        "type": "global",
+        "currency": "GBP"
+      }
+    ],
+    "max_savings": 5280
+  }
+]

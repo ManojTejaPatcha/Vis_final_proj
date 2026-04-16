@@ -1,0 +1,206 @@
+[
+  {
+    "scenario": "Tier 1 (Preferred Generic)",
+    "tier": 1,
+    "color": "#1a9850",
+    "monthly_data": [
+      {
+        "month": "Jan",
+        "monthly_cost": 550,
+        "cumulative_cost": 550
+      },
+      {
+        "month": "Feb",
+        "monthly_cost": 5,
+        "cumulative_cost": 555
+      },
+      {
+        "month": "Mar",
+        "monthly_cost": 5,
+        "cumulative_cost": 560
+      },
+      {
+        "month": "Apr",
+        "monthly_cost": 5,
+        "cumulative_cost": 565
+      },
+      {
+        "month": "May",
+        "monthly_cost": 5,
+        "cumulative_cost": 570
+      },
+      {
+        "month": "Jun",
+        "monthly_cost": 5,
+        "cumulative_cost": 575
+      },
+      {
+        "month": "Jul",
+        "monthly_cost": 5,
+        "cumulative_cost": 580
+      },
+      {
+        "month": "Aug",
+        "monthly_cost": 5,
+        "cumulative_cost": 585
+      },
+      {
+        "month": "Sep",
+        "monthly_cost": 5,
+        "cumulative_cost": 590
+      },
+      {
+        "month": "Oct",
+        "monthly_cost": 5,
+        "cumulative_cost": 595
+      },
+      {
+        "month": "Nov",
+        "monthly_cost": 5,
+        "cumulative_cost": 600
+      },
+      {
+        "month": "Dec",
+        "monthly_cost": 5,
+        "cumulative_cost": 605
+      }
+    ],
+    "annual_total": 605
+  },
+  {
+    "scenario": "Tier 3 (Preferred Brand)",
+    "tier": 3,
+    "color": "#d73027",
+    "monthly_data": [
+      {
+        "month": "Jan",
+        "monthly_cost": 580,
+        "cumulative_cost": 580
+      },
+      {
+        "month": "Feb",
+        "monthly_cost": 35,
+        "cumulative_cost": 615
+      },
+      {
+        "month": "Mar",
+        "monthly_cost": 35,
+        "cumulative_cost": 650
+      },
+      {
+        "month": "Apr",
+        "monthly_cost": 35,
+        "cumulative_cost": 685
+      },
+      {
+        "month": "May",
+        "monthly_cost": 35,
+        "cumulative_cost": 720
+      },
+      {
+        "month": "Jun",
+        "monthly_cost": 35,
+        "cumulative_cost": 755
+      },
+      {
+        "month": "Jul",
+        "monthly_cost": 35,
+        "cumulative_cost": 790
+      },
+      {
+        "month": "Aug",
+        "monthly_cost": 35,
+        "cumulative_cost": 825
+      },
+      {
+        "month": "Sep",
+        "monthly_cost": 35,
+        "cumulative_cost": 860
+      },
+      {
+        "month": "Oct",
+        "monthly_cost": 35,
+        "cumulative_cost": 895
+      },
+      {
+        "month": "Nov",
+        "monthly_cost": 35,
+        "cumulative_cost": 930
+      },
+      {
+        "month": "Dec",
+        "monthly_cost": 35,
+        "cumulative_cost": 965
+      }
+    ],
+    "annual_total": 965
+  },
+  {
+    "scenario": "Tier 5 (Specialty)",
+    "tier": 5,
+    "color": "#fc8d59",
+    "monthly_data": [
+      {
+        "month": "Jan",
+        "monthly_cost": 595,
+        "cumulative_cost": 595
+      },
+      {
+        "month": "Feb",
+        "monthly_cost": 50,
+        "cumulative_cost": 645
+      },
+      {
+        "month": "Mar",
+        "monthly_cost": 50,
+        "cumulative_cost": 695
+      },
+      {
+        "month": "Apr",
+        "monthly_cost": 50,
+        "cumulative_cost": 745
+      },
+      {
+        "month": "May",
+        "monthly_cost": 50,
+        "cumulative_cost": 795
+      },
+      {
+        "month": "Jun",
+        "monthly_cost": 50,
+        "cumulative_cost": 845
+      },
+      {
+        "month": "Jul",
+        "monthly_cost": 50,
+        "cumulative_cost": 895
+      },
+      {
+        "month": "Aug",
+        "monthly_cost": 50,
+        "cumulative_cost": 945
+      },
+      {
+        "month": "Sep",
+        "monthly_cost": 50,
+        "cumulative_cost": 995
+      },
+      {
+        "month": "Oct",
+        "monthly_cost": 50,
+        "cumulative_cost": 1045
+      },
+      {
+        "month": "Nov",
+        "monthly_cost": 50,
+        "cumulative_cost": 1095
+      },
+      {
+        "month": "Dec",
+        "monthly_cost": 50,
+        "cumulative_cost": 1145
+      }
+    ],
+    "annual_total": 1145
+  }
+]

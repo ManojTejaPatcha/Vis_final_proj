@@ -1,0 +1,62 @@
+[
+  {
+    "drug_id": "eliquis",
+    "drug_name": "Eliquis",
+    "us_retail": 550,
+    "us_medicare_avg": 862,
+    "canada_price": 380,
+    "canada_patient_cost": 0,
+    "uk_price_gbp": 126,
+    "uk_patient_cost_gbp": 9.65,
+    "canada_notes": "Provincial formularies vary; some require special authorization",
+    "uk_notes": "NHS covers via NICE appraisal; standard prescription charge applies"
+  },
+  {
+    "drug_id": "ozempic",
+    "drug_name": "Ozempic",
+    "us_retail": 936,
+    "us_medicare_avg": 1327,
+    "canada_price": 520,
+    "canada_patient_cost": 70,
+    "uk_price_gbp": 189,
+    "uk_patient_cost_gbp": 9.65,
+    "canada_notes": "Provincial formularies vary; some require special authorization",
+    "uk_notes": "NHS covers via NICE appraisal; standard prescription charge applies"
+  },
+  {
+    "drug_id": "jardiance",
+    "drug_name": "Jardiance",
+    "us_retail": 600,
+    "us_medicare_avg": 570,
+    "canada_price": 370,
+    "canada_patient_cost": 0,
+    "uk_price_gbp": 118,
+    "uk_patient_cost_gbp": 9.65,
+    "canada_notes": "Provincial formularies vary; some require special authorization",
+    "uk_notes": "NHS covers via NICE appraisal; standard prescription charge applies"
+  },
+  {
+    "drug_id": "trulicity",
+    "drug_name": "Trulicity",
+    "us_retail": 984,
+    "us_medicare_avg": 1385,
+    "canada_price": 590,
+    "canada_patient_cost": 140,
+    "uk_price_gbp": 300,
+    "uk_patient_cost_gbp": 9.65,
+    "canada_notes": "Provincial formularies vary; some require special authorization",
+    "uk_notes": "NHS covers via NICE appraisal; standard prescription charge applies"
+  },
+  {
+    "drug_id": "xarelto",
+    "drug_name": "Xarelto",
+    "us_retail": 520,
+    "us_medicare_avg": 948,
+    "canada_price": 320,
+    "canada_patient_cost": 0,
+    "uk_price_gbp": 134,
+    "uk_patient_cost_gbp": 9.65,
+    "canada_notes": "Provincial formularies vary; some require special authorization",
+    "uk_notes": "NHS covers via NICE appraisal; standard prescription charge applies"
+  }
+]
