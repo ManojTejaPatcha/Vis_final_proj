@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DrugWatch · Prescription Cost Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ROW 1: HEADER -->
+<header id="header">
+  <div class="hdr-left">
+    <div class="logo"><span class="logo-a">DRUG</span><span class="logo-b" id="logo-accent">WATCH</span></div>
+    <div class="logo-sub">Prescription Cost Intelligence · Medicare Part D · Illustrative data based on CMS Part D PUF 2023 &amp; OECD Pharma Spending orders of magnitude</div>
+  </div>
+  <div class="hdr-center" id="drug-pills">
+    <button class="drug-pill active" data-drug="ozempic" tabindex="0" role="button" aria-label="Select Ozempic">Ozempic</button>
+    <button class="drug-pill" data-drug="trulicity" tabindex="0" role="button" aria-label="Select Trulicity">Trulicity</button>
+    <button class="drug-pill" data-drug="jardiance" tabindex="0" role="button" aria-label="Select Jardiance">Jardiance</button>
+    <button class="drug-pill" data-drug="eliquis" tabindex="0" role="button" aria-label="Select Eliquis">Eliquis</button>
+    <button class="drug-pill" data-drug="xarelto" tabindex="0" role="button" aria-label="Select Xarelto">Xarelto</button>
+  </div>
+  <div class="hdr-right">
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="bc-arrow">▸</span>
+      <span class="bc-drug" id="bc-drug">Trulicity</span>
+      <span class="bc-sep">·</span>
+      <span class="bc-region" id="bc-region">National</span>
+      <span class="bc-sep">·</span>
+      <span class="bc-plan" id="bc-plan">All Plans</span>
+    </div>
+    <button id="reset-btn" aria-label="Reset all filters">↺ Reset</button>
+  </div>
+</header>
+
+<!-- ROW 2: KPI ROW -->
+<section id="kpi-row">
+  <div class="kpi-card" id="kpi-1">
+    <span class="kpi-label">COST / CLAIM</span>
+    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-1-val">$1,385</span><span class="kpi-sub" id="kpi-1-sub">National avg · 2023</span></span>
+  </div>
+  <div class="kpi-card" id="kpi-2">
+    <span class="kpi-label">TOTAL SPENDING</span>
+    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-2-val">$7.4B</span><span class="kpi-sub" id="kpi-2-sub">Medicare Part D · 2023</span></span>
+  </div>
+  <div class="kpi-card" id="kpi-3">
+    <span class="kpi-label">BENEFICIARIES</span>
+    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-3-val">0.9M</span><span class="kpi-sub" id="kpi-3-sub">Medicare Part D patients</span></span>
+  </div>
+  <div class="kpi-card" id="kpi-4">
+    <span class="kpi-label" title="5-year compound annual growth rate of unit cost. Green (↓) = costs falling = good for patients. Red (↑) = costs rising = higher burden.">5-YR CAGR</span>
+    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-4-val">+6.1%</span><span class="kpi-sub" id="kpi-4-sub">unit cost 2019→2023 · ↓ green = falling</span></span>
+  </div>
+</section>
+
+<!-- ROW A -->
+<section id="row-a" class="chart-row">
+  <div class="chart-card">
+    <div class="card-header">
+      <span class="card-title">US COST MAP · 4 REGIONS</span>
+      <span class="card-hint">choropleth · cost/claim by state · click state</span>
+    </div>
+    <div class="chart-area" id="chart-geomap"></div>
+  </div>
+  <div class="chart-card">
+    <div class="card-header">
+      <span class="card-title">SPENDING STREAM</span>
+      <span class="card-hint">2019–2023 · stacked area · click band = select drug</span>
+    </div>
+    <div class="chart-area" id="chart-stream"></div>
+  </div>
+  <div class="chart-card">
+    <div class="card-header">
+      <span class="card-title">DRUG PROFILES</span>
+      <span class="card-hint">parallel coords · 5 drugs × 5 axes · brush axis to filter</span>
+    </div>
+    <div class="chart-area" id="chart-parallel"></div>
+  </div>
+</section>
+
+<!-- ROW B -->
+<section id="row-b" class="chart-row">
+  <div class="chart-card">
+    <div class="card-header">
+      <span class="card-title">BEST INSURANCE PLANS</span>
+      <span class="card-hint">annual cost · click bar to filter all charts</span>
+    </div>
+    <div class="chart-area" id="chart-plans"></div>
+  </div>
+  <div class="chart-card chart-card-split" id="card-lollipop">
+    <div class="card-header">
+      <span class="card-title">WHAT WILL I PAY?</span>
+      <span class="card-hint">annual cost · reacts to plan + drug selection</span>
+    </div>
+    <div class="chart-area chart-area-split">
+      <div class="split-left" id="chart-lollipop"></div>
+      <div class="split-divider"></div>
+      <div class="split-right">
+        <div class="split-right-title">TREND</div>
+        <div id="chart-trend" class="chart-trend-area"></div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="card-header">
+      <span class="card-title">SPENDING SHARE</span>
+      <span class="card-hint">donut · click slice = select drug</span>
+    </div>
+    <div class="chart-area" id="chart-donut"></div>
+  </div>
+</section>
+
+<!-- ROW C -->
+<section id="row-c" class="chart-row">
+  <div class="chart-card">
+    <div class="card-header">
+      <span class="card-title">SPENDING TREE MAP</span>
+      <span class="card-hint">drug × region · national excluded · click cell = drug + region</span>
+    </div>
+    <div class="chart-area" id="chart-treemap"></div>
+  </div>
+  <div class="chart-card">
+    <div class="card-header">
+      <span class="card-title">COST vs BENEFICIARIES</span>
+      <span class="card-hint">bubble size = spending · click bubble → selects drug + region</span>
+    </div>
+    <div class="chart-area" id="chart-scatter"></div>
+  </div>
+  <div class="chart-card" id="card-splom">
+    <div class="card-header">
+      <span class="card-title">DRUG PROFILES — SPLOM</span>
+      <span class="card-hint">scatterplot matrix · 3 dims · click dot = select drug</span>
+    </div>
+    <div class="chart-area" id="chart-splom"></div>
+  </div>
+</section>
+
+<!-- TOOLTIP -->
+<div id="tooltip"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,2392 +1,1010 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthLens | Prescription Drug Cost Intelligence</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --bg-primary: #FAFBFC;
-            --bg-card: #FFFFFF;
-            --bg-subtle: #F3F4F6;
-            --border-light: #E5E7EB;
-            --text-primary: #111827;
-            --text-secondary: #6B7280;
-            --text-muted: #9CA3AF;
-            --primary: #1E40AF;
-            --primary-light: #3B82F6;
-            --success: #059669;
-            --warning: #D97706;
-            --danger: #DC2626;
-            --tier-2: #10B981;
-            --tier-3: #F59E0B;
-            --tier-4: #EF4444;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        
-        html, body { height: 100vh; overflow: hidden; }
-        
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 13px;
-            line-height: 1.4;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* ============ HEADER ============ */
-        .header {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-light);
-            padding: 8px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-            height: 52px;
-        }
-        
-        .brand { display: flex; align-items: center; gap: 10px; }
-        
-        .brand-icon {
-            width: 30px; height: 30px;
-            background: linear-gradient(135deg, var(--primary), var(--success));
-            border-radius: 7px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 15px;
-        }
-        
-        .brand-text h1 {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            line-height: 1;
-        }
-        
-        .brand-text p { font-size: 10px; color: var(--text-secondary); }
-        
-        .drug-selector {
-            display: flex;
-            gap: 4px;
-            background: var(--bg-primary);
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid var(--border-light);
-        }
-        
-        .drug-pill {
-            padding: 6px 14px;
-            border-radius: 7px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            background: transparent;
-            border: none;
-            transition: all 0.2s ease;
-        }
-        
-        .drug-pill:hover { color: var(--text-primary); }
-        
-        .drug-pill.active {
-            background: var(--bg-card);
-            color: var(--primary);
-            box-shadow: var(--shadow-sm);
-            font-weight: 600;
-        }
-        
-        /* ============ DASHBOARD GRID ============ */
-        .dashboard {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            grid-template-rows: auto auto 1fr;
-            gap: 10px;
-            padding: 10px;
-            min-height: 0;
-        }
-        
-        /* ============ DRUG STRIP ============ */
-        .drug-strip {
-            grid-column: 1 / -1;
-            background: var(--bg-card);
-            border-radius: 10px;
-            padding: 10px 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .drug-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
-        
-        .drug-info h2 { font-size: 20px; font-weight: 700; line-height: 1; }
-        
-        .drug-info .generic { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-        
-        .separator { width: 1px; height: 26px; background: var(--border-light); }
-        
-        .tags { display: flex; gap: 5px; }
-        
-        .tag {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        
-        .tag-therapeutic { background: #DBEAFE; color: var(--primary); }
-        .tag-condition { background: #D1FAE5; color: var(--success); }
-        
-        /* KPI inline stats */
-        .kpi-strip { display: flex; gap: 16px; }
-        
-        .kpi-item {
-            display: flex;
-            flex-direction: column;
-            padding: 0 10px;
-            border-right: 1px solid var(--border-light);
-        }
-        .kpi-item:last-child { border-right: none; }
-        
-        .kpi-label {
-            font-size: 9px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            font-weight: 600;
-        }
-        
-        .kpi-value {
-            font-size: 16px;
-            font-weight: 700;
-            line-height: 1.2;
-            color: var(--text-primary);
-        }
-        
-        .kpi-value.up { color: var(--danger); }
-        .kpi-value.down { color: var(--success); }
-        
-        .kpi-sub { font-size: 10px; color: var(--text-muted); }
-        
-        /* ============ SCENARIO CHIP BAR ============ */
-        .scenario-bar {
-            grid-column: 1 / -1;
-            grid-row: 2;
-            background: linear-gradient(90deg, #EFF6FF 0%, #F0F9FF 100%);
-            border: 1px solid #BFDBFE;
-            border-radius: 10px;
-            padding: 7px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: var(--shadow-sm);
-            min-height: 38px;
-            transition: background 0.3s;
-        }
-        
-        .scenario-bar.has-filters {
-            background: linear-gradient(90deg, #DBEAFE 0%, #E0F2FE 100%);
-            border-color: var(--primary);
-        }
-        
-        .scenario-label {
-            font-size: 9px;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 0.7px;
-            white-space: nowrap;
-            padding-right: 8px;
-            border-right: 1px solid #BFDBFE;
-        }
-        
-        .scenario-chips {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .scenario-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 4px 4px 10px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-primary);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-            animation: chipIn 0.25s ease-out;
-        }
-        
-        .scenario-chip.drug { border-color: var(--primary); color: var(--primary); }
-        .scenario-chip.insurer { border-color: #1E40AF; color: #1E40AF; background: #EFF6FF; }
-        .scenario-chip.country { border-color: var(--success); color: var(--success); background: #ECFDF5; }
-        
-        .scenario-chip-x {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.06);
-            cursor: pointer;
-            font-size: 11px;
-            line-height: 1;
-            transition: background 0.15s;
-        }
-        .scenario-chip-x:hover { background: rgba(239,68,68,0.2); color: var(--danger); }
-        
-        @keyframes chipIn {
-            from { opacity: 0; transform: translateY(-4px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        .scenario-hint {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
-        
-        .scenario-clear {
-            margin-left: auto;
-            padding: 4px 10px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .scenario-clear:hover { background: var(--danger); color: white; border-color: var(--danger); }
-        
-        /* Personalized KPI highlight */
-        .kpi-item.kpi-personal {
-            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
-            border-radius: 8px;
-            padding: 4px 12px;
-            border: 1px solid var(--primary);
-            border-right: 1px solid var(--primary) !important;
-            animation: chipIn 0.3s ease-out;
-        }
-        .kpi-item.kpi-personal .kpi-label { color: var(--primary); font-weight: 700; }
-        .kpi-item.kpi-personal .kpi-value { color: var(--primary); }
-        
-        /* ============ CROSS-FILTER STATES ============ */
-        .is-dimmed { opacity: 0.35 !important; filter: saturate(0.6); transition: opacity 0.3s, filter 0.3s; }
-        .is-selected { transition: all 0.3s; }
-        .is-hover-linked { filter: brightness(1.08) drop-shadow(0 0 4px rgba(37,99,235,0.35)); }
-        
-        /* ============ MAIN PANEL (LEFT) ============ */
-        .main-panel {
-            grid-column: 1;
-            grid-row: 3;
-            background: var(--bg-card);
-            border-radius: 10px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            min-height: 0;
-        }
-        
-        .panel-tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border-light);
-            padding: 0 14px;
-            background: var(--bg-primary);
-            flex-shrink: 0;
-        }
-        
-        .tab {
-            padding: 10px 14px;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -1px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .tab:hover { color: var(--text-primary); }
-        
-        .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-            font-weight: 600;
-            background: var(--bg-card);
-        }
-        
-        .tab-icon { font-size: 13px; }
-        
-        .panel-content {
-            flex: 1;
-            padding: 14px 16px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-        
-        .view { display: none; flex: 1; flex-direction: column; min-height: 0; }
-        .view.active { display: flex; }
-        
-        .view-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            flex-shrink: 0;
-        }
-        
-        .view-title { font-size: 13px; font-weight: 600; }
-        
-        .view-subtitle { font-size: 11px; color: var(--text-muted); }
-        
-        .view-controls { display: flex; gap: 4px; }
-        
-        .toggle-btn {
-            padding: 4px 10px;
-            border-radius: 5px;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-light);
-            color: var(--text-secondary);
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.15s;
-        }
-        
-        .toggle-btn:hover { color: var(--text-primary); }
-        
-        .toggle-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        /* ============ INSURER VIEW ============ */
-        .insurer-list {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            gap: 3px;
-            min-height: 0;
-        }
-        
-        .insurer-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            padding: 3px 6px;
-            border-radius: 6px;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-        .insurer-row:hover { background: #F9FAFB; }
-        .insurer-row.is-selected {
-            background: #EFF6FF;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 1px rgba(37,99,235,0.2);
-        }
-        .insurer-row.is-selected .insurer-name {
-            color: var(--primary);
-            font-weight: 700;
-        }
-        
-        .insurer-name {
-            width: 140px;
-            font-size: 11px;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .insurer-bar-container {
-            flex: 1;
-            height: 22px;
-            background: #F3F4F6;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .insurer-bar {
-            height: 100%;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 8px;
-            transition: width 0.5s ease;
-        }
-        
-        .insurer-bar.tier-2 { background: linear-gradient(90deg, var(--tier-2), #34D399); }
-        .insurer-bar.tier-3 { background: linear-gradient(90deg, var(--warning), #FBBF24); }
-        .insurer-bar.tier-4 { background: linear-gradient(90deg, var(--danger), #F87171); }
-        
-        .bar-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-        
-        .insurer-details {
-            width: 150px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            justify-content: flex-end;
-        }
-        
-        .copay { font-size: 11px; font-weight: 600; }
-        
-        .tier-badge {
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: 600;
-        }
-        
-        .tier-badge.tier-2 { background: #D1FAE5; color: var(--success); }
-        .tier-badge.tier-3 { background: #FEF3C7; color: var(--warning); }
-        .tier-badge.tier-4 { background: #FEE2E2; color: var(--danger); }
-        
-        .restriction-icon {
-            font-size: 9px;
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-weight: 600;
-            cursor: help;
-        }
-        
-        .restriction-icon.pa { background: #FEE2E2; color: var(--danger); }
-        .restriction-icon.st { background: #FEF3C7; color: var(--warning); }
-        .restriction-icon.ql { background: #E0E7FF; color: var(--primary); }
-        .restriction-icon.mo { background: #D1FAE5; color: var(--success); }
-        
-        /* ============ CHART AREA ============ */
-        .chart-area {
-            flex: 1;
-            position: relative;
-            min-height: 0;
-        }
-        
-        /* ============ SIDEBAR (RIGHT) ============ */
-        .sidebar {
-            grid-column: 2;
-            grid-row: 3;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            min-height: 0;
-        }
-        
-        .side-card {
-            background: var(--bg-card);
-            border-radius: 10px;
-            padding: 14px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-        
-        .side-card.expand { flex: 1; min-height: 180px; }
-        .side-card.savings-hero { flex-shrink: 0; }
-        
-        .side-card-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-        }
-        
-        .side-card-sub {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-        
-        /* Global benchmark flex */
-        .global-list {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-        }
-        
-        .global-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px 10px;
-            border-radius: 6px;
-            background: var(--bg-subtle);
-            transition: all 0.15s;
-        }
-        
-        .global-row.us {
-            background: linear-gradient(90deg, #FEF2F2, var(--bg-subtle));
-            border-left: 3px solid var(--danger);
-        }
-        
-        .global-row.best {
-            background: linear-gradient(90deg, #F0FDF4, var(--bg-subtle));
-            border-left: 3px solid var(--success);
-        }
-        
-        .country-info { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
-        
-        .country-flag { font-size: 15px; }
-        
-        .country-details { display: flex; flex-direction: column; min-width: 0; }
-        
-        .country-label { font-size: 11px; font-weight: 600; }
-        
-        .country-system { font-size: 9px; color: var(--text-muted); }
-        
-        .country-value {
-            font-size: 13px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        
-        .country-value.high { color: var(--danger); }
-        .country-value.low { color: var(--success); }
-        
-        /* Savings card - hero */
-        .savings-hero {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-        }
-        
-        .savings-label {
-            font-size: 10px;
-            font-weight: 600;
-            opacity: 0.85;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-        
-        .savings-amount {
-            font-size: 28px;
-            font-weight: 700;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-        
-        .savings-description { font-size: 11px; opacity: 0.9; line-height: 1.4; }
-        
-        .savings-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .savings-cell {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .savings-cell-label { font-size: 9px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.4px; }
-        .savings-cell-value { font-size: 14px; font-weight: 700; line-height: 1.2; }
-        
-        /* ============ BEST PLAN VIEW ============ */
-        .plan-grid {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            min-height: 0;
-            overflow: hidden;
-        }
-        
-        .plan-card {
-            display: grid;
-            grid-template-columns: 30px 1fr auto auto auto;
-            gap: 12px;
-            align-items: center;
-            padding: 7px 12px;
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            background: var(--bg-card);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        
-        .plan-card:hover {
-            border-color: var(--primary-light);
-            transform: translateX(2px);
-        }
-        
-        .plan-card.rank-1 {
-            background: linear-gradient(90deg, #F0FDF4, #FFFFFF);
-            border-color: var(--success);
-            border-width: 2px;
-        }
-        
-        .plan-card.rank-last {
-            background: linear-gradient(90deg, #FEF2F2, #FFFFFF);
-            border-color: var(--danger);
-        }
-        
-        .plan-card.is-selected {
-            background: linear-gradient(90deg, #DBEAFE, #EFF6FF) !important;
-            border: 2px solid var(--primary) !important;
-            box-shadow: 0 0 0 2px rgba(37,99,235,0.15), var(--shadow-sm);
-            animation: yourPlanPulse 2.4s ease-in-out infinite;
-        }
-        .plan-card.is-selected .plan-rank::after {
-            content: 'YOU';
-            display: block;
-            font-size: 8px;
-            background: var(--primary);
-            color: white;
-            padding: 1px 4px;
-            border-radius: 3px;
-            margin-top: 2px;
-        }
-        @keyframes yourPlanPulse {
-            0%, 100% { box-shadow: 0 0 0 2px rgba(37,99,235,0.15), var(--shadow-sm); }
-            50% { box-shadow: 0 0 0 4px rgba(37,99,235,0.25), var(--shadow-md); }
-        }
-        
-        .plan-rank {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-align: center;
-        }
-        
-        .plan-card.rank-1 .plan-rank { color: var(--success); }
-        .plan-card.rank-last .plan-rank { color: var(--danger); }
-        
-        .plan-details { display: flex; flex-direction: column; min-width: 0; }
-        
-        .plan-insurer {
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .best-badge {
-            background: var(--success);
-            color: white;
-            font-size: 8px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: 700;
-            letter-spacing: 0.4px;
-        }
-        
-        .plan-breakdown {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-        
-        .plan-breakdown .sep { margin: 0 5px; opacity: 0.5; }
-        
-        .plan-bar-cell {
-            width: 160px;
-            height: 14px;
-            background: var(--bg-subtle);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .plan-bar-fill {
-            height: 100%;
-            border-radius: 3px;
-            display: flex;
-        }
-        
-        .plan-bar-premium { background: var(--primary-light); }
-        .plan-bar-copay { background: var(--warning); }
-        
-        .plan-total {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-primary);
-            min-width: 75px;
-            text-align: right;
-        }
-        
-        .plan-card.rank-1 .plan-total { color: var(--success); }
-        .plan-card.rank-last .plan-total { color: var(--danger); }
-        
-        .plan-savings {
-            font-size: 10px;
-            color: var(--success);
-            font-weight: 600;
-            min-width: 70px;
-            text-align: right;
-        }
-        
-        .plan-savings.none { color: var(--text-muted); font-weight: 500; }
-        
-        .plan-legend {
-            display: flex;
-            gap: 12px;
-            padding-top: 6px;
-            margin-top: 4px;
-            border-top: 1px solid var(--border-light);
-            flex-shrink: 0;
-            font-size: 10px;
-            color: var(--text-secondary);
-        }
-        
-        .plan-legend-item { display: flex; align-items: center; gap: 5px; }
-        .plan-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
-        
-        /* ============ GLOBAL SNAPSHOT CHART ============ */
-        .snapshot-chart {
-            flex: 1;
-            min-height: 140px;
-            position: relative;
-        }
-        
-        /* ============ COMPARE VIEW ============ */
-        .compare-single-col {
-            margin-bottom: 10px;
-            flex-shrink: 0;
-        }
-        
-        .segmented {
-            display: inline-flex;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-light);
-            border-radius: 7px;
-            padding: 2px;
-            margin-right: 8px;
-        }
-        
-        .seg-btn {
-            padding: 4px 10px;
-            border: none;
-            background: transparent;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        
-        .seg-btn:hover { color: var(--text-primary); }
-        
-        .seg-btn.active {
-            background: var(--bg-card);
-            color: var(--primary);
-            font-weight: 600;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .compare-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 10px;
-            flex-shrink: 0;
-        }
-        
-        .compare-col-title {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-bottom: 6px;
-        }
-        
-        .compare-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        
-        .compare-chip {
-            padding: 4px 9px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-light);
-            cursor: pointer;
-            transition: all 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .compare-chip:hover { color: var(--text-primary); }
-        
-        .compare-chip.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        .compare-chip.active.country {
-            background: var(--success);
-            border-color: var(--success);
-        }
-        
-        /* SVG text */
-        .axis-text, .chart-label {
-            font-family: 'Inter', sans-serif;
-            fill: var(--text-muted);
-            font-size: 10px;
-        }
-        
-        .axis-text-bold {
-            fill: var(--text-secondary);
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .grid line { stroke: var(--border-light); stroke-dasharray: 2,2; }
-        .grid path { stroke-width: 0; }
-        
-        /* ============ TOOLTIP ============ */
-        .tooltip {
-            position: fixed;
-            background: rgba(17, 24, 39, 0.97);
-            color: white;
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            max-width: 240px;
-            pointer-events: none;
-            z-index: 1000;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
-        }
-        
-        .tooltip-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
-            padding-bottom: 4px;
-        }
-        
-        .tooltip-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 2px;
-        }
-        
-        .tooltip-row span:first-child { opacity: 0.75; }
-        
-        /* Legend */
-        .legend {
-            display: flex;
-            gap: 12px;
-            padding-top: 8px;
-            margin-top: 6px;
-            border-top: 1px solid var(--border-light);
-            flex-shrink: 0;
-            flex-wrap: wrap;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 10px;
-            color: var(--text-secondary);
-        }
-        
-        .legend-dot { width: 9px; height: 9px; border-radius: 2px; }
-        .legend-dot.tier-2 { background: var(--tier-2); }
-        .legend-dot.tier-3 { background: var(--warning); }
-        .legend-dot.tier-4 { background: var(--danger); }
-    </style>
+<meta charset="UTF-8">
+<title>HealthLens | Drug Cost Intelligence</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#F8FAFC;--card:#fff;--subtle:#F1F5F9;--border:#E2E8F0;
+  --txt:#0F172A;--txt2:#475569;--muted:#94A3B8;
+  --sh1:0 1px 3px rgba(0,0,0,.05);--sh2:0 4px 16px rgba(0,0,0,.09);
+  --accent:#2563EB;--accent-bg:#EFF6FF;--accent-border:#BFDBFE;
+  --radius:8px;
+  font-variant-numeric:tabular-nums;
+}
+html,body{height:100vh;overflow:hidden;font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:12px;}
+
+/* ── HEADER ───────────────────────────────────────────────── */
+.hdr{height:46px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;box-shadow:var(--sh1);flex-shrink:0;gap:12px;}
+.bicon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#059669);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;flex-shrink:0;transition:background .4s;}
+.bname h1{font-size:14px;font-weight:700;letter-spacing:-.3px;}
+.bname p{font-size:9px;color:var(--txt2);}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.hdr-drug-name{font-size:13px;font-weight:700;color:var(--accent);transition:color .3s;}
+.hdr-drug-class{font-size:9px;color:var(--muted);padding-left:8px;border-left:1px solid var(--border);}
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
+.main{height:calc(100vh - 46px);display:grid;grid-template-columns:262px 1fr;overflow:hidden;}
+
+/* ── SIDEBAR ──────────────────────────────────────────────── */
+.sidebar{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* Drug cards */
+.drug-section{padding:8px 10px 4px;border-bottom:1px solid var(--border);}
+.drug-section-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:6px;}
+.drug-cards{display:flex;flex-direction:column;gap:4px;}
+.dcard{display:flex;align-items:stretch;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;overflow:hidden;background:var(--subtle);transition:border-color .2s,background .2s,box-shadow .2s;}
+.dcard:hover{border-color:var(--accent);background:#fff;box-shadow:var(--sh1);}
+.dcard.active{background:var(--accent-bg);border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 15%,transparent);}
+.dcard-bar{width:4px;flex-shrink:0;border-radius:4px 0 0 4px;transition:background .3s;}
+.dcard-body{padding:6px 8px;flex:1;min-width:0;}
+.dcard-name{font-size:11px;font-weight:700;color:var(--txt);line-height:1.2;}
+.dcard-sub{font-size:8.5px;color:var(--txt2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dcard-stats{display:flex;gap:6px;margin-top:4px;}
+.dstat{font-size:8px;font-weight:600;padding:1px 5px;border-radius:10px;background:rgba(0,0,0,.06);}
+.dcard.active .dcard-name{color:var(--accent);}
+.dcard.active .dstat{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);}
+
+/* Sidebar sections */
+.sb-sec{padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-ttl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.state-badge{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;border-radius:8px;padding:1px 6px;font-size:8px;font-weight:700;}
+
+/* Country grid */
+.country-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.cflag{padding:4px 2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;background:var(--subtle);text-align:center;transition:all .15s;font-size:8px;line-height:1.5;color:var(--txt2);}
+.cflag:hover{border-color:var(--accent);background:var(--accent-bg);}
+.cflag.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);font-weight:600;}
+.cflag .fl{font-size:13px;display:block;}
+
+/* State card */
+.state-card{margin:8px 10px;background:linear-gradient(135deg,var(--accent-bg),#F0FDF4);border:1px solid var(--accent-border);border-radius:var(--radius);padding:9px 11px;flex-shrink:0;transition:border-color .3s,background .3s;}
+.sc-hed{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:2px;transition:color .3s;}
+.sc-state{font-size:22px;font-weight:800;color:var(--txt);line-height:1.1;}
+.sc-drug{font-size:9px;color:var(--txt2);margin-bottom:5px;}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.sc-cell{background:rgba(255,255,255,.75);border-radius:4px;padding:4px 6px;}
+.sc-lbl{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.sc-val{font-size:12px;font-weight:700;color:var(--txt);}
+.sc-val.good{color:#059669;}
+.sc-val.bad{color:#DC2626;}
+
+/* ── RIGHT PANEL ──────────────────────────────────────────── */
+.rpanel{display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:7px 10px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;}
+.kpi{background:var(--subtle);border-radius:7px;padding:6px 10px;border:1px solid var(--border);transition:background .35s,border-color .35s;}
+.kpi.hi{background:var(--accent-bg);border-color:var(--accent-border);}
+.klbl{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:1px;}
+.kval{font-size:14px;font-weight:700;color:var(--txt);line-height:1.1;transition:color .35s;}
+.kval.accent{color:var(--accent);}
+.ksub{font-size:8.5px;color:var(--txt2);margin-top:1px;}
+.kdelta{font-size:8.5px;font-weight:600;}
+.kdelta.up{color:#DC2626;}
+.kdelta.dn{color:#059669;}
+
+/* Chart grid */
+.cgrid{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:7px;padding:7px 10px;min-height:0;overflow:hidden;}
+.panel{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;min-height:0;box-shadow:var(--sh1);transition:border-color .35s,box-shadow .2s;}
+.panel:hover{box-shadow:var(--sh2);}
+.panel.wide{grid-column:span 2;}
+.ph{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 5px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ptitle{font-size:10px;font-weight:600;color:var(--txt);}
+.ptitle-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;background:var(--accent);transition:background .35s;}
+.psub{font-size:8px;color:var(--muted);}
+.pbody{flex:1;min-height:0;overflow:hidden;position:relative;}
+
+/* Loading skeleton */
+.skeleton{animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.skel-bar{background:#E2E8F0;border-radius:4px;}
+
+/* Tooltip */
+.tt{position:fixed;background:rgba(15,23,42,.94);color:#fff;border-radius:9px;padding:10px 14px;font-size:11px;pointer-events:none;display:none;z-index:9999;max-width:240px;line-height:1.55;box-shadow:0 8px 28px rgba(0,0,0,.28);}
+.tth{font-weight:700;font-size:12px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.15);}
+.ttr{display:flex;justify-content:space-between;gap:16px;opacity:.92;}
+.ttr b{font-weight:600;}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="brand">
-            <div class="brand-icon">H</div>
-            <div class="brand-text">
-                <h1>HealthLens</h1>
-                <p>Prescription Drug Cost Intelligence</p>
-            </div>
-        </div>
-        <div class="drug-selector" id="drug-selector"></div>
-    </div>
-    
-    <div class="dashboard">
-        <!-- DRUG STRIP WITH INLINE KPIS -->
-        <div class="drug-strip">
-            <div class="drug-info">
-                <h2 id="drug-name">Loading...</h2>
-                <div class="separator"></div>
-                <div class="generic" id="drug-generic"></div>
-                <div class="separator"></div>
-                <div class="tags" id="drug-tags"></div>
-            </div>
-            <div class="kpi-strip">
-                <div class="kpi-item">
-                    <div class="kpi-label">2023 Spending</div>
-                    <div class="kpi-value" id="kpi-spending">$---</div>
-                    <div class="kpi-sub" id="kpi-spending-sub">Medicare Part D</div>
-                </div>
-                <div class="kpi-item">
-                    <div class="kpi-label">Beneficiaries</div>
-                    <div class="kpi-value" id="kpi-benes">---M</div>
-                    <div class="kpi-sub" id="kpi-benes-sub">patients</div>
-                </div>
-                <div class="kpi-item">
-                    <div class="kpi-label">5-yr Growth</div>
-                    <div class="kpi-value up" id="kpi-growth">---%</div>
-                    <div class="kpi-sub">vs 2019</div>
-                </div>
-                <div class="kpi-item">
-                    <div class="kpi-label">CAGR Unit Cost</div>
-                    <div class="kpi-value" id="kpi-cagr">---%</div>
-                    <div class="kpi-sub">2019–2023</div>
-                </div>
-                <div class="kpi-item">
-                    <div class="kpi-label">Retail Price</div>
-                    <div class="kpi-value" id="kpi-retail">$---</div>
-                    <div class="kpi-sub">per month</div>
-                </div>
-                <div class="kpi-item kpi-personal" id="kpi-your" style="display:none;">
-                    <div class="kpi-label">Your Annual Cost</div>
-                    <div class="kpi-value" id="kpi-your-value">$---</div>
-                    <div class="kpi-sub" id="kpi-your-sub">select insurer</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- SCENARIO CONTEXT CHIP BAR -->
-        <div class="scenario-bar" id="scenario-bar">
-            <div class="scenario-label">YOUR SCENARIO</div>
-            <div class="scenario-chips" id="scenario-chips"></div>
-            <div class="scenario-hint" id="scenario-hint">Click any insurer or country below to filter the whole dashboard</div>
-            <button class="scenario-clear" id="scenario-clear" style="display:none;">Clear filters</button>
-        </div>
-        
-        <!-- MAIN PANEL WITH TABS -->
-        <div class="main-panel">
-            <div class="panel-tabs" id="panel-tabs">
-                <button class="tab active" data-view="insurers">
-                    <span class="tab-icon">🏥</span> US Insurer Coverage
-                </button>
-                <button class="tab" data-view="trends">
-                    <span class="tab-icon">📈</span> 5-Year Spending Trends
-                </button>
-                <button class="tab" data-view="global">
-                    <span class="tab-icon">🌍</span> Global Benchmark Over Time
-                </button>
-                <button class="tab" data-view="bestplan">
-                    <span class="tab-icon">💰</span> Best Plan for You
-                </button>
-                <button class="tab" data-view="compare">
-                    <span class="tab-icon">⚖️</span> Side-by-Side Compare
-                </button>
-            </div>
-            
-            <div class="panel-content">
-                <!-- VIEW: INSURERS -->
-                <div class="view active" id="view-insurers">
-                    <div class="view-header">
-                        <div>
-                            <div class="view-title">Coverage by Provider</div>
-                            <div class="view-subtitle">Negotiated prices and copays across 8 major insurers</div>
-                        </div>
-                        <div class="view-controls">
-                            <button class="toggle-btn active" data-metric="negotiated_price">Negotiated Price</button>
-                            <button class="toggle-btn" data-metric="patient_copay">Patient Copay</button>
-                            <button class="toggle-btn" data-metric="mail_order_copay">Mail-Order Copay</button>
-                        </div>
-                    </div>
-                    <div class="insurer-list" id="insurer-list"></div>
-                    <div class="legend">
-                        <div class="legend-item"><div class="legend-dot tier-2"></div><span>T2 Preferred</span></div>
-                        <div class="legend-item"><div class="legend-dot tier-3"></div><span>T3 Standard</span></div>
-                        <div class="legend-item"><div class="legend-dot tier-4"></div><span>T4 Non-Preferred</span></div>
-                        <div class="legend-item"><span style="background:#FEE2E2;color:var(--danger);padding:1px 5px;border-radius:3px;font-weight:600;">PA</span><span>Prior Auth</span></div>
-                        <div class="legend-item"><span style="background:#FEF3C7;color:var(--warning);padding:1px 5px;border-radius:3px;font-weight:600;">ST</span><span>Step Therapy</span></div>
-                        <div class="legend-item"><span style="background:#E0E7FF;color:var(--primary);padding:1px 5px;border-radius:3px;font-weight:600;">QL</span><span>Quantity Limit</span></div>
-                        <div class="legend-item"><span style="background:#D1FAE5;color:var(--success);padding:1px 5px;border-radius:3px;font-weight:600;">MO</span><span>Mail-Order</span></div>
-                    </div>
-                </div>
-                
-                <!-- VIEW: TRENDS -->
-                <div class="view" id="view-trends">
-                    <div class="view-header">
-                        <div>
-                            <div class="view-title">Medicare Part D Spending Evolution</div>
-                            <div class="view-subtitle">How this drug's impact has grown (2019–2023)</div>
-                        </div>
-                        <div class="view-controls">
-                            <button class="toggle-btn active" data-trend="total_spending_billions">Total Spending</button>
-                            <button class="toggle-btn" data-trend="beneficiaries">Beneficiaries</button>
-                            <button class="toggle-btn" data-trend="cost_per_claim">Cost/Claim</button>
-                            <button class="toggle-btn" data-trend="cost_per_unit">Cost/Unit</button>
-                        </div>
-                    </div>
-                    <div class="chart-area" id="trend-chart"></div>
-                </div>
-                
-                <!-- VIEW: BEST PLAN -->
-                <div class="view" id="view-bestplan">
-                    <div class="view-header">
-                        <div>
-                            <div class="view-title">Total Annual Cost Ranking</div>
-                            <div class="view-subtitle">Which provider saves you the most? Premium + copay combined for one full year</div>
-                        </div>
-                        <div class="view-controls">
-                            <button class="toggle-btn active" data-plan="standard">Standard Copay</button>
-                            <button class="toggle-btn" data-plan="mail">Mail-Order Copay</button>
-                        </div>
-                    </div>
-                    <div class="plan-grid" id="plan-grid"></div>
-                </div>
-                
-                <!-- VIEW: COMPARE -->
-                <div class="view" id="view-compare">
-                    <div class="view-header">
-                        <div>
-                            <div class="view-title" id="compare-title">Provider Comparison</div>
-                            <div class="view-subtitle" id="compare-sub">Compare US insurance providers for this drug</div>
-                        </div>
-                        <div class="view-controls">
-                            <div class="segmented">
-                                <button class="seg-btn active" data-cmp-scope="provider">🏥 By Provider</button>
-                                <button class="seg-btn" data-cmp-scope="country">🌍 By Country</button>
-                            </div>
-                            <button class="toggle-btn active" data-compare="monthly">Monthly</button>
-                            <button class="toggle-btn" data-compare="annual">Annual</button>
-                        </div>
-                    </div>
-                    <div class="compare-single-col">
-                        <div class="compare-col-title" id="compare-chips-title">Select providers to compare</div>
-                        <div class="compare-chips" id="compare-chips"></div>
-                    </div>
-                    <div class="chart-area" id="compare-chart"></div>
-                </div>
-                
-                <!-- VIEW: GLOBAL -->
-                <div class="view" id="view-global">
-                    <div class="view-header">
-                        <div>
-                            <div class="view-title">Pharmaceutical Spending Per Capita</div>
-                            <div class="view-subtitle">Countries ranked by 2022 spending (USD PPP) — hover for trajectory</div>
-                        </div>
-                        <div class="view-controls">
-                            <button class="toggle-btn active" data-global="bars">Bar View</button>
-                            <button class="toggle-btn" data-global="lines">Time Series</button>
-                        </div>
-                    </div>
-                    <div class="chart-area" id="global-chart"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- SIDEBAR: CONTEXT + SAVINGS -->
-        <div class="sidebar">
-            <div class="side-card expand">
-                <div class="side-card-title">Global Price Snapshot</div>
-                <div class="side-card-sub">Per-capita pharma spending · hover bars for trajectory</div>
-                <div class="snapshot-chart" id="global-snapshot"></div>
-            </div>
-            
-            <div class="side-card savings-hero">
-                <div class="savings-label">Max Annual Savings</div>
-                <div class="savings-amount" id="savings-amount">$---</div>
-                <div class="savings-description" id="savings-desc">Best US coverage vs retail</div>
-                <div class="savings-grid">
-                    <div class="savings-cell">
-                        <span class="savings-cell-label">Best US</span>
-                        <span class="savings-cell-value" id="savings-best">$---</span>
-                    </div>
-                    <div class="savings-cell">
-                        <span class="savings-cell-label">Worst US</span>
-                        <span class="savings-cell-value" id="savings-worst">$---</span>
-                    </div>
-                    <div class="savings-cell">
-                        <span class="savings-cell-label">No Insurance</span>
-                        <span class="savings-cell-value" id="savings-retail">$---</span>
-                    </div>
-                    <div class="savings-cell">
-                        <span class="savings-cell-label">UK NHS</span>
-                        <span class="savings-cell-value" id="savings-uk">£116</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="tooltip" id="tooltip" style="display: none;"></div>
 
-    <script>
-        // ============ STATE ============
-        let drugs = [], insurerPricing = [], globalData = [], scenarios = [];
-        let selectedDrug = null;
-        let activeView = 'insurers';
-        let insurerMetric = 'negotiated_price';
-        let trendMetric = 'total_spending_billions';
-        let globalViewMode = 'bars';
-        let planCopayMode = 'standard';
-        let compareMode = 'monthly';
-        let compareScope = 'provider'; // 'provider' or 'country'
-        let selectedInsurers = new Set();
-        let selectedCountries = new Set();
-        
-        // ============ SCENARIO (coordinated state) ============
-        const scenario = {
-            drug: null,           // drug id (mirrors selectedDrug)
-            insurer: null,        // insurer name or null
-            country: null,        // country name or null
-        };
-        
-        function setScenario(patch) {
-            Object.assign(scenario, patch);
-            if (patch.drug !== undefined) selectedDrug = patch.drug;
-            renderAll();
-        }
-        
-        function clearFilters() {
-            scenario.insurer = null;
-            scenario.country = null;
-            renderAll();
-        }
-        
-        function renderAll() {
-            const drug = drugs.find(d => d.id === selectedDrug);
-            if (!drug) return;
-            renderDrugStrip(drug);
-            renderScenarioBar();
-            renderPersonalizedKPI(drug);
-            renderGlobalSnapshot(drug);
-            renderSavings(drug);
-            renderActiveView();
-            renderDrugSelector();
-        }
-        
-        // Hover broadcaster: apply linked-highlight class across all panels
-        function setHoverTarget(type, id) {
-            document.querySelectorAll('[data-hover-type]').forEach(el => {
-                if (el.dataset.hoverType === type && el.dataset.hoverId === id) {
-                    el.classList.add('is-hover-linked');
-                } else {
-                    el.classList.remove('is-hover-linked');
-                }
-            });
-        }
-        function clearHoverTarget() {
-            document.querySelectorAll('.is-hover-linked').forEach(el => el.classList.remove('is-hover-linked'));
-        }
-        
-        // Realistic monthly premium estimates (2023 Medicare Part D average ~$56)
-        const INSURER_PREMIUMS = {
-            'UnitedHealthcare':       {premium: 62, rating: 4.5},
-            'Blue Cross Blue Shield': {premium: 58, rating: 4.3},
-            'Humana':                 {premium: 51, rating: 4.4},
-            'Aetna':                  {premium: 46, rating: 4.0},
-            'Cigna':                  {premium: 43, rating: 3.9},
-            'WellCare':               {premium: 38, rating: 3.7},
-            'Kaiser Permanente':      {premium: 69, rating: 4.6},
-            'CVS Caremark':           {premium: 41, rating: 3.8},
-        };
-        
-        // Color palette for countries
-        const countryColors = {
-            'United States': '#DC2626',
-            'Canada': '#3B82F6',
-            'United Kingdom': '#10B981',
-            'Germany': '#F59E0B',
-            'France': '#8B5CF6',
-            'Japan': '#EC4899',
-            'Australia': '#06B6D4',
-            'Switzerland': '#EF4444',
-        };
-        
-        // ============ ESCAPE AFFORDANCES ============
-        function attachEscapeHandlers() {
-            // Clear button
-            d3.select('#scenario-clear').on('click', clearFilters);
-            
-            // Esc key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && (scenario.insurer || scenario.country)) clearFilters();
-            });
-            
-            // Background click (clicks on dashboard container that aren't stopped)
-            document.querySelector('.dashboard').addEventListener('click', (e) => {
-                // Only clear if click target is literally the dashboard/panel background
-                if (e.target.classList.contains('dashboard') ||
-                    e.target.classList.contains('panel-content') ||
-                    e.target.classList.contains('view')) {
-                    if (scenario.insurer || scenario.country) clearFilters();
-                }
-            });
-        }
-        
-        // ============ LOAD DATA ============
-        Promise.all([
-            d3.json('data/drug_trends.json'),
-            d3.json('data/insurer_pricing.json'),
-            d3.json('data/global_trends.json'),
-            d3.json('data/patient_scenarios.json')
-        ]).then(([d, i, g, s]) => {
-            drugs = d; insurerPricing = i; globalData = g; scenarios = s;
-            
-            // Inject United States (OECD dataset excludes US; values from CMS/Statista)
-            if (!globalData.find(c => c.iso_code === 'USA')) {
-                const usYears = [
-                    {year:2010,spending_per_capita:984},{year:2011,spending_per_capita:1010},
-                    {year:2012,spending_per_capita:1026},{year:2013,spending_per_capita:1062},
-                    {year:2014,spending_per_capita:1162},{year:2015,spending_per_capita:1234},
-                    {year:2016,spending_per_capita:1272},{year:2017,spending_per_capita:1295},
-                    {year:2018,spending_per_capita:1334},{year:2019,spending_per_capita:1376},
-                    {year:2020,spending_per_capita:1404},{year:2021,spending_per_capita:1421},
-                    {year:2022,spending_per_capita:1432}
-                ];
-                globalData.unshift({
-                    country: 'United States', iso_code: 'USA', flag: '🇺🇸',
-                    system: 'Private / Medicare', yearly_data: usYears,
-                    latest_spending: 1432, earliest_spending: 984,
-                    growth_pct: 45.5, latest_year: 2022
-                });
-                globalData.sort((a,b) => b.latest_spending - a.latest_spending);
-            }
-            selectDrug(drugs[0].id);
-            renderDrugSelector();
-            attachTabHandlers();
-            attachToggleHandlers();
-            attachEscapeHandlers();
-        }).catch(err => console.error('Data load error:', err));
-        
-        // ============ SELECTOR & TABS ============
-        function renderDrugSelector() {
-            d3.select('#drug-selector').selectAll('.drug-pill')
-                .data(drugs)
-                .join('button')
-                .attr('class', d => `drug-pill ${d.id === selectedDrug ? 'active' : ''}`)
-                .text(d => d.brand_name)
-                .on('click', (e, d) => selectDrug(d.id));
-        }
-        
-        function attachTabHandlers() {
-            d3.selectAll('.tab').on('click', function() {
-                const view = this.dataset.view;
-                activeView = view;
-                d3.selectAll('.tab').classed('active', false);
-                d3.select(this).classed('active', true);
-                d3.selectAll('.view').classed('active', false);
-                d3.select(`#view-${view}`).classed('active', true);
-                renderActiveView();
-            });
-        }
-        
-        function attachToggleHandlers() {
-            // Insurer metric toggles
-            d3.selectAll('[data-metric]').on('click', function() {
-                d3.selectAll('[data-metric]').classed('active', false);
-                d3.select(this).classed('active', true);
-                insurerMetric = this.dataset.metric;
-                renderInsurerView();
-            });
-            
-            // Trend metric toggles
-            d3.selectAll('[data-trend]').on('click', function() {
-                d3.selectAll('[data-trend]').classed('active', false);
-                d3.select(this).classed('active', true);
-                trendMetric = this.dataset.trend;
-                renderTrendView();
-            });
-            
-            // Global view toggles
-            d3.selectAll('[data-global]').on('click', function() {
-                d3.selectAll('[data-global]').classed('active', false);
-                d3.select(this).classed('active', true);
-                globalViewMode = this.dataset.global;
-                renderGlobalView();
-            });
-            
-            // Plan copay toggles
-            d3.selectAll('[data-plan]').on('click', function() {
-                d3.selectAll('[data-plan]').classed('active', false);
-                d3.select(this).classed('active', true);
-                planCopayMode = this.dataset.plan;
-                renderBestPlanView();
-            });
-            
-            // Compare toggles
-            d3.selectAll('[data-compare]').on('click', function() {
-                d3.selectAll('[data-compare]').classed('active', false);
-                d3.select(this).classed('active', true);
-                compareMode = this.dataset.compare;
-                renderCompareView();
-            });
-            
-            // Compare scope switch (Provider / Country)
-            d3.selectAll('[data-cmp-scope]').on('click', function() {
-                d3.selectAll('[data-cmp-scope]').classed('active', false);
-                d3.select(this).classed('active', true);
-                compareScope = this.dataset.cmpScope;
-                renderCompareView();
-            });
-        }
-        
-        // ============ MAIN SELECT ============
-        // Called from drug selector pills. Switching drug clears cross-filters to avoid stale selections.
-        function selectDrug(drugId) {
-            setScenario({ drug: drugId, insurer: null, country: null });
-        }
-        
-        // Renders the header strip + KPIs only (pulled out of old selectDrug)
-        function renderDrugStrip(drug) {
-            d3.select('#drug-name').text(drug.brand_name);
-            d3.select('#drug-generic').text(drug.generic_name);
-            
-            const tags = d3.select('#drug-tags');
-            tags.html('');
-            tags.append('span').attr('class', 'tag tag-therapeutic').text(drug.therapeutic_class);
-            tags.append('span').attr('class', 'tag tag-condition').text(drug.condition);
-            
-            d3.select('#kpi-spending').text(`$${drug.latest_spending_b}B`);
-            d3.select('#kpi-benes').text(`${drug.latest_beneficiaries_m}M`);
-            d3.select('#kpi-benes-sub').text(`${drug.latest_claims_m}M claims`);
-            
-            const growth = drug.total_spending_growth_pct;
-            d3.select('#kpi-growth')
-                .text(`${growth > 0 ? '+' : ''}${growth}%`)
-                .classed('up', growth > 0)
-                .classed('down', growth < 0);
-            
-            const cagr = drug.cagr_cost_per_unit;
-            d3.select('#kpi-cagr')
-                .text(`${cagr > 0 ? '+' : ''}${cagr}%`)
-                .classed('up', cagr > 0)
-                .classed('down', cagr < 0);
-            
-            d3.select('#kpi-retail').text(`$${drug.retail_price}`);
-        }
-        
-        // ============ SCENARIO CHIP BAR ============
-        function renderScenarioBar() {
-            const drug = drugs.find(d => d.id === selectedDrug);
-            const bar = d3.select('#scenario-bar');
-            const chips = d3.select('#scenario-chips');
-            const hint = d3.select('#scenario-hint');
-            const clearBtn = d3.select('#scenario-clear');
-            
-            chips.html('');
-            
-            // Drug chip (always present)
-            if (drug) {
-                chips.append('div').attr('class', 'scenario-chip drug')
-                    .html(`<span>💊 ${drug.brand_name}</span>`);
-            }
-            
-            // Insurer chip
-            if (scenario.insurer) {
-                const chip = chips.append('div').attr('class', 'scenario-chip insurer');
-                chip.append('span').html(`🏥 ${scenario.insurer}`);
-                chip.append('span').attr('class', 'scenario-chip-x').html('×')
-                    .on('click', () => setScenario({ insurer: null }));
-            }
-            
-            // Country chip
-            if (scenario.country) {
-                const country = globalData.find(c => c.country === scenario.country);
-                const chip = chips.append('div').attr('class', 'scenario-chip country');
-                chip.append('span').html(`${country ? country.flag : '🌍'} ${scenario.country}`);
-                chip.append('span').attr('class', 'scenario-chip-x').html('×')
-                    .on('click', () => setScenario({ country: null }));
-            }
-            
-            const hasFilters = !!(scenario.insurer || scenario.country);
-            bar.classed('has-filters', hasFilters);
-            hint.style('display', hasFilters ? 'none' : '');
-            clearBtn.style('display', hasFilters ? '' : 'none');
-        }
-        
-        // ============ PERSONALIZED KPI ============
-        function renderPersonalizedKPI(drug) {
-            const slot = d3.select('#kpi-your');
-            if (!scenario.insurer && !scenario.country) {
-                slot.style('display', 'none');
-                return;
-            }
-            slot.style('display', '');
-            
-            if (scenario.insurer) {
-                const p = insurerPricing.find(x => x.drug_id === selectedDrug && x.insurer === scenario.insurer);
-                if (p) {
-                    const prem = (INSURER_PREMIUMS[p.insurer] || {premium: 50}).premium;
-                    const annual = (prem + p.patient_copay) * 12;
-                    const retailAnnual = drug.retail_price * 12;
-                    const savings = retailAnnual - annual;
-                    d3.select('#kpi-your .kpi-label').text('Your Annual Cost');
-                    d3.select('#kpi-your-value').text(`$${annual.toLocaleString()}`);
-                    d3.select('#kpi-your-sub').html(`<span style="color:var(--success);font-weight:700;">save $${savings.toLocaleString()}</span> vs retail`);
-                }
-            } else if (scenario.country) {
-                const country = globalData.find(c => c.country === scenario.country);
-                const countryRatios = {
-                    'United States': 1.0, 'Canada': 0.55, 'United Kingdom': 0.35,
-                    'Germany': 0.50, 'France': 0.45, 'Japan': 0.40,
-                    'Australia': 0.42, 'Switzerland': 0.70
-                };
-                const ratio = countryRatios[scenario.country] || 0.5;
-                const monthly = Math.round(drug.retail_price * ratio * (country && country.iso_code === 'USA' ? 1 : 0.15));
-                const annual = monthly * 12;
-                d3.select('#kpi-your .kpi-label').text(`Cost in ${country.flag} ${country.iso_code}`);
-                d3.select('#kpi-your-value').text(`$${annual.toLocaleString()}`);
-                d3.select('#kpi-your-sub').text(`per year (${country.system})`);
-            }
-        }
-        
-        function renderActiveView() {
-            if (activeView === 'insurers') renderInsurerView();
-            else if (activeView === 'trends') renderTrendView();
-            else if (activeView === 'global') renderGlobalView();
-            else if (activeView === 'bestplan') renderBestPlanView();
-            else if (activeView === 'compare') renderCompareView();
-        }
-        
-        // ============ COMPARE VIEW ============
-        function renderCompareView() {
-            const drug = drugs.find(d => d.id === selectedDrug);
-            const pricing = insurerPricing.filter(p => p.drug_id === selectedDrug);
-            
-            // Auto-select defaults if empty
-            if (selectedInsurers.size === 0) {
-                pricing.forEach(p => selectedInsurers.add(p.insurer));
-            }
-            if (selectedCountries.size === 0) {
-                globalData.forEach(c => selectedCountries.add(c.country));
-            }
-            
-            // Sync with global scenario: ensure scenario.insurer/country are part of selection if set
-            if (scenario.insurer) selectedInsurers.add(scenario.insurer);
-            if (scenario.country) selectedCountries.add(scenario.country);
-            
-            // Update header based on scope
-            if (compareScope === 'provider') {
-                d3.select('#compare-title').text('Provider Comparison');
-                d3.select('#compare-sub').text(`Compare US insurance providers for ${drug.brand_name}`);
-                d3.select('#compare-chips-title').text('Click chips to add/remove providers');
-            } else {
-                d3.select('#compare-title').text('Country Comparison');
-                d3.select('#compare-sub').text(`Compare international pricing systems for ${drug.brand_name}`);
-                d3.select('#compare-chips-title').text('Click chips to add/remove countries');
-            }
-            
-            // Render chips based on scope
-            const chipsContainer = d3.select('#compare-chips');
-            chipsContainer.selectAll('.compare-chip').remove();
-            
-            if (compareScope === 'provider') {
-                chipsContainer.selectAll('.compare-chip')
-                    .data(pricing)
-                    .join('div')
-                    .attr('class', d => `compare-chip insurer ${selectedInsurers.has(d.insurer) ? 'active' : ''}`)
-                    .text(d => d.insurer)
-                    .on('click', (e, d) => {
-                        if (selectedInsurers.has(d.insurer)) selectedInsurers.delete(d.insurer);
-                        else selectedInsurers.add(d.insurer);
-                        renderCompareView();
-                    });
-            } else {
-                chipsContainer.selectAll('.compare-chip')
-                    .data(globalData)
-                    .join('div')
-                    .attr('class', d => `compare-chip country ${selectedCountries.has(d.country) ? 'active' : ''}`)
-                    .html(d => `${d.flag} ${d.country}`)
-                    .on('click', (e, d) => {
-                        if (selectedCountries.has(d.country)) selectedCountries.delete(d.country);
-                        else selectedCountries.add(d.country);
-                        renderCompareView();
-                    });
-            }
-            
-            // Build comparison data for current scope only
-            const countryRatios = {
-                'United States': 1.0, 'Canada': 0.55, 'United Kingdom': 0.35,
-                'Germany': 0.50, 'France': 0.45, 'Japan': 0.40,
-                'Australia': 0.42, 'Switzerland': 0.70
-            };
-            
-            const items = [];
-            if (compareScope === 'provider') {
-                pricing.forEach(p => {
-                    if (!selectedInsurers.has(p.insurer)) return;
-                    const prem = (INSURER_PREMIUMS[p.insurer] || {premium: 50}).premium;
-                    const rating = (INSURER_PREMIUMS[p.insurer] || {rating: 4.0}).rating;
-                    const monthly = prem + p.patient_copay;
-                    const annual = monthly * 12;
-                    items.push({
-                        label: p.insurer,
-                        type: 'insurer',
-                        color: d3.interpolateBlues(0.4 + (p.tier - 2) * 0.2),
-                        monthly, annual,
-                        sub: `$${prem}/mo premium + $${p.patient_copay} copay · Tier ${p.tier} · ★ ${rating}`
-                    });
-                });
-            } else {
-                globalData.forEach(c => {
-                    if (!selectedCountries.has(c.country)) return;
-                    const ratio = countryRatios[c.country] || 0.5;
-                    const monthly = Math.round(drug.retail_price * ratio * (c.iso_code === 'USA' ? 1 : 0.15));
-                    const annual = monthly * 12;
-                    items.push({
-                        label: `${c.flag} ${c.country}`,
-                        type: 'country',
-                        color: countryColors[c.country] || '#059669',
-                        monthly, annual,
-                        sub: `${c.system} · 2022 pharma spend: $${c.latest_spending}/capita`
-                    });
-                });
-            }
-            
-            // Sort by current metric
-            items.sort((a, b) => a[compareMode] - b[compareMode]);
-            
-            // Render chart
-            const container = d3.select('#compare-chart');
-            container.selectAll('*').remove();
-            
-            if (items.length === 0) {
-                container.append('div')
-                    .style('display', 'flex')
-                    .style('align-items', 'center')
-                    .style('justify-content', 'center')
-                    .style('height', '100%')
-                    .style('color', 'var(--text-muted)')
-                    .style('font-size', '13px')
-                    .text('Select at least one insurer or country above to compare');
-                return;
-            }
-            
-            const width = container.node().clientWidth;
-            const height = container.node().clientHeight;
-            const margin = {top: 10, right: 90, bottom: 30, left: 170};
-            
-            const svg = container.append('svg').attr('width', width).attr('height', height);
-            
-            const y = d3.scaleBand()
-                .domain(items.map(d => d.label))
-                .range([margin.top, height - margin.bottom])
-                .padding(0.22);
-            
-            const maxVal = d3.max(items, d => d[compareMode]);
-            const x = d3.scaleLinear()
-                .domain([0, maxVal * 1.15])
-                .range([margin.left, width - margin.right]);
-            
-            svg.append('g')
-                .attr('class', 'grid')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).tickSize(-(height - margin.top - margin.bottom)).tickFormat(''));
-            
-            // Bars
-            const bars = svg.selectAll('.cmp-group')
-                .data(items)
-                .join('g')
-                .attr('class', 'cmp-group');
-            
-            bars.append('rect')
-                .attr('x', margin.left)
-                .attr('y', d => y(d.label))
-                .attr('height', y.bandwidth())
-                .attr('width', 0)
-                .attr('rx', 4)
-                .attr('fill', d => d.color)
-                .attr('opacity', 0.85)
-                .transition().duration(500)
-                .attr('width', d => x(d[compareMode]) - margin.left);
-            
-            // Left labels
-            bars.append('text')
-                .attr('x', margin.left - 8)
-                .attr('y', d => y(d.label) + y.bandwidth()/2 - 2)
-                .attr('text-anchor', 'end')
-                .attr('class', 'axis-text-bold')
-                .style('font-size', '11px')
-                .text(d => d.label);
-            
-            bars.append('text')
-                .attr('x', margin.left - 8)
-                .attr('y', d => y(d.label) + y.bandwidth()/2 + 10)
-                .attr('text-anchor', 'end')
-                .attr('class', 'axis-text')
-                .style('font-size', '9px')
-                .text(d => d.sub.length > 32 ? d.sub.slice(0, 30) + '…' : d.sub);
-            
-            // Value labels
-            bars.append('text')
-                .attr('x', d => x(d[compareMode]) + 6)
-                .attr('y', d => y(d.label) + y.bandwidth()/2 + 4)
-                .attr('class', 'axis-text-bold')
-                .style('font-size', '12px')
-                .style('font-weight', '700')
-                .style('fill', d => d.color)
-                .text(d => `$${d[compareMode].toLocaleString()}`);
-            
-            // X axis
-            svg.append('g')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).ticks(5).tickFormat(d => `$${d}`))
-                .selectAll('text').attr('class', 'axis-text');
-            
-            svg.append('text')
-                .attr('class', 'axis-text')
-                .attr('x', (margin.left + width - margin.right) / 2)
-                .attr('y', height - 5)
-                .attr('text-anchor', 'middle')
-                .text(compareMode === 'monthly' ? 'Monthly patient cost (USD)' : 'Annual patient cost (USD, premium + copay)');
-            
-            // Tooltips
-            bars.on('mousemove', (e, d) => {
-                showTooltip(e, `
-                    <div class="tooltip-title">${d.label}</div>
-                    <div class="tooltip-row"><span>Type:</span><span>${d.type === 'insurer' ? 'US Insurer' : 'Country'}</span></div>
-                    <div class="tooltip-row"><span>Monthly:</span><span>$${d.monthly.toLocaleString()}</span></div>
-                    <div class="tooltip-row"><span>Annual:</span><span>$${d.annual.toLocaleString()}</span></div>
-                    <div class="tooltip-row"><span>Details:</span><span style="text-align:right;max-width:160px;">${d.sub}</span></div>
-                `);
-            }).on('mouseout', hideTooltip);
-        }
-        
-        // ============ INSURER VIEW ============
-        function renderInsurerView() {
-            const pricing = insurerPricing.filter(p => p.drug_id === selectedDrug);
-            const sorted = [...pricing].sort((a, b) => a[insurerMetric] - b[insurerMetric]);
-            const maxVal = d3.max(sorted, d => d[insurerMetric]);
-            
-            const list = d3.select('#insurer-list');
-            list.selectAll('.insurer-row').remove();
-            
-            const anyFilter = !!(scenario.insurer || scenario.country);
-            const rows = list.selectAll('.insurer-row')
-                .data(sorted)
-                .join('div')
-                .attr('class', d => {
-                    let cls = 'insurer-row';
-                    if (scenario.insurer === d.insurer) cls += ' is-selected';
-                    else if (anyFilter && scenario.insurer) cls += ' is-dimmed';
-                    return cls;
-                })
-                .attr('data-hover-type', 'insurer')
-                .attr('data-hover-id', d => d.insurer)
-                .on('click', (e, d) => {
-                    e.stopPropagation();
-                    setScenario({ insurer: scenario.insurer === d.insurer ? null : d.insurer });
-                })
-                .on('mouseenter', (e, d) => setHoverTarget('insurer', d.insurer))
-                .on('mouseleave', clearHoverTarget);
-            
-            rows.append('div').attr('class', 'insurer-name').text(d => d.insurer);
-            
-            rows.append('div')
-                .attr('class', 'insurer-bar-container')
-                .append('div')
-                .attr('class', d => `insurer-bar tier-${d.tier}`)
-                .style('width', d => `${Math.max(12, (d[insurerMetric] / maxVal) * 100)}%`)
-                .append('span')
-                .attr('class', 'bar-label')
-                .text(d => insurerMetric === 'negotiated_price' ? `$${d[insurerMetric].toLocaleString()}` : `$${d[insurerMetric]}`);
-            
-            const details = rows.append('div').attr('class', 'insurer-details');
-            details.append('div').attr('class', 'copay').text(d => `$${d.patient_copay}`);
-            details.append('div').attr('class', d => `tier-badge tier-${d.tier}`).text(d => `T${d.tier}`);
-            details.each(function(d) {
-                const sel = d3.select(this);
-                if (d.prior_auth_required) sel.append('span').attr('class', 'restriction-icon pa').text('PA');
-                if (d.step_therapy) sel.append('span').attr('class', 'restriction-icon st').text('ST');
-                if (d.quantity_limit) sel.append('span').attr('class', 'restriction-icon ql').text('QL');
-                if (d.mail_order_available) sel.append('span').attr('class', 'restriction-icon mo').text('MO');
-            });
-            
-            rows.on('mousemove', (e, d) => {
-                showTooltip(e, `
-                    <div class="tooltip-title">${d.insurer}</div>
-                    <div class="tooltip-row"><span>Negotiated:</span><span>$${d.negotiated_price.toLocaleString()}</span></div>
-                    <div class="tooltip-row"><span>Copay:</span><span>$${d.patient_copay}</span></div>
-                    <div class="tooltip-row"><span>Mail-Order:</span><span>$${d.mail_order_copay}</span></div>
-                    <div class="tooltip-row"><span>Tier:</span><span>${d.tier}</span></div>
-                    <div class="tooltip-row"><span>Network:</span><span>${d.network_size}</span></div>
-                    <div class="tooltip-row"><span>Market Share:</span><span>${d.market_share}%</span></div>
-                    ${d.prior_auth_required ? '<div style="margin-top:5px;color:#FCA5A5;">⚠ Prior Authorization</div>' : ''}
-                    ${d.step_therapy ? '<div style="margin-top:2px;color:#FCD34D;">⚠ Step Therapy</div>' : ''}
-                    ${d.quantity_limit ? '<div style="margin-top:2px;color:#93C5FD;">⚠ Quantity Limit</div>' : ''}
-                `);
-            }).on('mouseout', hideTooltip);
-        }
-        
-        // ============ TREND VIEW ============
-        function renderTrendView() {
-            const drug = drugs.find(d => d.id === selectedDrug);
-            const container = d3.select('#trend-chart');
-            container.selectAll('*').remove();
-            
-            const width = container.node().clientWidth;
-            const height = container.node().clientHeight;
-            const margin = {top: 20, right: 20, bottom: 35, left: 55};
-            
-            const svg = container.append('svg').attr('width', width).attr('height', height);
-            
-            const x = d3.scaleLinear()
-                .domain(d3.extent(drug.yearly_data, d => d.year))
-                .range([margin.left, width - margin.right]);
-            
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(drug.yearly_data, d => d[trendMetric]) * 1.15])
-                .range([height - margin.bottom, margin.top]);
-            
-            // Grid
-            svg.append('g')
-                .attr('class', 'grid')
-                .attr('transform', `translate(${margin.left},0)`)
-                .call(d3.axisLeft(y).tickSize(-(width - margin.left - margin.right)).tickFormat(''));
-            
-            // Area
-            const area = d3.area()
-                .x(d => x(d.year))
-                .y0(height - margin.bottom)
-                .y1(d => y(d[trendMetric]))
-                .curve(d3.curveMonotoneX);
-            
-            const gradient = svg.append('defs').append('linearGradient')
-                .attr('id', 'trendGrad')
-                .attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
-            gradient.append('stop').attr('offset', '0%').attr('stop-color', '#3B82F6').attr('stop-opacity', 0.3);
-            gradient.append('stop').attr('offset', '100%').attr('stop-color', '#3B82F6').attr('stop-opacity', 0);
-            
-            svg.append('path')
-                .datum(drug.yearly_data)
-                .attr('fill', 'url(#trendGrad)')
-                .attr('d', area);
-            
-            // Line
-            const line = d3.line()
-                .x(d => x(d.year))
-                .y(d => y(d[trendMetric]))
-                .curve(d3.curveMonotoneX);
-            
-            svg.append('path')
-                .datum(drug.yearly_data)
-                .attr('fill', 'none')
-                .attr('stroke', '#1E40AF')
-                .attr('stroke-width', 2.5)
-                .attr('d', line);
-            
-            // Dots
-            const fmt = formatForMetric(trendMetric);
-            
-            svg.selectAll('.trend-dot')
-                .data(drug.yearly_data)
-                .join('circle')
-                .attr('class', 'trend-dot')
-                .attr('cx', d => x(d.year))
-                .attr('cy', d => y(d[trendMetric]))
-                .attr('r', 5)
-                .attr('fill', 'white')
-                .attr('stroke', '#1E40AF')
-                .attr('stroke-width', 2.5)
-                .on('mousemove', (e, d) => {
-                    showTooltip(e, `
-                        <div class="tooltip-title">${d.year}</div>
-                        <div class="tooltip-row"><span>Total Spending:</span><span>$${d.total_spending_billions}B</span></div>
-                        <div class="tooltip-row"><span>Beneficiaries:</span><span>${(d.beneficiaries/1e6).toFixed(2)}M</span></div>
-                        <div class="tooltip-row"><span>Claims:</span><span>${(d.claims/1e6).toFixed(2)}M</span></div>
-                        <div class="tooltip-row"><span>Cost / Claim:</span><span>$${d.cost_per_claim.toLocaleString()}</span></div>
-                        <div class="tooltip-row"><span>Cost / Unit:</span><span>$${d.cost_per_unit}</span></div>
-                    `);
-                })
-                .on('mouseout', hideTooltip);
-            
-            // Value labels
-            svg.selectAll('.trend-label')
-                .data(drug.yearly_data)
-                .join('text')
-                .attr('class', 'axis-text-bold')
-                .attr('x', d => x(d.year))
-                .attr('y', d => y(d[trendMetric]) - 10)
-                .attr('text-anchor', 'middle')
-                .text(d => fmt(d[trendMetric]));
-            
-            // X axis
-            svg.append('g')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(5))
-                .selectAll('text').attr('class', 'axis-text-bold');
-            
-            // Y axis
-            svg.append('g')
-                .attr('transform', `translate(${margin.left},0)`)
-                .call(d3.axisLeft(y).ticks(5).tickFormat(fmt))
-                .selectAll('text').attr('class', 'axis-text');
-        }
-        
-        function formatForMetric(metric) {
-            if (metric === 'total_spending_billions') return d => `$${d}B`;
-            if (metric === 'beneficiaries') return d => `${(d/1e6).toFixed(1)}M`;
-            if (metric === 'cost_per_claim') return d => `$${Math.round(d)}`;
-            if (metric === 'cost_per_unit') return d => `$${d.toFixed(2)}`;
-            return d => d;
-        }
-        
-        // ============ GLOBAL VIEW ============
-        function renderGlobalView() {
-            if (globalViewMode === 'bars') renderGlobalBars();
-            else renderGlobalLines();
-        }
-        
-        function renderGlobalBars() {
-            const container = d3.select('#global-chart');
-            container.selectAll('*').remove();
-            
-            const width = container.node().clientWidth;
-            const height = container.node().clientHeight;
-            const margin = {top: 10, right: 60, bottom: 30, left: 140};
-            
-            const svg = container.append('svg').attr('width', width).attr('height', height);
-            
-            const data = [...globalData].sort((a, b) => b.latest_spending - a.latest_spending);
-            
-            const y = d3.scaleBand()
-                .domain(data.map(d => d.country))
-                .range([margin.top, height - margin.bottom])
-                .padding(0.25);
-            
-            const x = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.latest_spending) * 1.1])
-                .range([margin.left, width - margin.right]);
-            
-            // Grid
-            svg.append('g')
-                .attr('class', 'grid')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).tickSize(-(height - margin.top - margin.bottom)).tickFormat(''));
-            
-            // Bars
-            svg.selectAll('.country-bar')
-                .data(data)
-                .join('rect')
-                .attr('class', d => {
-                    let cls = 'country-bar';
-                    if (scenario.country === d.country) cls += ' is-selected';
-                    else if (scenario.country) cls += ' is-dimmed';
-                    return cls;
-                })
-                .attr('data-hover-type', 'country')
-                .attr('data-hover-id', d => d.country)
-                .style('cursor', 'pointer')
-                .attr('x', margin.left)
-                .attr('y', d => y(d.country))
-                .attr('height', y.bandwidth())
-                .attr('width', d => x(d.latest_spending) - margin.left)
-                .attr('rx', 4)
-                .attr('fill', d => countryColors[d.country] || '#6B7280')
-                .attr('opacity', 0.85)
-                .attr('stroke', d => scenario.country === d.country ? '#111827' : 'none')
-                .attr('stroke-width', d => scenario.country === d.country ? 2 : 0)
-                .on('click', (e, d) => {
-                    e.stopPropagation();
-                    setScenario({ country: scenario.country === d.country ? null : d.country });
-                })
-                .on('mousemove', (e, d) => {
-                    setHoverTarget('country', d.country);
-                    showTooltip(e, `
-                        <div class="tooltip-title">${d.flag} ${d.country}</div>
-                        <div class="tooltip-row"><span>${d.latest_year}:</span><span>$${d.latest_spending}</span></div>
-                        <div class="tooltip-row"><span>${d.first_year}:</span><span>$${d.first_spending}</span></div>
-                        <div class="tooltip-row"><span>Growth:</span><span>${d.growth_pct > 0 ? '+' : ''}${d.growth_pct}%</span></div>
-                        <div class="tooltip-row"><span>System:</span><span style="text-align:right;">${d.system}</span></div>
-                        <div style="margin-top:4px;font-style:italic;opacity:0.7;">Click to filter the whole dashboard</div>
-                    `);
-                })
-                .on('mouseout', () => { clearHoverTarget(); hideTooltip(); });
-            
-            // Labels (country names)
-            svg.selectAll('.country-label')
-                .data(data)
-                .join('text')
-                .attr('class', 'axis-text-bold')
-                .attr('x', margin.left - 8)
-                .attr('y', d => y(d.country) + y.bandwidth()/2 + 4)
-                .attr('text-anchor', 'end')
-                .text(d => `${d.flag} ${d.country}`);
-            
-            // Value labels
-            svg.selectAll('.value-label')
-                .data(data)
-                .join('text')
-                .attr('class', 'axis-text-bold')
-                .attr('x', d => x(d.latest_spending) + 6)
-                .attr('y', d => y(d.country) + y.bandwidth()/2 + 4)
-                .text(d => `$${d.latest_spending}`);
-            
-            // X axis
-            svg.append('g')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).ticks(5).tickFormat(d => `$${d}`))
-                .selectAll('text').attr('class', 'axis-text');
-            
-            svg.append('text')
-                .attr('class', 'axis-text')
-                .attr('x', (margin.left + width - margin.right) / 2)
-                .attr('y', height - 5)
-                .attr('text-anchor', 'middle')
-                .text('Per-capita spending (USD PPP)');
-        }
-        
-        function renderGlobalLines() {
-            const container = d3.select('#global-chart');
-            container.selectAll('*').remove();
-            
-            const width = container.node().clientWidth;
-            const height = container.node().clientHeight;
-            const margin = {top: 10, right: 110, bottom: 35, left: 55};
-            
-            const svg = container.append('svg').attr('width', width).attr('height', height);
-            
-            const allYears = globalData.flatMap(c => c.yearly_data.map(d => d.year));
-            const allVals = globalData.flatMap(c => c.yearly_data.map(d => d.spending_per_capita));
-            
-            const x = d3.scaleLinear()
-                .domain(d3.extent(allYears))
-                .range([margin.left, width - margin.right]);
-            
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(allVals) * 1.05])
-                .range([height - margin.bottom, margin.top]);
-            
-            // Grid
-            svg.append('g')
-                .attr('class', 'grid')
-                .attr('transform', `translate(${margin.left},0)`)
-                .call(d3.axisLeft(y).tickSize(-(width - margin.left - margin.right)).tickFormat(''));
-            
-            const line = d3.line()
-                .x(d => x(d.year))
-                .y(d => y(d.spending_per_capita))
-                .curve(d3.curveMonotoneX);
-            
-            // Sort for rendering: US on top
-            const sorted = [...globalData].sort((a, b) => (a.iso_code === 'USA' ? 1 : 0) - (b.iso_code === 'USA' ? 1 : 0));
-            
-            sorted.forEach(country => {
-                const isSel = scenario.country === country.country;
-                const isDimmed = scenario.country && !isSel;
-                svg.append('path')
-                    .datum(country.yearly_data)
-                    .attr('fill', 'none')
-                    .attr('stroke', countryColors[country.country] || '#6B7280')
-                    .attr('stroke-width', isSel ? 4 : (country.iso_code === 'USA' ? 3 : 2))
-                    .attr('opacity', isDimmed ? 0.2 : (country.iso_code === 'USA' ? 1 : 0.8))
-                    .style('cursor', 'pointer')
-                    .attr('data-hover-type', 'country')
-                    .attr('data-hover-id', country.country)
-                    .on('click', (e) => {
-                        e.stopPropagation();
-                        setScenario({ country: scenario.country === country.country ? null : country.country });
-                    })
-                    .on('mouseenter', () => setHoverTarget('country', country.country))
-                    .on('mouseleave', clearHoverTarget)
-                    .attr('d', line);
-                
-                // End label
-                const last = country.yearly_data[country.yearly_data.length - 1];
-                svg.append('text')
-                    .attr('class', 'axis-text-bold')
-                    .attr('x', x(last.year) + 6)
-                    .attr('y', y(last.spending_per_capita) + 3)
-                    .attr('fill', countryColors[country.country])
-                    .attr('font-size', '10px')
-                    .text(`${country.flag} ${country.iso_code}`);
-                
-                // Dots on line
-                svg.selectAll(`.dot-${country.iso_code}`)
-                    .data(country.yearly_data)
-                    .join('circle')
-                    .attr('cx', d => x(d.year))
-                    .attr('cy', d => y(d.spending_per_capita))
-                    .attr('r', 2.5)
-                    .attr('fill', countryColors[country.country])
-                    .attr('opacity', 0)
-                    .on('mousemove', (e, d) => {
-                        showTooltip(e, `
-                            <div class="tooltip-title">${country.flag} ${country.country}, ${d.year}</div>
-                            <div class="tooltip-row"><span>Per Capita:</span><span>$${d.spending_per_capita}</span></div>
-                            <div class="tooltip-row"><span>System:</span><span>${country.system}</span></div>
-                        `);
-                    })
-                    .on('mouseout', hideTooltip)
-                    .transition().duration(200).attr('opacity', 1);
-            });
-            
-            // Axes
-            svg.append('g')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).ticks(7).tickFormat(d3.format('d')))
-                .selectAll('text').attr('class', 'axis-text');
-            
-            svg.append('g')
-                .attr('transform', `translate(${margin.left},0)`)
-                .call(d3.axisLeft(y).ticks(5).tickFormat(d => `$${d}`))
-                .selectAll('text').attr('class', 'axis-text');
-            
-            svg.append('text')
-                .attr('class', 'axis-text')
-                .attr('transform', 'rotate(-90)')
-                .attr('x', -(height/2))
-                .attr('y', 15)
-                .attr('text-anchor', 'middle')
-                .text('Spending per capita (USD PPP)');
-        }
-        
-        // ============ BEST PLAN VIEW ============
-        function renderBestPlanView() {
-            const drug = drugs.find(d => d.id === selectedDrug);
-            const pricing = insurerPricing.filter(p => p.drug_id === selectedDrug);
-            
-            // Compute total annual cost = (premium * 12) + (copay * 12)
-            const plans = pricing.map(p => {
-                const info = INSURER_PREMIUMS[p.insurer] || {premium: 50, rating: 4.0};
-                const copay = planCopayMode === 'mail' ? p.mail_order_copay : p.patient_copay;
-                const annualPremium = info.premium * 12;
-                const annualCopay = copay * 12;
-                const total = annualPremium + annualCopay;
-                return {
-                    insurer: p.insurer,
-                    premium_monthly: info.premium,
-                    rating: info.rating,
-                    copay_monthly: copay,
-                    annual_premium: annualPremium,
-                    annual_copay: annualCopay,
-                    annual_total: total,
-                    tier: p.tier,
-                    prior_auth: p.prior_auth_required,
-                    step_therapy: p.step_therapy,
-                    network: p.network_size,
-                };
-            }).sort((a, b) => a.annual_total - b.annual_total);
-            
-            const worstTotal = plans[plans.length - 1].annual_total;
-            const bestTotal = plans[0].annual_total;
-            const retailAnnual = drug.retail_price * 12;
-            const maxBarVal = worstTotal;
-            
-            const grid = d3.select('#plan-grid');
-            grid.selectAll('*').remove();
-            
-            plans.forEach((plan, i) => {
-                const isBest = i === 0;
-                const isWorst = i === plans.length - 1;
-                const savingsVsWorst = worstTotal - plan.annual_total;
-                const savingsVsRetail = retailAnnual - plan.annual_total;
-                
-                const isSelected = scenario.insurer === plan.insurer;
-                const card = grid.append('div')
-                    .attr('class', `plan-card ${isBest ? 'rank-1' : ''} ${isWorst ? 'rank-last' : ''} ${isSelected ? 'is-selected' : ''} ${scenario.insurer && !isSelected ? 'is-dimmed' : ''}`)
-                    .attr('data-hover-type', 'insurer')
-                    .attr('data-hover-id', plan.insurer)
-                    .on('click', (e) => {
-                        e.stopPropagation();
-                        setScenario({ insurer: scenario.insurer === plan.insurer ? null : plan.insurer });
-                    })
-                    .on('mouseenter', () => setHoverTarget('insurer', plan.insurer))
-                    .on('mouseleave', clearHoverTarget);
-                
-                card.append('div').attr('class', 'plan-rank').text(`#${i + 1}`);
-                
-                const details = card.append('div').attr('class', 'plan-details');
-                const name = details.append('div').attr('class', 'plan-insurer');
-                name.append('span').text(plan.insurer);
-                if (isBest) name.append('span').attr('class', 'best-badge').text('BEST VALUE');
-                name.append('span').style('font-size', '10px').style('color', 'var(--text-muted)').text(`★ ${plan.rating}`);
-                
-                details.append('div').attr('class', 'plan-breakdown')
-                    .html(`$${plan.premium_monthly}/mo premium <span class="sep">·</span> $${plan.copay_monthly} copay <span class="sep">·</span> Tier ${plan.tier} <span class="sep">·</span> ${plan.network}`);
-                
-                // Stacked bar: premium + copay
-                const barCell = card.append('div').attr('class', 'plan-bar-cell');
-                const fill = barCell.append('div').attr('class', 'plan-bar-fill')
-                    .style('width', `${(plan.annual_total / maxBarVal) * 100}%`);
-                
-                const premiumPct = (plan.annual_premium / plan.annual_total) * 100;
-                fill.append('div').attr('class', 'plan-bar-premium')
-                    .style('width', `${premiumPct}%`);
-                fill.append('div').attr('class', 'plan-bar-copay')
-                    .style('width', `${100 - premiumPct}%`);
-                
-                card.append('div').attr('class', 'plan-total').text(`$${plan.annual_total.toLocaleString()}`);
-                
-                card.append('div')
-                    .attr('class', `plan-savings ${isWorst ? 'none' : ''}`)
-                    .text(isWorst ? 'baseline' : `save $${savingsVsWorst.toLocaleString()}`);
-                
-                card.on('mousemove', (e) => {
-                    showTooltip(e, `
-                        <div class="tooltip-title">${plan.insurer} · Rank #${i + 1}</div>
-                        <div class="tooltip-row"><span>Monthly Premium:</span><span>$${plan.premium_monthly}</span></div>
-                        <div class="tooltip-row"><span>Monthly Copay:</span><span>$${plan.copay_monthly}</span></div>
-                        <div class="tooltip-row"><span>Annual Premium:</span><span>$${plan.annual_premium.toLocaleString()}</span></div>
-                        <div class="tooltip-row"><span>Annual Copay:</span><span>$${plan.annual_copay.toLocaleString()}</span></div>
-                        <div class="tooltip-row" style="border-top:1px solid rgba(255,255,255,0.2);padding-top:4px;margin-top:4px;"><span>TOTAL / YEAR:</span><span style="font-weight:700;">$${plan.annual_total.toLocaleString()}</span></div>
-                        <div class="tooltip-row"><span>vs. No Insurance:</span><span style="color:#86EFAC;">save $${savingsVsRetail.toLocaleString()}</span></div>
-                        ${plan.prior_auth ? '<div style="margin-top:4px;color:#FCA5A5;font-size:10px;">⚠ Prior Auth required</div>' : ''}
-                        ${plan.step_therapy ? '<div style="color:#FCD34D;font-size:10px;">⚠ Step Therapy required</div>' : ''}
-                    `);
-                }).on('mouseout', hideTooltip);
-            });
-            
-            // Legend
-            const legend = grid.append('div').attr('class', 'plan-legend');
-            legend.append('div').attr('class', 'plan-legend-item')
-                .html('<div class="plan-legend-dot" style="background: var(--primary-light);"></div><span>Annual Premium</span>');
-            legend.append('div').attr('class', 'plan-legend-item')
-                .html('<div class="plan-legend-dot" style="background: var(--warning);"></div><span>Annual Copay for this drug</span>');
-            legend.append('div').attr('class', 'plan-legend-item')
-                .style('margin-left', 'auto')
-                .html(`<span>Retail (no insurance): <strong style="color:var(--danger);">$${retailAnnual.toLocaleString()}/yr</strong></span>`);
-        }
-        
-        // ============ SIDEBAR CHART ============
-        function renderGlobalSnapshot(drug) {
-            const container = d3.select('#global-snapshot');
-            container.selectAll('*').remove();
-            
-            const width = container.node().clientWidth;
-            const height = container.node().clientHeight;
-            if (!width || !height) { setTimeout(() => renderGlobalSnapshot(drug), 100); return; }
-            
-            const margin = {top: 6, right: 58, bottom: 18, left: 78};
-            const svg = container.append('svg').attr('width', width).attr('height', height);
-            
-            const data = [...globalData].sort((a, b) => b.latest_spending - a.latest_spending);
-            
-            const y = d3.scaleBand()
-                .domain(data.map(d => d.country))
-                .range([margin.top, height - margin.bottom])
-                .padding(0.22);
-            
-            const x = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.latest_spending) * 1.05])
-                .range([margin.left, width - margin.right]);
-            
-            // Grid
-            svg.append('g')
-                .attr('class', 'grid')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).tickSize(-(height - margin.top - margin.bottom)).tickFormat(''));
-            
-            // Bars
-            const barGroup = svg.selectAll('.snap-group')
-                .data(data)
-                .join('g')
-                .attr('class', d => {
-                    let cls = 'snap-group';
-                    if (scenario.country === d.country) cls += ' is-selected';
-                    else if (scenario.country) cls += ' is-dimmed';
-                    return cls;
-                })
-                .attr('data-hover-type', 'country')
-                .attr('data-hover-id', d => d.country)
-                .style('cursor', 'pointer')
-                .on('click', (e, d) => {
-                    e.stopPropagation();
-                    setScenario({ country: scenario.country === d.country ? null : d.country });
-                })
-                .on('mouseenter', (e, d) => setHoverTarget('country', d.country))
-                .on('mouseleave', clearHoverTarget);
-            
-            barGroup.append('rect')
-                .attr('x', margin.left)
-                .attr('y', d => y(d.country))
-                .attr('height', y.bandwidth())
-                .attr('width', 0)
-                .attr('rx', 3)
-                .attr('fill', d => countryColors[d.country] || '#6B7280')
-                .attr('opacity', 0.85)
-                .attr('stroke', d => scenario.country === d.country ? '#111827' : 'none')
-                .attr('stroke-width', d => scenario.country === d.country ? 1.5 : 0)
-                .transition().duration(600)
-                .attr('width', d => x(d.latest_spending) - margin.left);
-            
-            // Country labels (flag + code)
-            barGroup.append('text')
-                .attr('class', 'axis-text-bold')
-                .attr('x', margin.left - 6)
-                .attr('y', d => y(d.country) + y.bandwidth()/2 + 3)
-                .attr('text-anchor', 'end')
-                .style('font-size', '10px')
-                .text(d => `${d.flag} ${d.iso_code}`);
-            
-            // Value labels on right
-            barGroup.append('text')
-                .attr('class', 'axis-text-bold')
-                .attr('x', d => x(d.latest_spending) + 5)
-                .attr('y', d => y(d.country) + y.bandwidth()/2 + 3)
-                .style('font-size', '10px')
-                .style('font-weight', '600')
-                .style('fill', d => d.iso_code === 'USA' ? 'var(--danger)' : (d.latest_spending < 500 ? 'var(--success)' : 'var(--text-primary)'))
-                .text(d => `$${d.latest_spending}`);
-            
-            // Inline sparkline inside bar (mini trajectory)
-            barGroup.each(function(d) {
-                const g = d3.select(this);
-                const yearly = d.yearly_data;
-                if (yearly.length < 2) return;
-                
-                const sparkX = d3.scaleLinear().domain(d3.extent(yearly, p => p.year)).range([margin.left + 2, x(d.latest_spending) - 2]);
-                const sparkY = d3.scaleLinear()
-                    .domain([d3.min(yearly, p => p.spending_per_capita) * 0.95, d3.max(yearly, p => p.spending_per_capita)])
-                    .range([y(d.country) + y.bandwidth() - 2, y(d.country) + 2]);
-                
-                const sparkLine = d3.line()
-                    .x(p => sparkX(p.year))
-                    .y(p => sparkY(p.spending_per_capita))
-                    .curve(d3.curveMonotoneX);
-                
-                g.append('path')
-                    .datum(yearly)
-                    .attr('fill', 'none')
-                    .attr('stroke', 'rgba(255,255,255,0.7)')
-                    .attr('stroke-width', 1.2)
-                    .attr('d', sparkLine)
-                    .attr('opacity', 0)
-                    .transition().delay(400).duration(300)
-                    .attr('opacity', 1);
-            });
-            
-            // X axis
-            svg.append('g')
-                .attr('transform', `translate(0,${height - margin.bottom})`)
-                .call(d3.axisBottom(x).ticks(3).tickFormat(d => `$${d}`))
-                .selectAll('text').attr('class', 'axis-text').style('font-size', '9px');
-            
-            // Hover interactions
-            barGroup.on('mousemove', (e, d) => {
-                showTooltip(e, `
-                    <div class="tooltip-title">${d.flag} ${d.country}</div>
-                    <div class="tooltip-row"><span>System:</span><span style="text-align:right;">${d.system}</span></div>
-                    <div class="tooltip-row"><span>${d.latest_year}:</span><span>$${d.latest_spending}</span></div>
-                    <div class="tooltip-row"><span>${d.first_year}:</span><span>$${d.first_spending}</span></div>
-                    <div class="tooltip-row"><span>${d.first_year}–${d.latest_year} Growth:</span><span style="color:${d.growth_pct > 0 ? '#FCA5A5' : '#86EFAC'};">${d.growth_pct > 0 ? '+' : ''}${d.growth_pct}%</span></div>
-                `);
-            }).on('mouseout', hideTooltip);
-        }
-        
-        function renderSavings(drug) {
-            const pricing = insurerPricing.filter(p => p.drug_id === selectedDrug);
-            const best = Math.min(...pricing.map(p => p.patient_copay)) * 12;
-            const worst = Math.max(...pricing.map(p => p.patient_copay)) * 12;
-            const retail = drug.retail_price * 12;
-            
-            // Default headline: max annual savings
-            let headline = retail - best;
-            let label = 'Max Annual Savings';
-            let desc = `Best US coverage vs paying $${retail.toLocaleString()} retail`;
-            
-            // If user selected an insurer → personalize as "Your Savings"
-            if (scenario.insurer) {
-                const p = pricing.find(x => x.insurer === scenario.insurer);
-                if (p) {
-                    const prem = (INSURER_PREMIUMS[p.insurer] || {premium: 50}).premium;
-                    const yourAnnual = (prem + p.patient_copay) * 12;
-                    headline = retail - yourAnnual;
-                    label = `Your Savings · ${scenario.insurer}`;
-                    desc = `With ${scenario.insurer}: <strong>$${yourAnnual.toLocaleString()}/yr</strong> vs $${retail.toLocaleString()} retail`;
-                }
-            } else if (scenario.country) {
-                // If a country is selected, show the delta vs US retail
-                const country = globalData.find(c => c.country === scenario.country);
-                if (country && country.iso_code !== 'USA') {
-                    const countryRatios = {
-                        'Canada': 0.55, 'United Kingdom': 0.35, 'Germany': 0.50,
-                        'France': 0.45, 'Japan': 0.40, 'Australia': 0.42, 'Switzerland': 0.70
-                    };
-                    const ratio = countryRatios[scenario.country] || 0.5;
-                    const countryAnnual = Math.round(drug.retail_price * ratio * 0.15) * 12;
-                    headline = retail - countryAnnual;
-                    label = `Savings vs US Retail`;
-                    desc = `In ${country.flag} ${country.country}: <strong>$${countryAnnual.toLocaleString()}/yr</strong> (${country.system})`;
-                }
-            }
-            
-            // Animate headline number
-            const amountEl = d3.select('#savings-amount');
-            const current = parseInt(amountEl.text().replace(/[^\d]/g, '')) || 0;
-            amountEl.transition().duration(450).tween('text', function() {
-                const interp = d3.interpolateNumber(current, headline);
-                return function(t) {
-                    this.textContent = `$${Math.round(interp(t)).toLocaleString()}`;
-                };
-            });
-            
-            d3.select('.savings-label').text(label);
-            d3.select('#savings-desc').html(desc);
-            d3.select('#savings-best').text(`$${best.toLocaleString()}`);
-            d3.select('#savings-worst').text(`$${worst.toLocaleString()}`);
-            d3.select('#savings-retail').text(`$${retail.toLocaleString()}`);
-            d3.select('#savings-uk').text(`£${(9.65 * 12).toFixed(0)}`);
-        }
-        
-        // ============ TOOLTIP ============
-        function showTooltip(event, html) {
-            const tooltip = d3.select('#tooltip');
-            tooltip.html(html)
-                .style('display', 'block')
-                .style('left', Math.min(event.clientX + 12, window.innerWidth - 260) + 'px')
-                .style('top', Math.min(event.clientY - 10, window.innerHeight - 200) + 'px');
-        }
-        
-        function hideTooltip() {
-            d3.select('#tooltip').style('display', 'none');
-        }
-    </script>
+<!-- ── HEADER ─────────────────────────────────────────────── -->
+<div class="hdr">
+  <div class="bicon" id="bicon">H</div>
+  <div class="bname">
+    <h1>HealthLens</h1>
+    <p>Prescription Drug Cost Intelligence</p>
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-drug-name" id="hdr-drug">Eliquis</span>
+    <span class="hdr-drug-class" id="hdr-class">Anticoagulant · AFib, DVT/PE</span>
+  </div>
+</div>
+
+<!-- ── MAIN ───────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Drug selector cards -->
+    <div class="drug-section">
+      <div class="drug-section-label">Select Drug</div>
+      <div class="drug-cards" id="drug-cards"></div>
+    </div>
+
+    <!-- State map -->
+    <div class="sb-sec">
+      <div class="sb-ttl">Geographic Price Map <span class="state-badge" id="sbadge" style="display:none"></span></div>
+      <div id="map-wrap"></div>
+    </div>
+
+    <!-- Country flags -->
+    <div class="sb-sec">
+      <div class="sb-ttl">Compare Countries</div>
+      <div class="country-grid" id="cflags"></div>
+    </div>
+
+    <!-- State KPI card -->
+    <div class="state-card" id="state-card">
+      <div class="sc-hed">Selected Region</div>
+      <div class="sc-state" id="sc-name">National</div>
+      <div class="sc-drug" id="sc-drug-lbl"></div>
+      <div class="sc-grid" id="sc-cells"></div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="rpanel">
+
+    <div class="kpi-strip" id="kstrip">
+      <!-- skeleton -->
+      <div class="kpi skeleton"><div class="skel-bar" style="height:10px;width:70%;margin-bottom:6px"></div><div class="skel-bar" style="height:18px;width:55%"></div></div>
+      <div class="kpi skeleton"><div class="skel-bar" style="height:10px;width:60%;margin-bottom:6px"></div><div class="skel-bar" style="height:18px;width:50%"></div></div>
+      <div class="kpi skeleton"><div class="skel-bar" style="height:10px;width:65%;margin-bottom:6px"></div><div class="skel-bar" style="height:18px;width:60%"></div></div>
+      <div class="kpi skeleton"><div class="skel-bar" style="height:10px;width:55%;margin-bottom:6px"></div><div class="skel-bar" style="height:18px;width:45%"></div></div>
+      <div class="kpi skeleton"><div class="skel-bar" style="height:10px;width:70%;margin-bottom:6px"></div><div class="skel-bar" style="height:18px;width:55%"></div></div>
+    </div>
+
+    <div class="cgrid">
+      <div class="panel" id="p-plan">
+        <div class="ph">
+          <span class="ptitle"><span class="ptitle-dot"></span>Best Plans</span>
+          <span class="psub" id="plan-sub">Annual cost · state-adjusted</span>
+        </div>
+        <div class="pbody" id="plan-body"><div class="skeleton" style="height:100%;background:#F1F5F9;border-radius:4px;"></div></div>
+      </div>
+      <div class="panel" id="p-stream">
+        <div class="ph">
+          <span class="ptitle"><span class="ptitle-dot"></span>Spending Flows</span>
+          <span class="psub">2019–2023 · Medicare Part D $B</span>
+        </div>
+        <div class="pbody" id="stream-body"><div class="skeleton" style="height:100%;background:#F1F5F9;border-radius:4px;"></div></div>
+      </div>
+      <div class="panel" id="p-scenario">
+        <div class="ph">
+          <span class="ptitle"><span class="ptitle-dot"></span>What Will I Pay?</span>
+          <span class="psub" id="scenario-sub">Annual patient cost · 6 real-world scenarios</span>
+        </div>
+        <div class="pbody" id="scenario-body"><div class="skeleton" style="height:100%;background:#F1F5F9;border-radius:4px;"></div></div>
+      </div>
+      <div class="panel wide" id="p-glob">
+        <div class="ph">
+          <span class="ptitle"><span class="ptitle-dot"></span>Global Benchmark</span>
+          <span class="psub" id="glob-sub">Per-capita pharma spending · USD</span>
+        </div>
+        <div class="pbody" id="glob-body"><div class="skeleton" style="height:100%;background:#F1F5F9;border-radius:4px;"></div></div>
+      </div>
+      <div class="panel" id="p-para">
+        <div class="ph">
+          <span class="ptitle"><span class="ptitle-dot"></span>Drug Profiles</span>
+          <span class="psub" id="para-sub">Parallel coordinates · 6 dims</span>
+        </div>
+        <div class="pbody" id="para-body"><div class="skeleton" style="height:100%;background:#F1F5F9;border-radius:4px;"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const DC={eliquis:'#2563EB',ozempic:'#059669',jardiance:'#D97706',trulicity:'#7C3AED',xarelto:'#DC2626'};
+const DORDER=['eliquis','ozempic','jardiance','trulicity','xarelto'];
+const DBGLIGHT={eliquis:'#EFF6FF',ozempic:'#F0FDF4',jardiance:'#FFFBEB',trulicity:'#F5F3FF',xarelto:'#FEF2F2'};
+const DBORDERLIGHT={eliquis:'#BFDBFE',ozempic:'#A7F3D0',jardiance:'#FDE68A',trulicity:'#DDD6FE',xarelto:'#FECACA'};
+
+const IP={
+  'UnitedHealthcare':{p:62},'Blue Cross Blue Shield':{p:58},'Humana':{p:51},
+  'Aetna':{p:46},'Cigna':{p:43},'WellCare':{p:38},'Kaiser Permanente':{p:69},'CVS Caremark':{p:41}
+};
+
+const SM={
+  WA:1.05,OR:1.02,CA:1.12,NV:1.08,ID:0.92,MT:0.88,WY:0.86,CO:1.01,UT:0.97,AZ:1.09,NM:0.95,
+  ND:0.64,SD:0.72,NE:0.80,KS:0.83,OK:0.89,TX:1.03,MN:0.78,IA:0.82,MO:0.90,AR:0.92,LA:1.05,
+  MS:1.07,AL:1.06,GA:1.02,FL:1.10,SC:1.01,NC:0.98,TN:0.93,KY:0.88,WV:0.86,WI:0.85,MI:0.92,
+  IL:1.08,IN:0.88,OH:0.93,PA:1.02,NY:1.12,NJ:1.15,CT:1.10,MA:1.13,RI:1.08,VT:1.01,NH:1.02,
+  ME:0.98,VA:1.02,MD:1.07,DE:1.04,AK:0.92,HI:1.04,DC:1.10
+};
+
+const TILES=[
+  {s:'ME',c:10,r:0},{s:'VT',c:9,r:0},
+  {s:'WA',c:0,r:1},{s:'MT',c:1,r:1},{s:'ND',c:3,r:1},{s:'MN',c:4,r:1},{s:'WI',c:5,r:1},{s:'MI',c:6,r:1},{s:'NY',c:8,r:1},{s:'NH',c:10,r:1},
+  {s:'OR',c:0,r:2},{s:'ID',c:1,r:2},{s:'WY',c:2,r:2},{s:'SD',c:3,r:2},{s:'IA',c:4,r:2},{s:'IL',c:5,r:2},{s:'IN',c:6,r:2},{s:'OH',c:7,r:2},{s:'PA',c:8,r:2},{s:'NJ',c:9,r:2},{s:'MA',c:10,r:2},
+  {s:'CA',c:0,r:3},{s:'NV',c:1,r:3},{s:'UT',c:2,r:3},{s:'CO',c:3,r:3},{s:'NE',c:4,r:3},{s:'MO',c:5,r:3},{s:'KY',c:6,r:3},{s:'WV',c:7,r:3},{s:'VA',c:8,r:3},{s:'MD',c:9,r:3},{s:'CT',c:10,r:3},
+  {s:'AZ',c:1,r:4},{s:'NM',c:2,r:4},{s:'KS',c:4,r:4},{s:'AR',c:5,r:4},{s:'TN',c:6,r:4},{s:'NC',c:7,r:4},{s:'SC',c:8,r:4},{s:'DE',c:9,r:4},{s:'RI',c:10,r:4},
+  {s:'OK',c:3,r:5},{s:'TX',c:4,r:5},{s:'LA',c:5,r:5},{s:'MS',c:6,r:5},{s:'AL',c:7,r:5},{s:'GA',c:8,r:5},
+  {s:'HI',c:0,r:6},{s:'AK',c:1,r:6},{s:'FL',c:9,r:6}
+];
+
+const CCOLORS={
+  'United States':'#DC2626','Germany':'#F59E0B','Canada':'#3B82F6',
+  'Switzerland':'#EF4444','Japan':'#EC4899','United Kingdom':'#10B981',
+  'France':'#8B5CF6','Australia':'#06B6D4'
+};
+
+const $=id=>document.getElementById(id);
+const fmt=v=>'$'+Math.round(v).toLocaleString();
+const ec=base=>base*(SM[selState]||1);
+const lat=drug=>drug.yearly_data[drug.yearly_data.length-1];
+const DUR=350; // transition duration ms
+
+// ═══════════════════════════════════════════════════════════════
+// APP STATE
+// ═══════════════════════════════════════════════════════════════
+let drugs=[], insData=[], globData=[], globPrices=[], scenarios=[];
+let selDrug='eliquis', selState=null;
+let selCountries=new Set(['United States']);
+
+// ═══════════════════════════════════════════════════════════════
+// ACCENT PROPAGATION
+// ═══════════════════════════════════════════════════════════════
+function setAccent(drugId){
+  const col=DC[drugId]||'#2563EB';
+  const bg=DBGLIGHT[drugId]||'#EFF6FF';
+  const border=DBORDERLIGHT[drugId]||'#BFDBFE';
+  const root=document.documentElement.style;
+  root.setProperty('--accent',col);
+  root.setProperty('--accent-bg',bg);
+  root.setProperty('--accent-border',border);
+  // Header icon gradient
+  $('bicon').style.background=`linear-gradient(135deg,${col},#059669)`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DATA LOAD
+// ═══════════════════════════════════════════════════════════════
+Promise.all([
+  d3.json('data/drug_trends.json'),
+  d3.json('data/insurer_pricing.json'),
+  d3.json('data/global_trends.json'),
+  d3.json('data/global_prices.json').catch(()=>[]),
+  d3.json('data/patient_scenarios.json').catch(()=>[])
+]).then(([d,i,g,gp,sc])=>{
+  drugs=d; insData=i; globPrices=gp; scenarios=sc;
+  g.unshift({country:'United States',iso_code:'USA',flag:'🇺🇸',system:'Private/Medicare',
+    yearly_data:[
+      {year:2010,spending_per_capita:984},{year:2011,spending_per_capita:1005},
+      {year:2012,spending_per_capita:1026},{year:2013,spending_per_capita:1094},
+      {year:2014,spending_per_capita:1162},{year:2015,spending_per_capita:1217},
+      {year:2016,spending_per_capita:1272},{year:2017,spending_per_capita:1303},
+      {year:2018,spending_per_capita:1334},{year:2019,spending_per_capita:1376},
+      {year:2020,spending_per_capita:1404},{year:2021,spending_per_capita:1421},
+      {year:2022,spending_per_capita:1432}
+    ],latest_spending:1432,first_spending:984,growth_pct:45.5,latest_year:2022,first_year:2010
+  });
+  globData=g;
+  buildDrugCards();
+  buildCountryButtons();
+  setAccent(selDrug);
+  renderAll();
+}).catch(e=>console.error('Load error:',e));
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD DRUG CARDS
+// ═══════════════════════════════════════════════════════════════
+function buildDrugCards(){
+  const container=$('drug-cards');
+  container.innerHTML='';
+  drugs.forEach(d=>{
+    const yd=lat(d);
+    const isActive=d.id===selDrug;
+    const col=DC[d.id]||'#64748B';
+    const card=document.createElement('div');
+    card.className='dcard'+(isActive?' active':'');
+    card.dataset.id=d.id;
+    card.innerHTML=`
+      <div class="dcard-bar" style="background:${col}"></div>
+      <div class="dcard-body">
+        <div class="dcard-name">${d.brand_name}</div>
+        <div class="dcard-sub">${d.generic_name} · ${d.therapeutic_class}</div>
+        <div class="dcard-stats">
+          <span class="dstat">$${d.latest_spending_b.toFixed(1)}B</span>
+          <span class="dstat">${d.cagr_cost_per_unit>=0?'+':''}${d.cagr_cost_per_unit.toFixed(1)}% CAGR</span>
+        </div>
+      </div>`;
+    card.addEventListener('click',()=>{
+      if(selDrug===d.id)return;
+      selDrug=d.id;
+      setAccent(selDrug);
+      document.querySelectorAll('.dcard').forEach(c=>c.classList.toggle('active',c.dataset.id===selDrug));
+      renderAll();
+    });
+    container.appendChild(card);
+  });
+}
+
+function updateDrugCards(){
+  document.querySelectorAll('.dcard').forEach(c=>{
+    c.classList.toggle('active',c.dataset.id===selDrug);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD COUNTRY BUTTONS
+// ═══════════════════════════════════════════════════════════════
+function buildCountryButtons(){
+  d3.select('#cflags').selectAll('.cflag').data(globData).join('div')
+    .attr('class',d=>'cflag'+(selCountries.has(d.country)?' active':''))
+    .html(d=>`<span class="fl">${d.flag}</span>${d.country.replace('United States','USA').replace('United Kingdom','UK')}`)
+    .on('click',function(e,d){
+      if(selCountries.has(d.country)&&selCountries.size>1) selCountries.delete(d.country);
+      else selCountries.add(d.country);
+      d3.selectAll('.cflag').classed('active',dd=>selCountries.has(dd.country));
+      renderGlobal(); renderKPIs(); renderStateCard();
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════════════════════════
+function renderAll(){
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  // Update header
+  $('hdr-drug').textContent=drug.brand_name;
+  $('hdr-drug').style.color='var(--accent)';
+  $('hdr-class').textContent=drug.therapeutic_class+' · '+drug.condition;
+  // Update panel title dots (accent color via CSS var)
+  document.querySelectorAll('.ptitle-dot').forEach(el=>el.style.background='var(--accent)');
+  renderKPIs();
+  renderMap();
+  renderParallel();
+  renderStream();
+  renderScenarios();
+  renderGlobal();
+  renderBestPlan();
+  renderStateCard();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════════════════
+function showTT(e,html){
+  const el=$('tt');
+  el.innerHTML=html;el.style.display='block';
+  el.style.left=Math.min(e.clientX+14,window.innerWidth-254)+'px';
+  el.style.top=Math.min(e.clientY-10,window.innerHeight-215)+'px';
+}
+function hideTT(){$('tt').style.display='none';}
+function row(l,v){return`<div class="ttr"><span>${l}</span><span><b>${v}</b></span></div>`;}
+
+// ═══════════════════════════════════════════════════════════════
+// KPI STRIP — drug-specific
+// ═══════════════════════════════════════════════════════════════
+function renderKPIs(){
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  const yd=lat(drug);
+  const nat=yd.cost_per_claim, adj=ec(nat);
+  const gp=globPrices.find(g=>g.drug_id===selDrug);
+  const cmpName=[...selCountries].find(c=>c!=='United States');
+  const cmpData=cmpName?globData.find(g=>g.country===cmpName):null;
+  const usData=globData.find(g=>g.iso_code==='USA');
+  const gap=cmpData&&usData?Math.round((usData.latest_spending-cmpData.latest_spending)/cmpData.latest_spending*100):null;
+  const mults=Object.values(SM);
+  const bestMult=Math.min(...mults),worstMult=Math.max(...mults);
+
+  const cards=[
+    {lbl:'2023 Medicare Spending',val:'$'+drug.latest_spending_b.toFixed(1)+'B',sub:drug.latest_claims_m.toFixed(1)+'M claims',delta:drug.total_spending_growth_pct>0?`↑${drug.total_spending_growth_pct.toFixed(0)}% vs 2019`:null,isUp:true,hi:true},
+    {lbl:'Cost per Claim',val:fmt(adj),sub:selState?`${selState} · ×${(SM[selState]||1).toFixed(2)}`:'National avg 2023',delta:selState?(adj>nat?`↑${Math.round((adj/nat-1)*100)}% vs avg`:`↓${Math.round((1-adj/nat)*100)}% vs avg`):null,isUp:adj>nat,hi:!!selState},
+    {lbl:'5-yr CAGR (Unit Cost)',val:(drug.cagr_cost_per_unit>=0?'+':'')+drug.cagr_cost_per_unit.toFixed(1)+'%',sub:'2019 → 2023',delta:drug.yoy_change_22_23?`${drug.yoy_change_22_23>0?'↑':'↓'}${Math.abs(drug.yoy_change_22_23).toFixed(1)}% YoY`:null,isUp:drug.yoy_change_22_23>0,hi:false},
+    {lbl:'Beneficiaries',val:drug.latest_beneficiaries_m.toFixed(1)+'M',sub:'Medicare Part D patients',delta:`${drug.beneficiary_growth_pct>0?'↑':'↓'}${Math.abs(drug.beneficiary_growth_pct).toFixed(0)}% growth`,isUp:drug.beneficiary_growth_pct>0,hi:false},
+    {lbl:cmpName?'vs '+cmpName.replace('United Kingdom','UK').replace('United States','US'):'Intl Ratio',
+      val:gp?`${(nat/gp.canada_price).toFixed(1)}× Canada`:gap!=null?gap+'% more':'Select country',
+      sub:gp?`US $${Math.round(nat)} vs CA $${gp.canada_price}`:cmpName?cmpName+' per-capita':'Toggle flag',
+      delta:null,isUp:false,hi:!!gp||!!cmpName}
+  ];
+
+  const strip=$('kstrip');strip.innerHTML='';
+  cards.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='kpi'+(c.hi?' hi':'');
+    div.innerHTML=`<div class="klbl">${c.lbl}</div>`
+      +`<div class="kval${c.hi?' accent':''}">${c.val}</div>`
+      +(c.sub?`<div class="ksub">${c.sub}</div>`:''  )
+      +(c.delta?`<div class="kdelta ${c.isUp?'up':'dn'}">${c.delta}</div>`:'');
+    strip.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE CARD
+// ═══════════════════════════════════════════════════════════════
+function renderStateCard(){
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  const yd=lat(drug), nat=yd.cost_per_claim;
+  const m=SM[selState]||1, adj=nat*m;
+  const bestMult=Math.min(...Object.values(SM));
+  const savAnn=Math.round((m-bestMult)*nat*12);
+  $('sc-name').textContent=selState||'National';
+  $('sc-drug-lbl').textContent=drug.brand_name+' · '+drug.generic_name;
+  const cells=[
+    {l:'Cost / Claim',v:fmt(adj),cls:''},
+    {l:'Annual Est.',v:fmt(adj*12),cls:''},
+    {l:'vs Best State',v:savAnn>0?'+'+fmt(savAnn)+'/yr':'Cheapest!',cls:savAnn>0?'bad':'good'},
+    {l:'Multiplier',v:'×'+m.toFixed(2),cls:m<1?'good':m>1.05?'bad':''}
+  ];
+  $('sc-cells').innerHTML=cells.map(c=>`<div class="sc-cell"><div class="sc-lbl">${c.l}</div><div class="sc-val ${c.cls}">${c.v}</div></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TILE CARTOGRAM MAP
+// ═══════════════════════════════════════════════════════════════
+function renderMap(){
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  const yd=lat(drug);
+  const cont=d3.select('#map-wrap');cont.selectAll('*').remove();
+  const TZ=19,GAP=1.5,COLS=11,ROWS=7;
+  const W=COLS*(TZ+GAP)+GAP, H=ROWS*(TZ+GAP)+GAP+14;
+  const accentCol=DC[selDrug]||'#2563EB';
+  const colorScale=d3.scaleSequential().domain([0.6,1.2])
+    .interpolator(d3.interpolateRgb('#93C5FD','#B91C1C'));
+  const svg=cont.append('svg').attr('width','100%').attr('viewBox',`0 0 ${W} ${H}`).attr('preserveAspectRatio','xMidYMid meet');
+  const defs=svg.append('defs');
+  const grad=defs.append('linearGradient').attr('id','lgrd').attr('x1','0%').attr('x2','100%');
+  grad.append('stop').attr('offset','0%').attr('stop-color','#93C5FD');
+  grad.append('stop').attr('offset','100%').attr('stop-color','#B91C1C');
+
+  TILES.forEach(t=>{
+    const x=GAP+t.c*(TZ+GAP),y=GAP+t.r*(TZ+GAP);
+    const m=SM[t.s]||1,isSel=t.s===selState;
+    svg.append('rect').attr('x',x).attr('y',y).attr('width',TZ).attr('height',TZ).attr('rx',3)
+      .attr('fill',colorScale(m))
+      .attr('stroke',isSel?accentCol:'rgba(255,255,255,.25)')
+      .attr('stroke-width',isSel?2.5:0.8)
+      .style('cursor','pointer')
+      .style('filter',isSel?`drop-shadow(0 0 4px ${accentCol}88)`:'none')
+      .on('click',()=>{selState=(selState===t.s)?null:t.s;renderAll();})
+      .on('mousemove',e=>{
+        const adjC=yd.cost_per_claim*m;
+        showTT(e,`<div class="tth">📍 ${t.s} — ${drug.brand_name}</div>`
+          +row('Cost/Claim',fmt(adjC))+row('vs National',(m>=1?'↑':'↓')+Math.abs(Math.round((m-1)*100))+'%')
+          +row('Annual Est.',fmt(adjC*12))+row('Multiplier','×'+m.toFixed(2)));
+      })
+      .on('mouseout',hideTT);
+    svg.append('text').attr('x',x+TZ/2).attr('y',y+TZ/2+3.5).attr('text-anchor','middle')
+      .attr('font-size',5.5).attr('fill','rgba(255,255,255,.92)').attr('pointer-events','none').attr('font-weight',600).text(t.s);
+  });
+  svg.append('rect').attr('x',GAP).attr('y',H-10).attr('width',90).attr('height',5).attr('rx',2).attr('fill','url(#lgrd)');
+  svg.append('text').attr('x',GAP).attr('y',H-12).attr('font-size',5).attr('fill','#94A3B8').text('Lower cost');
+  svg.append('text').attr('x',94).attr('y',H-12).attr('text-anchor','end').attr('font-size',5).attr('fill','#94A3B8').text('Higher cost');
+  const badge=$('sbadge');
+  if(selState){badge.textContent=selState;badge.style.display='inline';}
+  else badge.style.display='none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PARALLEL COORDINATES — with transitions
+// ═══════════════════════════════════════════════════════════════
+function renderParallel(){
+  const cont=d3.select('#para-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!drugs.length)return;
+  const W=node.clientWidth||360,H=node.clientHeight||200;
+  const mx={t:26,r:58,b:22,l:10};
+  const w=W-mx.l-mx.r,h=H-mx.t-mx.b;
+  const DIMS=['cost','claims','benefic','cagr','growth','intl'];
+  const LABS=['Cost/Claim','Claims M','Benefic M','CAGR%','Growth%','US÷Intl'];
+  const rows=drugs.map(d=>{
+    const yd=lat(d);
+    const gp=globPrices.find(g=>g.drug_id===d.id);
+    const adjCost=ec(yd.cost_per_claim);
+    return{id:d.id,name:d.brand_name,
+      cost:adjCost,claims:yd.claims/1e6,benefic:yd.beneficiaries/1e6,
+      cagr:d.cagr_cost_per_unit,growth:d.total_spending_growth_pct,
+      intl:gp?adjCost/(gp.canada_price||adjCost*.5):2.5};
+  });
+  const scales={};DIMS.forEach(dim=>{scales[dim]=d3.scaleLinear().domain(d3.extent(rows,r=>r[dim])).range([h,0]).nice();});
+  const xSc=d3.scalePoint().domain(DIMS).range([0,w]);
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${mx.l},${mx.t})`);
+
+  // Axes
+  DIMS.forEach((dim,i)=>{
+    g.append('line').attr('x1',xSc(dim)).attr('y1',0).attr('x2',xSc(dim)).attr('y2',h).attr('stroke','#E2E8F0').attr('stroke-width',1);
+    g.append('text').attr('x',xSc(dim)).attr('y',h+13).attr('text-anchor','middle').attr('font-size',8).attr('fill','#94A3B8').text(LABS[i]);
+    scales[dim].ticks(3).forEach(v=>{
+      g.append('text').attr('x',xSc(dim)+3).attr('y',scales[dim](v)+3).attr('font-size',6.5).attr('fill','#CBD5E1')
+        .text(v>999?'$'+Math.round(v/1000)+'k':v.toFixed(1));
+    });
+  });
+
+  // Lines — non-selected first, then selected on top
+  const sorted=[...rows].sort((a,b)=>(a.id===selDrug?1:-1)-(b.id===selDrug?1:-1));
+  sorted.forEach((r,idx)=>{
+    const isSel=r.id===selDrug;
+    const pathD='M'+DIMS.map(dim=>`${xSc(dim)},${scales[dim](r[dim])}`).join('L');
+    const line=g.append('path').attr('fill','none').attr('stroke',DC[r.id])
+      .attr('stroke-width',isSel?3:1.2).attr('opacity',isSel?1:0)
+      .attr('d',pathD).style('cursor','pointer')
+      .on('mousemove',e=>showTT(e,`<div class="tth">${r.name}</div>`+row('Cost/Claim',fmt(r.cost))
+        +(selState?row('State Adj','×'+(SM[selState]||1).toFixed(2)):'')+row('CAGR',r.cagr.toFixed(1)+'%')+row('US÷Intl',r.intl.toFixed(1)+'×')))
+      .on('mouseout',hideTT)
+      .on('click',()=>{selDrug=r.id;setAccent(selDrug);updateDrugCards();renderAll();});
+    if(isSel){
+      // stroke-dashoffset draw animation for selected line
+      const len=line.node().getTotalLength();
+      line.attr('stroke-dasharray',len+' '+len).attr('stroke-dashoffset',len)
+        .transition().duration(700).ease(d3.easeCubicInOut).attr('stroke-dashoffset',0)
+        .on('end',()=>line.attr('stroke-dasharray','none'));
+      // dot at each axis crossing
+      DIMS.forEach((dim,di)=>{
+        g.append('circle').attr('cx',xSc(dim)).attr('cy',scales[dim](r[dim])).attr('r',0)
+          .attr('fill',DC[r.id]).attr('stroke','#fff').attr('stroke-width',1.5).attr('pointer-events','none')
+          .transition().duration(180).delay(di*100+200).attr('r',4);
+      });
+      // label slides in
+      g.append('text').attr('x',xSc(DIMS[0])-5).attr('y',scales[DIMS[0]](r[DIMS[0]])+4)
+        .attr('text-anchor','end').attr('font-size',9).attr('fill',DC[r.id]).attr('font-weight',700)
+        .attr('opacity',0).attr('transform','translate(-8,0)')
+        .text(r.name)
+        .transition().duration(400).delay(500).attr('opacity',1).attr('transform','translate(0,0)');
+    } else {
+      line.transition().duration(DUR).delay(idx*30).attr('opacity',.28);
+    }
+  });
+  if(selState){
+    g.append('text').attr('x',w/2).attr('y',-10).attr('text-anchor','middle').attr('font-size',8.5)
+      .attr('fill','#D97706').attr('font-weight',600)
+      .text(`📍 ${selState}: ×${(SM[selState]||1).toFixed(2)} cost adjustment applied`);
+  }
+  $('para-sub').textContent=selState?`${selState}-adjusted · click line to focus`:'National avg · click line to focus';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STREAM GRAPH — with transitions
+// ═══════════════════════════════════════════════════════════════
+function renderStream(){
+  const cont=d3.select('#stream-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!drugs.length)return;
+  const W=node.clientWidth||360,H=node.clientHeight||200;
+  const mx={t:14,r:12,b:22,l:38};
+  const YEARS=[2019,2020,2021,2022,2023];
+  const tableData=YEARS.map(yr=>{
+    const row={year:yr};
+    drugs.forEach(d=>{const yd=d.yearly_data.find(y=>y.year===yr)||d.yearly_data[0];row[d.id]=yd?yd.total_spending_billions:0;});
+    return row;
+  });
+  const stack=d3.stack().keys(DORDER).offset(d3.stackOffsetWiggle)(tableData);
+  const xSc=d3.scaleLinear().domain([2019,2023]).range([mx.l,W-mx.r]);
+  const yExt=d3.extent(stack.flat(2));
+  const ySc=d3.scaleLinear().domain(yExt).range([H-mx.b,mx.t]);
+  const areaGen=d3.area().x(d=>xSc(d.data.year)).y0(d=>ySc(d[0])).y1(d=>ySc(d[1])).curve(d3.curveCatmullRom);
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  svg.append('g').attr('transform',`translate(0,${H-mx.b})`).call(d3.axisBottom(xSc).ticks(5).tickFormat(d3.format('d')))
+    .call(g=>{g.select('.domain').remove();g.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+  svg.append('g').attr('transform',`translate(${mx.l},0)`).call(d3.axisLeft(ySc).ticks(3).tickFormat(v=>`$${Math.abs(v).toFixed(0)}B`))
+    .call(g=>{g.select('.domain').remove();g.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+
+  stack.forEach((layer,i)=>{
+    const drugId=DORDER[i];
+    const isSel=drugId===selDrug;
+    const path=svg.append('path').datum(layer)
+      .attr('fill',DC[drugId]).attr('opacity',0).attr('d',areaGen)
+      .style('cursor','pointer')
+      .on('mousemove',e=>{
+        const d=drugs.find(x=>x.id===drugId);const yd=lat(d);
+        showTT(e,`<div class="tth">${d.brand_name}</div>`+row('2023 Spending','$'+yd.total_spending_billions.toFixed(1)+'B')
+          +row('Growth 2019-23','+'+d.total_spending_growth_pct.toFixed(0)+'%')+row('Beneficiaries',d.latest_beneficiaries_m.toFixed(1)+'M'));
+      })
+      .on('mouseout',hideTT)
+      .on('click',()=>{selDrug=drugId;setAccent(selDrug);updateDrugCards();renderAll();});
+    path.transition().duration(DUR).attr('opacity',isSel?0.88:0.32);
+
+    if(isSel){
+      const midPt=layer[Math.floor(layer.length/2)];
+      if(midPt){
+        svg.append('text').attr('x',xSc(midPt.data.year)).attr('y',ySc((midPt[0]+midPt[1])/2)+4)
+          .attr('text-anchor','middle').attr('font-size',9).attr('font-weight',700).attr('fill','#0F172A')
+          .attr('pointer-events','none').attr('opacity',0).text(drugs.find(d=>d.id===selDrug)?.brand_name||'')
+          .transition().duration(DUR).attr('opacity',1);
+      }
+    }
+  });
+  // Legend strip
+  const LX=mx.l, LY=12;
+  DORDER.forEach((id,i)=>{
+    svg.append('rect').attr('x',LX+i*52).attr('y',LY-7).attr('width',8).attr('height',8).attr('rx',2).attr('fill',DC[id]).attr('opacity',id===selDrug?1:.4);
+    svg.append('text').attr('x',LX+i*52+10).attr('y',LY).attr('font-size',7.5).attr('fill','#64748B').text(drugs.find(d=>d.id===id)?.brand_name||id);
+  });
+  if(selState){
+    svg.append('rect').attr('x',W-mx.r-90).attr('y',4).attr('width',88).attr('height',14).attr('rx',4).attr('fill','#FEF3C7').attr('opacity',.92);
+    svg.append('text').attr('x',W-mx.r-46).attr('y',14).attr('text-anchor','middle').attr('font-size',8).attr('fill','#92400E').attr('font-weight',600).text(`📍 ${selState}: ×${(SM[selState]||1).toFixed(2)}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PATIENT COST SCENARIOS — lollipop chart with draw animation
+// ═══════════════════════════════════════════════════════════════
+function renderScenarios(){
+  const cont=d3.select('#scenario-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!scenarios.length)return;
+  const rec=scenarios.find(s=>s.drug_id===selDrug);
+  if(!rec)return;
+  const W=node.clientWidth||280, H=node.clientHeight||200;
+  const m=SM[selState]||1;
+
+  // Only Medicare-avg and retail (no insurance) prices vary by state; plan copays (best/worst) are contract-fixed
+  const SC_TYPE_COL={best:'#059669',worst:'#F59E0B',avg:'#3B82F6',retail:'#DC2626',global:'#7C3AED'};
+  const stateAdjTypes=new Set(['avg','retail']);
+  const rows=rec.scenarios.map(s=>{
+    const stateAdj=stateAdjTypes.has(s.type);
+    const adj=stateAdj?Math.round(s.annual*m):s.annual;
+    return{...s, adj, stateAdj};
+  });
+
+  const LEFT=112, RIGHT=58, TOP=14, BOT=26;
+  const w=W-LEFT-RIGHT, h=H-TOP-BOT;
+  const rowH=h/rows.length;
+  const maxVal=d3.max(rows,r=>r.adj)*1.08;
+  const xSc=d3.scaleLinear().domain([0,maxVal]).range([0,w]);
+
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${LEFT},${TOP})`);
+
+  // x-axis ticks
+  g.append('g').attr('transform',`translate(0,${h})`)
+    .call(d3.axisBottom(xSc).ticks(4).tickFormat(v=>v>=1000?'$'+Math.round(v/1000)+'k':'$'+v))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').remove();
+      ax.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+
+  // Grid lines
+  xSc.ticks(4).forEach(tv=>{
+    g.append('line').attr('x1',xSc(tv)).attr('x2',xSc(tv)).attr('y1',0).attr('y2',h)
+      .attr('stroke','#F1F5F9').attr('stroke-width',1);
+  });
+
+  rows.forEach((s,i)=>{
+    const cy=i*rowH+rowH/2;
+    const col=SC_TYPE_COL[s.type]||'#64748B';
+    const targetX=xSc(s.adj);
+
+    // Row label
+    svg.append('text').attr('x',LEFT-6).attr('y',TOP+cy+4).attr('text-anchor','end')
+      .attr('font-size',8.5).attr('fill',s.type==='retail'?'#DC2626':s.type==='global'?'#7C3AED':'#475569')
+      .attr('font-weight',s.type==='best'||s.type==='global'?600:400)
+      .text(s.name);
+
+    // Track line (thin gray)
+    g.append('line').attr('x1',0).attr('x2',w).attr('y1',cy).attr('y2',cy)
+      .attr('stroke','#F1F5F9').attr('stroke-width',1);
+
+    // Lollipop stem — animate width
+    const stem=g.append('line').attr('x1',0).attr('x2',0).attr('y1',cy).attr('y2',cy)
+      .attr('stroke',col).attr('stroke-width',s.type==='best'||s.type==='retail'?2.5:1.8)
+      .attr('opacity',.85);
+    stem.transition().duration(520).delay(i*65).ease(d3.easeCubicOut).attr('x2',targetX);
+
+    // Lollipop dot — pops in after stem
+    const dot=g.append('circle').attr('cx',0).attr('cy',cy).attr('r',0)
+      .attr('fill',col).attr('stroke','#fff').attr('stroke-width',1.5)
+      .style('cursor','default');
+    dot.transition().duration(200).delay(i*65+480).attr('cx',targetX).attr('r',s.type==='retail'||s.type==='best'?5:4);
+
+    // Value label — fades in
+    g.append('text').attr('x',targetX+8).attr('y',cy+4)
+      .attr('font-size',s.type==='retail'||s.type==='best'?9:8)
+      .attr('fill',col).attr('font-weight',s.type==='retail'||s.type==='best'?700:500)
+      .attr('opacity',0)
+      .text(fmt(s.adj)+(s.stateAdj&&selState&&m!==1?' *':''))
+      .transition().duration(250).delay(i*65+560).attr('opacity',1);
+
+    // Savings badge on global rows vs retail
+    if(s.type==='global'){
+      const retail=rows.find(r=>r.type==='retail');
+      if(retail){
+        const savePct=Math.round((1-s.adj/retail.adj)*100);
+        g.append('rect').attr('x',targetX+8).attr('y',cy-rowH/2+1).attr('width',32).attr('height',10).attr('rx',3)
+          .attr('fill','#F0FDF4').attr('stroke','#A7F3D0').attr('opacity',0)
+          .transition().duration(200).delay(i*65+600).attr('opacity',1);
+        g.append('text').attr('x',targetX+24).attr('y',cy-rowH/2+9).attr('text-anchor','middle')
+          .attr('font-size',7.5).attr('fill','#059669').attr('font-weight',700).attr('opacity',0)
+          .text('-'+savePct+'%')
+          .transition().duration(200).delay(i*65+600).attr('opacity',1);
+      }
+    }
+
+    // Hover
+    g.append('rect').attr('x',0).attr('y',cy-rowH/2).attr('width',w).attr('height',rowH).attr('fill','transparent')
+      .on('mousemove',e=>showTT(e,`<div class="tth">${s.name}</div>`
+        +row('Annual Cost',fmt(s.adj))
+        +(s.stateAdj&&selState?row('State Adj ('+selState+')','×'+m.toFixed(2)):'')
+        +(s.currency==='GBP'?row('Original','£'+s.annual+' GBP'):'')
+        +row('Type',s.type.charAt(0).toUpperCase()+s.type.slice(1))))
+      .on('mouseout',hideTT);
+  });
+
+  // State note — clarify which scenarios are adjusted
+  if(selState&&m!==1){
+    svg.append('text').attr('x',LEFT).attr('y',H-4).attr('font-size',7.5)
+      .attr('fill','#D97706').attr('font-weight',600)
+      .text(`* Medicare & No-Insurance adjusted ×${m.toFixed(2)} for ${selState}; plan copays are fixed`);
+  }
+
+  // Max savings badge top-right
+  const badge=svg.append('g').attr('transform',`translate(${W-RIGHT-2},${TOP})`);
+  badge.append('rect').attr('width',RIGHT+2).attr('height',22).attr('rx',5)
+    .attr('fill','#F0FDF4').attr('stroke','#A7F3D0').attr('opacity',0)
+    .transition().duration(400).delay(rows.length*65+200).attr('opacity',1);
+  badge.append('text').attr('x',(RIGHT+2)/2).attr('y',8).attr('text-anchor','middle')
+    .attr('font-size',6.5).attr('fill','#059669').attr('font-weight',600).attr('opacity',0)
+    .text('MAX SAVE').transition().duration(300).delay(rows.length*65+300).attr('opacity',1);
+  badge.append('text').attr('x',(RIGHT+2)/2).attr('y',19).attr('text-anchor','middle')
+    .attr('font-size',9).attr('fill','#059669').attr('font-weight',800).attr('opacity',0)
+    .text(fmt(rec.max_savings)).transition().duration(300).delay(rows.length*65+350).attr('opacity',1);
+
+  $('scenario-sub').textContent=rec.drug_name+(selState?` · ${selState}-adjusted`:'')+'  ·  annual patient cost';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL BENCHMARK — best covered plan: US vs selected countries (line chart across all drugs)
+// ═══════════════════════════════════════════════════════════════
+function renderGlobal(){
+  const cont=d3.select('#glob-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!scenarios.length)return;
+  const W=node.clientWidth||540,H=node.clientHeight||200;
+  const mx={t:28,r:108,b:28,l:52};
+  const w=W-mx.l-mx.r,h=H-mx.t-mx.b;
+  const m=SM[selState]||1;
+  const USD_GBP=1.27;
+
+  // Helper: get scenario value for a drug_id by type/name
+  const scVal=(drugId,pred)=>{
+    const rec=scenarios.find(s=>s.drug_id===drugId);
+    if(!rec)return null;
+    const s=rec.scenarios.find(pred);
+    return s?s.annual:null;
+  };
+
+  // Build coverage lines — X = DORDER drugs, Y = annual patient cost
+  // Only lines with at least one non-null value are drawn
+  const buildLine=(key,flag,col,dash,thick,pred,adjFn=v=>v)=>{
+    const vals=DORDER.map(id=>{const v=scVal(id,pred);return{id,v:v!=null?Math.round(adjFn(v)):null};});
+    if(vals.every(d=>d.v===null))return null;
+    return{key,flag,col,dash,thick,vals};
+  };
+
+  // Canada's actual per-capita (used as scaling base for countries without drug-specific prices)
+  const canadaGlob=globData.find(c=>c.country==='Canada');
+  const canadaPC=canadaGlob?canadaGlob.latest_spending:900;
+
+  const coverageLines=[];
+  // US Best Coverage only (state-adjusted — plan copays are fixed so no adjustment needed)
+  coverageLines.push(buildLine('US Best Coverage','🇺🇸',DC[selDrug],'none',true,s=>s.type==='best'));
+
+  // Country-specific lines — Canada & UK have real drug-level data; others estimated via Canada ratio
+  const otherSel=[...selCountries].filter(c=>c!=='United States');
+  otherSel.forEach(ctrName=>{
+    const ctrData=globData.find(c=>c.country===ctrName);
+    if(!ctrData)return;
+    const col=CCOLORS[ctrName]||'#94A3B8';
+    if(ctrName==='Canada'){
+      coverageLines.push(buildLine('Canada (best)',ctrData.flag,col,'none',false,s=>s.name.includes('Canada')));
+    } else if(ctrName==='United Kingdom'){
+      coverageLines.push(buildLine('UK (NHS)',ctrData.flag,col,'none',false,s=>s.name.includes('UK'),v=>v*USD_GBP));
+    } else {
+      // Estimate drug-specific prices by scaling Canada's actual drug prices by per-capita ratio
+      // e.g. Germany_Eliquis ≈ Canada_Eliquis × (Germany_per_capita / Canada_per_capita)
+      const ratio=ctrData.latest_spending/canadaPC;
+      const estVals=DORDER.map(id=>{
+        const canadaRec=scenarios.find(s=>s.drug_id===id);
+        const canadaVal=canadaRec?canadaRec.scenarios.find(s=>s.name.includes('Canada'))?.annual:null;
+        return{id,v:canadaVal!=null?Math.round(canadaVal*ratio):null};
+      });
+      const shortName=ctrName.replace('Switzerland','Swiss').replace('Australia','Aus.').replace('Germany','DE').replace('Japan','JP').replace('France','FR');
+      coverageLines.push({key:shortName,flag:ctrData.flag,col,dash:'5,3',thick:false,vals:estVals,estimated:true});
+    }
+  });
+
+  const lines=coverageLines.filter(Boolean);
+  const allVals=lines.flatMap(l=>l.vals.map(d=>d.v)).filter(v=>v!=null);
+  const xSc=d3.scalePoint().domain(DORDER).range([0,w]).padding(0.4);
+  const ySc=d3.scaleLinear().domain([0,d3.max(allVals)*1.16]).range([h,0]).nice();
+
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${mx.l},${mx.t})`);
+
+  // Axes
+  g.append('g').attr('transform',`translate(0,${h})`)
+    .call(d3.axisBottom(xSc).tickFormat(id=>drugs.find(d=>d.id===id)?.brand_name||id))
+    .call(ax=>{ax.select('.domain').remove();
+      ax.selectAll('text').style('font-size','8px').style('fill',id=>id===selDrug?DC[selDrug]:'#94A3B8')
+        .style('font-weight',id=>id===selDrug?'700':'400');});
+  g.append('g').call(d3.axisLeft(ySc).ticks(5).tickFormat(v=>v>=1000?'$'+Math.round(v/1000)+'k':'$'+v))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').style('stroke','#F1F5F9');
+      ax.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+
+  // Grid
+  ySc.ticks(5).forEach(tv=>{
+    g.append('line').attr('x1',0).attr('x2',w).attr('y1',ySc(tv)).attr('y2',ySc(tv))
+      .attr('stroke','#F1F5F9').attr('stroke-width',1);
+  });
+
+  // Selected drug vertical focal marker
+  const selX=xSc(selDrug);
+  g.append('line').attr('x1',selX).attr('x2',selX).attr('y1',0).attr('y2',h)
+    .attr('stroke',DC[selDrug]).attr('stroke-width',1.5).attr('stroke-dasharray','3,3').attr('opacity',.45);
+
+  // Shaded region under US Best Coverage line (fills toward Canada if present)
+  const usBestLine=lines.find(l=>l.key==='US Best Coverage');
+  const canadaLine=lines.find(l=>l.key==='Canada (best)');
+  if(usBestLine&&canadaLine){
+    const lineGen2=d3.area()
+      .x(d=>xSc(d.id)).y0(d=>{const ca=canadaLine.vals.find(v=>v.id===d.id);return ca?ySc(ca.v):h;})
+      .y1(d=>ySc(d.v)).defined(d=>d.v!=null).curve(d3.curveCatmullRom);
+    g.append('path').datum(usBestLine.vals.filter(d=>d.v!=null))
+      .attr('fill',DC[selDrug]).attr('opacity',0).attr('d',lineGen2)
+      .transition().duration(500).delay(200).attr('opacity',0.06);
+  }
+
+  // Anti-overlap for right-side labels
+  const usedLY=[];
+  const safeY=(ry,sz=8)=>{let y=ry;usedLY.forEach(u=>{if(Math.abs(y-u)<sz+3)y=u+sz+4;});usedLY.push(y);return y;};
+
+  // Draw each line
+  const lineGen=d3.line().x(d=>xSc(d.id)).y(d=>ySc(d.v)).defined(d=>d.v!=null).curve(d3.curveCatmullRom);
+  lines.forEach((ln,li)=>{
+    const pts=ln.vals.filter(d=>d.v!=null);
+    const path=g.append('path').datum(pts).attr('fill','none').attr('stroke',ln.col)
+      .attr('stroke-width',ln.thick?3:ln.estimated?1.5:2)
+      .attr('stroke-dasharray',ln.dash==='none'?null:ln.dash)
+      .attr('opacity',ln.estimated?0.65:1)
+      .attr('d',lineGen).style('cursor','pointer')
+      .on('mouseover',function(){d3.select(this).attr('stroke-width',ln.thick?4.5:ln.estimated?2.5:3);})
+      .on('mouseout',function(){hideTT();d3.select(this).attr('stroke-width',ln.thick?3:ln.estimated?1.5:2);})
+      .on('mousemove',e=>{
+        const selVal=ln.vals.find(d=>d.id===selDrug);
+        const usBest=lines.find(l=>l.key==='US Best Coverage');
+        const usBestVal=usBest?usBest.vals.find(d=>d.id===selDrug):null;
+        showTT(e,`<div class="tth">${ln.flag} ${ln.key}</div>`
+          +row('For '+drugs.find(d=>d.id===selDrug)?.brand_name,selVal?fmt(selVal.v):'—')
+          +(ln.estimated?row('Note','Estimated via Canada ratio†'):'')
+          +(usBestVal&&selVal&&ln.key!=='US Best Coverage'?row('vs US Best','+'+(((usBestVal.v/selVal.v-1)*100).toFixed(0))+'%'):''));
+      });
+    // Stroke-dashoffset draw animation
+    const len=path.node().getTotalLength();
+    path.attr('stroke-dasharray',len+' '+len).attr('stroke-dashoffset',len)
+      .transition().duration(ln.thick?800:600).delay(li*90).ease(d3.easeCubicInOut)
+      .attr('stroke-dashoffset',0)
+      .on('end',()=>{if(ln.dash==='none')path.attr('stroke-dasharray','none');else path.attr('stroke-dasharray',ln.dash);});
+
+    // Dots at each drug point
+    pts.forEach((pt,pi)=>{
+      const isFocal=pt.id===selDrug;
+      g.append('circle').attr('cx',xSc(pt.id)).attr('cy',ySc(pt.v)).attr('r',0)
+        .attr('fill',ln.col).attr('stroke','#fff').attr('stroke-width',isFocal?2:1.5)
+        .attr('pointer-events','none')
+        .transition().duration(isFocal?280:180).delay(li*90+pi*80+400)
+        .attr('r',isFocal?6:3.5);
+    });
+
+    // Right-side label (end of line)
+    const lastPt=pts[pts.length-1];
+    const ry=ySc(lastPt.v);
+    const ly=safeY(ry,8);
+    const suffix=ln.estimated?'†':'';
+    g.append('text').attr('x',w+4).attr('y',ly).attr('font-size',ln.thick?9:7.5)
+      .attr('fill',ln.col).attr('font-weight',ln.thick?700:500).attr('opacity',0)
+      .text(ln.flag+' '+ln.key+suffix)
+      .transition().duration(300).delay(li*90+700).attr('opacity',1);
+    g.append('text').attr('x',w+4).attr('y',ly+9).attr('font-size',7.5)
+      .attr('fill',ln.col).attr('opacity',0).text(fmt(lastPt.v))
+      .transition().duration(300).delay(li*90+750).attr('opacity',.8);
+  });
+
+  // Gap annotation at selected drug focal point
+  const usBestAtSel=usBestLine?usBestLine.vals.find(d=>d.id===selDrug):null;
+  const cheapestAtSel=lines.filter(l=>l.key!=='US Best Coverage')
+    .map(l=>({key:l.key,flag:l.flag,v:(l.vals.find(d=>d.id===selDrug)||{}).v}))
+    .filter(d=>d.v!=null).sort((a,b)=>a.v-b.v)[0];
+  if(usBestAtSel&&cheapestAtSel){
+    const pct=Math.round((usBestAtSel.v/cheapestAtSel.v-1)*100);
+    const ratio=(usBestAtSel.v/cheapestAtSel.v).toFixed(1);
+    const bw=230;
+    g.append('rect').attr('x',w/2-bw/2).attr('y',-24).attr('width',bw).attr('height',18).attr('rx',6).attr('fill','#FEF2F2');
+    g.append('text').attr('x',w/2).attr('y',-11).attr('text-anchor','middle').attr('font-size',9.5)
+      .attr('fill','#DC2626').attr('font-weight',700)
+      .text(`US best plan is ${pct}% more than ${cheapestAtSel.flag} ${cheapestAtSel.key} (${ratio}×)`);
+  } else {
+    g.append('text').attr('x',w/2).attr('y',-11).attr('text-anchor','middle').attr('font-size',8.5)
+      .attr('fill','#94A3B8').text('Select 🇨🇦 Canada or 🇬🇧 UK to compare best covered plan costs');
+  }
+
+  // Estimated footnote
+  if(lines.some(l=>l.estimated)){
+    svg.append('text').attr('x',mx.l).attr('y',H-3).attr('font-size',7).attr('fill','#94A3B8')
+      .text('† Estimated: Canada drug price × (country per-capita / Canada per-capita) — proportional approximation');
+  }
+
+  const drug=drugs.find(d=>d.id===selDrug);
+  $('glob-sub').textContent=(drug?.brand_name||selDrug)+(selState?` · ${selState}-adj`:'')
+    +'  ·  best covered plan: US vs countries  ·  click drug name to switch';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BEST PLANS — with transitions
+// ═══════════════════════════════════════════════════════════════
+function renderBestPlan(){
+  const cont=d3.select('#plan-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!insData.length)return;
+  const W=node.clientWidth||260,H=node.clientHeight||200;
+  const mx={t:8,r:14,b:20,l:78};
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  const recs=insData.filter(r=>r.drug_id===selDrug);
+  const plans=recs.map(r=>{
+    const annCopay=ec(r.patient_copay)*12;
+    const annPrem=(IP[r.insurer]?.p||50)*12;
+    return{ins:r.insurer,
+      short:r.insurer.replace('Blue Cross Blue Shield','BCBS').replace('Kaiser Permanente','Kaiser').replace('UnitedHealthcare','United').replace('CVS Caremark','CVS'),
+      total:annCopay+annPrem,copay:annCopay,prem:annPrem,tier:r.tier,pa:r.prior_auth_required};
+  }).sort((a,b)=>a.total-b.total);
+
+  const xSc=d3.scaleLinear().domain([0,d3.max(plans,p=>p.total)*1.08]).range([0,W-mx.l-mx.r]);
+  const bH=Math.max(Math.floor((H-mx.t-mx.b-2*(plans.length-1))/plans.length),10);
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${mx.l},${mx.t})`);
+
+  plans.forEach((p,i)=>{
+    const y=i*(bH+2);
+    const isBest=i===0;
+    const col=isBest?'#059669':'#64748B';
+    g.append('text').attr('x',-4).attr('y',y+bH/2+4).attr('text-anchor','end')
+      .attr('font-size',8).attr('fill',col).attr('font-weight',isBest?700:400)
+      .text(p.short+(p.pa?' ⚠':''));
+    // Animate bar width
+    const copayBar=g.append('rect').attr('x',0).attr('y',y).attr('width',0).attr('height',bH).attr('rx',2).attr('fill',DC[selDrug]).attr('opacity',isBest?.88:.65);
+    copayBar.transition().duration(DUR).attr('width',xSc(p.copay));
+    const premBar=g.append('rect').attr('x',0).attr('y',y).attr('width',0).attr('height',bH).attr('rx',2).attr('fill','#CBD5E1');
+    premBar.transition().duration(DUR).attr('x',xSc(p.copay)).attr('width',xSc(p.prem));
+    g.append('text').attr('x',xSc(p.total)+4).attr('y',y+bH/2+4).attr('font-size',8.5).attr('fill',col).attr('font-weight',isBest?700:400).attr('opacity',0)
+      .text(fmt(p.total)).transition().duration(DUR).delay(200).attr('opacity',1);
+    if(isBest){
+      g.append('text').attr('x',xSc(p.copay/2)).attr('y',y+bH/2+4).attr('text-anchor','middle').attr('font-size',7).attr('fill','#fff').attr('font-weight',700).attr('pointer-events','none').attr('opacity',0)
+        .text('BEST').transition().duration(DUR).attr('opacity',1);
+    }
+    g.append('rect').attr('x',0).attr('y',y).attr('width',W-mx.l-mx.r).attr('height',bH).attr('fill','transparent')
+      .on('mousemove',e=>showTT(e,`<div class="tth">${p.ins}</div>`
+        +row('Annual Copay',fmt(p.copay))+(selState?row('State ('+selState+')','×'+(SM[selState]||1).toFixed(2)):'')
+        +row('Annual Premium',fmt(p.prem))+row('Total Annual',fmt(p.total))
+        +row('Formulary Tier','T'+p.tier)+(p.pa?row('Prior Auth','⚠️ Required'):'')))
+      .on('mouseout',hideTT);
+  });
+  const LY=H-9;
+  g.append('rect').attr('x',0).attr('y',LY-7).attr('width',8).attr('height',7).attr('fill',DC[selDrug]).attr('opacity',.85);
+  g.append('text').attr('x',10).attr('y',LY).attr('font-size',7).attr('fill','#94A3B8').text('Drug copay');
+  g.append('rect').attr('x',64).attr('y',LY-7).attr('width',8).attr('height',7).attr('fill','#CBD5E1');
+  g.append('text').attr('x',74).attr('y',LY).attr('font-size',7).attr('fill','#94A3B8').text('Premium');
+  $('plan-sub').textContent=(selState?selState+'-adjusted':'National avg')+' · '+drug.brand_name;
+}
+</script>
 </body>
 </html>
