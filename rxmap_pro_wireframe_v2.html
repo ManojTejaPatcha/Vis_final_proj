@@ -1,0 +1,465 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sh{background:#04080F;border-radius:12px;border:0.5px solid #0A1624;overflow:hidden;font-family:var(--font-sans)}
+.hdr{height:44px;background:#030710;border-bottom:0.5px solid #081422;padding:0 14px;display:flex;align-items:center;justify-content:space-between}
+.htit{font-size:14px;font-weight:500;color:#6898B8;display:flex;align-items:center;gap:7px}
+.hsub{font-size:11px;color:#122030;margin-top:1px}
+.dp{font-size:11px;padding:3px 9px;border-radius:20px;border:0.5px solid #0C1E2E;color:#12283A;background:transparent;cursor:pointer;transition:all .12s}
+.dp.on{background:#071E34;color:#3E80B8;border-color:#0B3C68}
+.sarc{height:24px;background:#030810;border-bottom:0.5px solid #071420;display:flex;align-items:center;padding:0 10px;gap:0;overflow:hidden}
+.st{display:flex;align-items:center;gap:2px;padding:2px 5px;border-radius:4px;cursor:pointer;transition:all .12s;flex-shrink:0}
+.st:hover{background:#071422}
+.st.on{background:#07182C}
+.sn{width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;background:#060C18;border:0.5px solid #0B1A28;color:#122030;flex-shrink:0;transition:all .12s}
+.st.on .sn{background:#0A2448;border-color:#103870;color:#3E80B0}
+.stx{font-size:11px;color:#0E2030;white-space:nowrap;transition:color .12s}
+.st.on .stx{color:#2E70A0}
+.sarr{font-size:10px;color:#071622;flex-shrink:0}
+.kr{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:6px 6px 5px}
+.kc{background:#050C18;border:0.5px solid #091828;border-radius:7px;padding:5px 8px}
+.kl{font-size:11px;color:#102030;margin-bottom:1px}
+.kv{font-size:13px;font-weight:500;color:#4888AC;line-height:1.2}
+.ks{font-size:11px;color:#0C1C2C;margin-top:1px}
+.mb{display:grid;grid-template-columns:244px 1fr 200px;gap:5px;padding:0 6px 5px;height:222px}
+.lb{display:grid;grid-template-columns:1fr 175px;gap:5px;padding:0 6px 5px;height:150px}
+.pnl{background:#050C18;border:0.5px solid #091828;border-radius:8px;padding:5px 7px;overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s}
+.pnl:hover{border-color:#14304A}
+.pnl.on{border-color:#1560A0!important;background:#061A30!important}
+.fc{display:flex;flex-direction:column;gap:5px;height:100%}
+.pl{font-size:11px;font-weight:500;color:#122538;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;display:flex;align-items:center;gap:3px;line-height:1.3}
+.bx{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:600;flex-shrink:0}
+.bg{background:#04180A;color:#166030;border:0.5px solid #0A3A1E}
+.bs{background:#07102A;color:#1E4088;border:0.5px solid #0E2A60}
+.ba{background:#0D0628;color:#443898;border:0.5px solid #201468}
+.ldd{display:flex;gap:2px;margin-left:auto;flex-shrink:0}
+.ld{width:5px;height:5px;border-radius:50%}
+.ld-d{background:#0C3E78}.ld-s{background:#083E28}.ld-y{background:#6A3E10}.ld-p{background:#581428}
+.wl{background:#030710;border-top:0.5px solid #071420;padding:5px 12px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.wli{display:flex;align-items:center;gap:3px;font-size:11px;color:#0C1C2C}
+.wdiv{width:0.5px;height:10px;background:#071420}
+input[type=text]{font-size:11px;padding:2px 5px;height:18px;border:0.5px solid #091828;border-radius:4px;background:#030810;color:#407898;width:100%}
+</style>
+
+<h2 class="sr-only">RxMap Pro wireframe: 9 coordinated visualizations including choropleth, parallel coordinates, stream graph, scatter plot, treemap, heatmap, Sankey diagram, line chart, and bar chart — all brushing-linked with story arc navigation for Medicare drug price analysis</h2>
+
+<div class="sh">
+
+<div class="hdr">
+  <div>
+    <div class="htit"><i class="ti ti-chart-scatter" style="font-size:15px;color:#0E2438" aria-hidden="true"></i>RxMap Pro — Medicare Drug Price Intelligence</div>
+    <div class="hsub">Part D 2019–2023 · 27,418 CMS Plans · OECD 38 nations · 14,127 drugs · 9 coordinated views · CMV brushing-linked</div>
+  </div>
+  <div style="display:flex;gap:4px;align-items:center">
+    <span id="dp-E" class="dp on" onclick="selD('Eliquis')">Eliquis</span>
+    <span id="dp-O" class="dp" onclick="selD('Ozempic')">Ozempic</span>
+    <span id="dp-J" class="dp" onclick="selD('Jardiance')">Jardiance</span>
+    <span id="dp-H" class="dp" onclick="selD('Humira')">Humira</span>
+    <div style="width:0.5px;height:16px;background:#091828;margin:0 5px"></div>
+    <select id="yr" style="background:#030810;color:#142030;border:0.5px solid #091828;font-size:11px;padding:1px 3px;height:20px;border-radius:4px;width:52px" onchange="selYr(+this.value)">
+      <option>2023</option><option>2022</option><option>2021</option><option>2020</option><option>2019</option>
+    </select>
+    <span id="sbtn" onclick="runStory()" style="font-size:11px;color:#0E2030;padding:2px 8px;border:0.5px solid #091828;border-radius:4px;cursor:pointer;background:#030810">▶ Story</span>
+  </div>
+</div>
+
+<div class="sarc">
+  <span class="st on" id="s1" onclick="goStep(1)"><span class="sn">1</span><span class="stx">Overview</span></span>
+  <span class="sarr">›</span>
+  <span class="st" id="s2" onclick="goStep(2)"><span class="sn">2</span><span class="stx">Where?</span></span>
+  <span class="sarr">›</span>
+  <span class="st" id="s3" onclick="goStep(3)"><span class="sn">3</span><span class="stx">Profiles</span></span>
+  <span class="sarr">›</span>
+  <span class="st" id="s4" onclick="goStep(4)"><span class="sn">4</span><span class="stx">Trends</span></span>
+  <span class="sarr">›</span>
+  <span class="st" id="s5" onclick="goStep(5)"><span class="sn">5</span><span class="stx">Compare</span></span>
+  <span class="sarr">›</span>
+  <span class="st" id="s6" onclick="goStep(6)"><span class="sn">6</span><span class="stx">Act</span></span>
+  <span style="margin-left:auto;font-size:11px;color:#091C2E;white-space:nowrap;flex-shrink:0">← click steps · all charts linked</span>
+</div>
+
+<div class="kr">
+  <div class="kc"><div class="kl">US avg cost / claim</div><div class="kv" id="k1">$487</div><div class="ks" style="color:#5E1818">↑ 8.2% YoY</div></div>
+  <div class="kc"><div class="kl">Cheapest US state</div><div class="kv" id="k2" style="font-size:12px">North Dakota</div><div class="ks" id="k2s" style="color:#0A4028">$312 / claim</div></div>
+  <div class="kc"><div class="kl">Max intl saving / yr</div><div class="kv" id="k3" style="color:#0A6038">$9,240</div><div class="ks" id="k3s">vs Germany</div></div>
+  <div class="kc"><div class="kl">5-yr CAGR vs OECD</div><div class="kv" id="k4" style="color:#6C280A">+8.2%</div><div class="ks">OECD avg: +3.1%</div></div>
+  <div class="kc">
+    <div class="kl">Savings calculator</div>
+    <div style="display:flex;gap:3px;margin-top:2px">
+      <input type="text" id="ci" placeholder="State e.g. CA">
+      <button onclick="runCal()" style="font-size:11px;padding:0 6px;height:18px;background:#06182E;color:#2E70A0;border:0.5px solid #0C2C58;border-radius:3px;cursor:pointer;flex-shrink:0">Go</button>
+    </div>
+    <div id="cal" style="font-size:11px;font-weight:500;color:#0A6038;margin-top:1px"></div>
+  </div>
+</div>
+
+<div class="mb">
+
+  <div class="pnl" id="p1" onclick="pClk('p1')">
+    <div class="pl"><span class="bg bx">GEO</span> Geographic price map — click state <div class="ldd"><div class="ld ld-d"></div><div class="ld ld-s"></div></div></div>
+    <svg id="msvg" width="100%" viewBox="0 0 232 148" style="display:block"></svg>
+    <div style="display:flex;align-items:center;gap:3px;margin-top:3px">
+      <span style="font-size:11px;color:#0E2030">Low</span>
+      <div style="flex:1;height:3px;border-radius:2px;background:linear-gradient(to right,#091830,#0D3060,#1258A0,#1A7AC8,#22A0F0)"></div>
+      <span style="font-size:11px;color:#0E2030">High cost</span>
+      <span style="font-size:11px;color:#185030;margin-left:7px;white-space:nowrap">● OECD overlay</span>
+    </div>
+  </div>
+
+  <div class="fc">
+    <div class="pnl" id="p2" style="flex:1;min-height:0" onclick="pClk('p2')">
+      <div class="pl"><span class="ba bx">ADV</span> Drug profiles — parallel coordinates <div class="ldd"><div class="ld ld-d"></div></div></div>
+      <svg id="pcsvg" width="100%" viewBox="0 0 206 90" style="display:block;overflow:visible"></svg>
+    </div>
+    <div class="pnl" id="p3" style="flex:0 0 73px" onclick="pClk('p3')">
+      <div class="pl"><span class="ba bx">ADV</span> Spending flows 2019–2023 — stream graph <div class="ldd"><div class="ld ld-y"></div><div class="ld ld-d"></div></div></div>
+      <svg width="100%" viewBox="0 0 206 44" style="display:block">
+        <path d="M0,42 C52,41 104,42 156,39 C182,37 206,35 206,35 L206,44 L0,44Z" fill="#1A1040" opacity=".85"/>
+        <path d="M0,35 C52,33 104,34 156,30 C182,27 206,24 206,24 L206,35 C182,35 156,39 104,42 C52,41 0,42 0,42Z" fill="#1258A0" opacity=".8"/>
+        <path d="M0,27 C52,25 104,26 156,21 C182,18 206,15 206,15 L206,24 C182,24 156,30 104,34 C52,33 0,35 0,35Z" fill="#1A7FD4" opacity=".85"/>
+        <path d="M0,22 C52,21 104,19 156,13 C182,8 206,4 206,4 L206,15 C182,15 156,21 104,26 C52,25 0,27 0,27Z" fill="#1AB874" opacity=".9"/>
+        <text x="3" y="43" font-size="6.5" fill="#142838" font-family="sans-serif">2019</text>
+        <text x="103" y="43" text-anchor="middle" font-size="6.5" fill="#142838" font-family="sans-serif">2021</text>
+        <text x="203" y="43" text-anchor="end" font-size="6.5" fill="#142838" font-family="sans-serif">2023</text>
+        <text x="202" y="7" text-anchor="end" font-size="6" fill="#1AB874" font-family="sans-serif">Ozempic ↑62%</text>
+        <text x="202" y="17" text-anchor="end" font-size="6" fill="#1A7FD4" font-family="sans-serif">Eliquis</text>
+        <text x="202" y="27" text-anchor="end" font-size="5.5" fill="#C8881E" font-family="sans-serif">Jardiance</text>
+        <text x="202" y="37" text-anchor="end" font-size="5.5" fill="#CC4A28" font-family="sans-serif">Humira</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="fc">
+    <div class="pnl" id="p4" style="flex:1;min-height:0" onclick="pClk('p4')">
+      <div class="pl"><span class="bs bx">STD</span> Cost vs utilization — bubble chart <div class="ldd"><div class="ld ld-d"></div></div></div>
+      <svg width="100%" viewBox="0 0 184 72" style="display:block;overflow:visible">
+        <line x1="18" y1="4" x2="18" y2="66" stroke="#0D2030" stroke-width=".75"/>
+        <line x1="18" y1="66" x2="180" y2="66" stroke="#0D2030" stroke-width=".75"/>
+        <line x1="18" y1="35" x2="180" y2="35" stroke="#081422" stroke-width=".4" stroke-dasharray="3 3"/>
+        <line x1="99" y1="4" x2="99" y2="66" stroke="#081422" stroke-width=".4" stroke-dasharray="3 3"/>
+        <circle cx="33" cy="12" r="12" fill="#7060C8" opacity=".6"/>
+        <text x="33" y="16" text-anchor="middle" font-size="5.5" fill="#C8B8F8" font-family="sans-serif">Lipitor</text>
+        <circle cx="54" cy="17" r="13" fill="#1A7FD4" opacity=".65"/>
+        <text x="54" y="21" text-anchor="middle" font-size="5.5" fill="#A8D8F8" font-family="sans-serif">Eliquis</text>
+        <circle cx="70" cy="52" r="6" fill="#C8881E" opacity=".65"/>
+        <text x="70" y="56" text-anchor="middle" font-size="5" fill="#F8D880" font-family="sans-serif">Jard.</text>
+        <circle cx="115" cy="41" r="9" fill="#1AB874" opacity=".65"/>
+        <text x="115" y="45" text-anchor="middle" font-size="5.5" fill="#90E8C8" font-family="sans-serif">Ozempic</text>
+        <circle cx="154" cy="58" r="11" fill="#CC4A28" opacity=".65"/>
+        <text x="154" y="62" text-anchor="middle" font-size="5.5" fill="#F0A880" font-family="sans-serif">Humira</text>
+        <text x="172" y="55" text-anchor="end" font-size="5.5" fill="#E8A520" font-family="sans-serif">← Outlier</text>
+        <text x="99" y="71" text-anchor="middle" font-size="6" fill="#122030" font-family="sans-serif">Cost per claim →</text>
+        <text x="5" y="35" text-anchor="middle" font-size="6" fill="#122030" font-family="sans-serif" transform="rotate(-90,5,35)">Beneficiaries →</text>
+        <text x="178" y="11" text-anchor="end" font-size="5" fill="#152030" font-family="sans-serif">● = total spend</text>
+      </svg>
+    </div>
+    <div class="pnl" id="p5" style="flex:0 0 57px" onclick="pClk('p5')">
+      <div class="pl"><span class="ba bx">ADV</span> Drug spending share — treemap <div class="ldd"><div class="ld ld-d"></div></div></div>
+      <svg width="100%" viewBox="0 0 184 36" style="display:block">
+        <rect x="0" y="0" width="110" height="36" fill="#091C38" rx="2"/>
+        <rect x="1" y="1" width="108" height="20" fill="#1258A0" rx="1"/>
+        <text x="55" y="12" text-anchor="middle" font-size="6.5" fill="#6AAAD8" font-family="sans-serif" font-weight="600">Eliquis $16.2B</text>
+        <rect x="1" y="23" width="62" height="12" fill="#1A6AAA" rx="1"/>
+        <text x="32" y="30" text-anchor="middle" font-size="5.5" fill="#4888B8" font-family="sans-serif">Plavix $8.0B</text>
+        <rect x="65" y="23" width="44" height="12" fill="#1E88C8" rx="1"/>
+        <text x="87" y="30" text-anchor="middle" font-size="5.5" fill="#70B0D8" font-family="sans-serif">Brilinta</text>
+        <rect x="112" y="0" width="72" height="36" fill="#071C10" rx="2"/>
+        <rect x="113" y="1" width="70" height="21" fill="#085041" rx="1"/>
+        <text x="148" y="12.5" text-anchor="middle" font-size="6.5" fill="#30A870" font-family="sans-serif" font-weight="600">Ozempic $10.1B</text>
+        <rect x="113" y="24" width="38" height="11" fill="#1D9E75" rx="1"/>
+        <text x="132" y="30" text-anchor="middle" font-size="5.5" fill="#60D8A8" font-family="sans-serif">Jardiance</text>
+        <rect x="153" y="24" width="29" height="11" fill="#5DCAA5" rx="1"/>
+        <text x="167" y="30" text-anchor="middle" font-size="5.5" fill="#A0F0D0" font-family="sans-serif">Humira</text>
+        <text x="2" y="5" font-size="5" fill="#0C2040" font-family="sans-serif">CARDIOLOGY</text>
+        <text x="114" y="5" font-size="5" fill="#082010" font-family="sans-serif">DIABETES/IMMUNO</text>
+      </svg>
+    </div>
+    <div class="pnl" id="p6" style="flex:0 0 52px" onclick="pClk('p6')">
+      <div class="pl"><span class="ba bx">ADV</span> Formulary tiers — heatmap <div class="ldd"><div class="ld ld-p"></div><div class="ld ld-d"></div></div></div>
+      <div id="hm"></div>
+    </div>
+  </div>
+</div>
+
+<div class="lb">
+  <div class="pnl" id="p7" onclick="pClk('p7')">
+    <div class="pl"><span class="ba bx">ADV</span> Patient flow — state → plan type → drug category &nbsp;(Sankey diagram) <div class="ldd"><div class="ld ld-s"></div><div class="ld ld-p"></div></div></div>
+    <svg id="sksvg" width="100%" viewBox="0 0 470 90" style="display:block"></svg>
+  </div>
+  <div class="fc">
+    <div class="pnl" id="p8" style="flex:1;min-height:0" onclick="pClk('p8')">
+      <div class="pl"><span class="bs bx">STD</span> US vs intl trend — fixed scale <div class="ldd"><div class="ld ld-y"></div><div class="ld ld-d"></div></div></div>
+      <svg id="lsvg" width="100%" viewBox="0 0 162 44" style="display:block;overflow:visible"></svg>
+      <div style="display:flex;gap:6px;margin-top:1px">
+        <span style="font-size:11px;color:#162840;display:flex;align-items:center;gap:2px"><span style="width:10px;height:2px;background:#1A7FD4;display:inline-block"></span>US avg</span>
+        <span style="font-size:11px;color:#162840;display:flex;align-items:center;gap:2px"><span style="width:10px;height:1px;background:#1AB874;display:inline-block"></span>Intl ref</span>
+      </div>
+    </div>
+    <div class="pnl" id="p9" style="flex:0 0 58px" onclick="pClk('p9')">
+      <div class="pl"><span class="bs bx">STD</span> OECD benchmark — bar chart <div class="ldd"><div class="ld ld-d"></div></div></div>
+      <svg id="ibsvg" width="100%" viewBox="0 0 162 34" style="display:block;overflow:visible"></svg>
+    </div>
+  </div>
+</div>
+
+<div class="wl">
+  <div class="wli"><div class="ld ld-d" style="width:7px;height:7px"></div>Drug → all 9 views</div>
+  <div class="wdiv"></div>
+  <div class="wli"><div class="ld ld-s" style="width:7px;height:7px"></div>State → Map, Parallel, Sankey, Calc</div>
+  <div class="wdiv"></div>
+  <div class="wli"><div class="ld ld-y" style="width:7px;height:7px"></div>Year → Stream, Line</div>
+  <div class="wdiv"></div>
+  <div class="wli"><div class="ld ld-p" style="width:7px;height:7px"></div>Plan → Heatmap, Sankey</div>
+  <div style="margin-left:auto;display:flex;gap:5px;align-items:center">
+    <span class="ba bx">ADV</span><span style="font-size:11px;color:#0C1C2C">6 non-std</span>
+    <span class="bs bx">STD</span><span style="font-size:11px;color:#0C1C2C">3 standard</span>
+    <span class="bg bx">GEO</span><span style="font-size:11px;color:#0C1C2C">1 geo · 9 total · CMV</span>
+  </div>
+</div>
+</div>
+
+<script>
+const DM={
+  Eliquis:  {avg:487, yoy:8.2, cs:'ND',cc:312, ms:9240, vco:'Germany',trend:[412,435,458,471,487]},
+  Ozempic:  {avg:1100,yoy:23.5,cs:'WI',cc:890, ms:18500,vco:'Canada', trend:[680,780,890,980,1100]},
+  Jardiance:{avg:380, yoy:5.1, cs:'MN',cc:201, ms:7100, vco:'Germany',trend:[310,330,350,365,380]},
+  Humira:   {avg:2200,yoy:12.8,cs:'IA',cc:1840,ms:45000,vco:'UK',     trend:[1800,1900,2000,2100,2200]},
+};
+const OE={
+  Eliquis:  {US:487, CA:198,UK:142,DE:215,FR:167,JP:124},
+  Ozempic:  {US:1100,CA:312,UK:240,DE:289,FR:215,JP:178},
+  Jardiance:{US:380, CA:167,UK:125,DE:188,FR:145,JP:112},
+  Humira:   {US:2200,CA:780,UK:540,DE:820,FR:690,JP:420},
+};
+const SM={
+  WA:1.05,OR:1.02,CA:1.12,NV:1.08,ID:0.92,MT:0.88,WY:0.86,CO:1.01,UT:0.97,AZ:1.09,NM:0.95,
+  ND:0.64,SD:0.72,NE:0.80,KS:0.83,OK:0.89,TX:1.03,MN:0.78,IA:0.82,MO:0.90,AR:0.92,
+  LA:1.05,MS:1.07,AL:1.06,GA:1.02,FL:1.10,SC:1.01,NC:0.98,TN:0.93,KY:0.88,WV:0.86,
+  WI:0.85,MI:0.92,IL:1.08,IN:0.88,OH:0.93,PA:1.02,NY:1.12,NJ:1.15,CT:1.10,MA:1.13,
+  RI:1.08,VT:1.01,NH:1.02,ME:0.98,VA:1.02,MD:1.07,DE:1.04,AK:0.92,HI:1.04
+};
+const TILES=[
+  {s:'ME',c:10,r:0},{s:'VT',c:9,r:0},
+  {s:'WA',c:0,r:1},{s:'MT',c:1,r:1},{s:'ND',c:3,r:1},{s:'MN',c:4,r:1},{s:'WI',c:5,r:1},{s:'MI',c:6,r:1},{s:'NY',c:8,r:1},{s:'NH',c:10,r:1},
+  {s:'OR',c:0,r:2},{s:'ID',c:1,r:2},{s:'WY',c:2,r:2},{s:'SD',c:3,r:2},{s:'IA',c:4,r:2},{s:'IL',c:5,r:2},{s:'IN',c:6,r:2},{s:'OH',c:7,r:2},{s:'PA',c:8,r:2},{s:'NJ',c:9,r:2},{s:'MA',c:10,r:2},
+  {s:'CA',c:0,r:3},{s:'NV',c:1,r:3},{s:'UT',c:2,r:3},{s:'CO',c:3,r:3},{s:'NE',c:4,r:3},{s:'MO',c:5,r:3},{s:'KY',c:6,r:3},{s:'WV',c:7,r:3},{s:'VA',c:8,r:3},{s:'MD',c:9,r:3},{s:'CT',c:10,r:3},
+  {s:'AZ',c:1,r:4},{s:'NM',c:2,r:4},{s:'KS',c:4,r:4},{s:'AR',c:5,r:4},{s:'TN',c:6,r:4},{s:'NC',c:7,r:4},{s:'SC',c:8,r:4},{s:'DE',c:9,r:4},{s:'RI',c:10,r:4},
+  {s:'TX',c:3,r:5},{s:'OK',c:4,r:5},{s:'LA',c:5,r:5},{s:'MS',c:6,r:5},{s:'AL',c:7,r:5},{s:'GA',c:8,r:5},
+  {s:'FL',c:9,r:6},{s:'AK',c:0,r:7},{s:'HI',c:1,r:7},
+];
+const PLANS=[
+  {n:'AARP MRx',t:{Eliquis:1,Ozempic:3,Jardiance:2,Humira:4}},
+  {n:'Humana',  t:{Eliquis:2,Ozempic:2,Jardiance:1,Humira:3}},
+  {n:'SilverScr',t:{Eliquis:3,Ozempic:1,Jardiance:2,Humira:4}},
+  {n:'WellCare',t:{Eliquis:2,Ozempic:4,Jardiance:3,Humira:2}},
+];
+const TC=['#085041','#1D9E75','#5DCAA5','#9FE1CB'];
+const TT=['#B0F0D0','#B0F0D0','#042C1C','#042C1C'];
+const DC={Eliquis:'#1A7FD4',Ozempic:'#1AB874',Jardiance:'#C8881E',Humira:'#CC4A28'};
+const SN={ND:'North Dakota',WI:'Wisconsin',MN:'Minnesota',IA:'Iowa'};
+const SMAP={1:['p1','p4','p5'],2:['p1','p8','p9'],3:['p2'],4:['p3','p8'],5:['p7','p9'],6:['p6']};
+let aD='Eliquis',aS=null;
+const fmt=n=>'$'+Math.round(n).toLocaleString();
+
+function mCol(m){
+  const t=Math.max(0,Math.min(1,(m-0.64)/(1.15-0.64)));
+  if(t<0.2)return'#091830';if(t<0.4)return'#0D3060';if(t<0.6)return'#1258A0';if(t<0.8)return'#1A7AC8';return'#22A0F0';
+}
+
+function renderMap(){
+  const svg=document.getElementById('msvg');
+  const tw=19,th=13,tg=2;
+  let h='';
+  TILES.forEach(t=>{
+    const x=t.c*(tw+tg),y=t.r*(th+tg);
+    const m=SM[t.s]||1,fill=mCol(m),sel=aS===t.s;
+    h+=`<g style="cursor:pointer" onclick="selS('${t.s}',event)"><rect x="${x}" y="${y}" width="${tw}" height="${th}" fill="${fill}" stroke="${sel?'#E8A520':'rgba(255,255,255,0.05)'}" stroke-width="${sel?1.5:0.4}" rx="1.5"/><text x="${x+9.5}" y="${y+7}" text-anchor="middle" dominant-baseline="central" fill="${m<0.78?'#2870A8':'#B8D8F0'}" font-size="5" font-family="sans-serif" font-weight="500">${t.s}</text></g>`;
+  });
+  [{l:'UK',x:126,y:9,c:'#C8D030'},{l:'DE',x:138,y:15,c:'#E89030'},{l:'JP',x:153,y:9,c:'#D04070'},{l:'CA',x:47,y:7,c:'#40C080'}].forEach(o=>{
+    h+=`<circle cx="${o.x}" cy="${o.y}" r="3.5" fill="${o.c}" opacity=".7" stroke="rgba(0,0,0,.3)" stroke-width=".5"/>`;
+    h+=`<text x="${o.x}" y="${o.y+9}" text-anchor="middle" font-size="4.5" fill="${o.c}" font-family="sans-serif">${o.l}</text>`;
+  });
+  if(aS){
+    const cost=fmt(DM[aD].avg*(SM[aS]||1));
+    h+=`<rect x="0" y="137" width="115" height="11" fill="rgba(0,0,0,.55)" rx="2"/>`;
+    h+=`<text x="4" y="143.5" dominant-baseline="central" font-size="6.5" fill="#E8A520" font-family="sans-serif">${aS}: ${cost} / claim  ← selected</text>`;
+  }
+  svg.innerHTML=h;
+}
+
+function renderPC(){
+  const svg=document.getElementById('pcsvg');
+  const axes=[22,62,102,142,182];
+  const labs=['Avg Cost','Claims(M)','Benefic.','CAGR%','US/Intl×'];
+  const axTop=8,axH=68;
+  const py=v=>axTop+(1-v)*axH;
+  const vals={
+    Eliquis:  [0.22,0.85,0.80,0.35,0.68],
+    Ozempic:  [0.50,0.40,0.42,0.95,0.85],
+    Jardiance:[0.17,0.48,0.45,0.22,0.52],
+    Humira:   [1.00,0.15,0.18,0.58,0.48],
+  };
+  let h='';
+  axes.forEach((x,i)=>{
+    h+=`<line x1="${x}" y1="${axTop}" x2="${x}" y2="${axTop+axH}" stroke="#0D1E2E" stroke-width="1.2"/>`;
+    [0,.25,.5,.75,1].forEach(q=>{
+      const ty=axTop+q*axH;
+      h+=`<line x1="${x-3}" y1="${ty}" x2="${x+3}" y2="${ty}" stroke="#0D1E2E" stroke-width=".5"/>`;
+    });
+    h+=`<text x="${x}" y="88" text-anchor="middle" font-size="5.5" fill="#142838" font-family="sans-serif">${labs[i]}</text>`;
+  });
+  Object.entries(vals).forEach(([d,v])=>{
+    if(d===aD) return;
+    h+=`<polyline points="${axes.map((x,i)=>`${x},${py(v[i])}`).join(' ')}" fill="none" stroke="${DC[d]}" stroke-width=".75" opacity=".22"/>`;
+  });
+  const av=vals[aD];
+  if(av){
+    h+=`<polyline points="${axes.map((x,i)=>`${x},${py(av[i])}`).join(' ')}" fill="none" stroke="${DC[aD]}" stroke-width="2"/>`;
+    axes.forEach((x,i)=>{h+=`<circle cx="${x}" cy="${py(av[i])}" r="3" fill="${DC[aD]}" stroke="#04080F" stroke-width=".5"/>`;});
+  }
+  const bT=py(.5),bB=py(.1);
+  h+=`<rect x="${axes[0]-5}" y="${bT}" width="10" height="${bB-bT}" fill="rgba(26,127,212,.15)" stroke="#1A7FD4" stroke-width=".75" rx="2"/>`;
+  h+=`<text x="${axes[0]+9}" y="${(bT+bB)/2+2}" font-size="5.5" fill="#1A7FD4" font-family="sans-serif">brush</text>`;
+  let ly=12;
+  Object.entries(DC).forEach(([d,c])=>{
+    const op=d===aD?1:0.28;
+    h+=`<circle cx="${axes[4]+13}" cy="${ly}" r="3" fill="${c}" opacity="${op}"/>`;
+    h+=`<text x="${axes[4]+19}" y="${ly+1}" dominant-baseline="central" font-size="5" fill="${c}" opacity="${op}" font-family="sans-serif">${d.slice(0,4)}</text>`;
+    ly+=11;
+  });
+  svg.innerHTML=h;
+}
+
+function renderLine(){
+  const svg=document.getElementById('lsvg');
+  const tr=DM[aD].trend,itr=tr.map(v=>Math.round(v*.41));
+  const W=162,H=44,ml=24,mt=4,mr=8,mb=10,cw=W-ml-mr,ch=H-mt-mb;
+  const all=[...tr,...itr],mn=Math.min(...all)*.88,mx=Math.max(...all)*1.1;
+  const px=i=>ml+i*(cw/4),py=v=>mt+ch-(v-mn)/(mx-mn)*ch;
+  let h='';
+  [0,1,2,3].forEach(i=>h+=`<line x1="${ml}" y1="${mt+i*(ch/3)}" x2="${W-mr}" y2="${mt+i*(ch/3)}" stroke="#091828" stroke-width=".4"/>`);
+  h+=`<line x1="${ml}" y1="${mt+ch}" x2="${W-mr}" y2="${mt+ch}" stroke="#0D1E2E" stroke-width=".6"/>`;
+  h+=`<polyline points="${itr.map((v,i)=>`${px(i)},${py(v)}`).join(' ')}" fill="none" stroke="#1AB874" stroke-width="1" stroke-dasharray="2 2"/>`;
+  h+=`<polyline points="${tr.map((v,i)=>`${px(i)},${py(v)}`).join(' ')}" fill="none" stroke="${DC[aD]}" stroke-width="1.5"/>`;
+  tr.forEach((v,i)=>{h+=`<circle cx="${px(i)}" cy="${py(v)}" r="2" fill="${DC[aD]}" stroke="#04080F" stroke-width=".5"/>`;});
+  const usy=py(tr[4]),iy=py(itr[4]),pct=Math.round(tr[4]/itr[4]-1)*100;
+  h+=`<line x1="${px(4)+5}" y1="${iy}" x2="${px(4)+5}" y2="${usy}" stroke="#E8A520" stroke-width=".75"/>`;
+  h+=`<text x="${px(4)+9}" y="${(iy+usy)/2+2}" font-size="5" fill="#E8A520" font-family="sans-serif" font-weight="600">+${pct}%</text>`;
+  [2019,2020,2021,2022,2023].forEach((yr,i)=>{
+    h+=`<text x="${px(i)}" y="${H-1}" text-anchor="middle" font-size="6" fill="#122030" font-family="sans-serif">${yr}</text>`;
+  });
+  [[mn,'$'+Math.round(mn/100)*100],[(mn+mx)/2,'$'+Math.round((mn+mx)/200)*100],[mx,'$'+Math.round(mx/100)*100]].forEach(([v,lbl])=>{
+    h+=`<text x="${ml-2}" y="${py(v)}" text-anchor="end" dominant-baseline="central" font-size="5.5" fill="#122030" font-family="sans-serif">${lbl}</text>`;
+  });
+  svg.innerHTML=h;
+}
+
+function renderIntl(){
+  const svg=document.getElementById('ibsvg');
+  const d=OE[aD],cos=['US','CA','UK','DE','FR','JP'],lbl={US:'USA',CA:'CAN',UK:'GBR',DE:'DEU',FR:'FRA',JP:'JPN'};
+  const H=34,tp=4,ch=H-tp-10,bw=16,bg=9,sx=6;
+  let h=`<line x1="${sx}" y1="${tp}" x2="${sx+cos.length*(bw+bg)}" y2="${tp}" stroke="#1A7FD4" stroke-width=".5" stroke-dasharray="2 2"/>`;
+  cos.forEach((co,i)=>{
+    const val=d[co],bh=(val/d.US)*ch,x=sx+i*(bw+bg),y=tp+ch-bh;
+    h+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${co==='US'?'#1258A0':'#0D2E52'}" rx="1"/>`;
+    h+=`<text x="${x+bw/2}" y="${y-2}" text-anchor="middle" font-size="5" fill="${co==='US'?'#4898D0':'#1A3858'}" font-family="sans-serif">$${Math.round(val)}</text>`;
+    h+=`<text x="${x+bw/2}" y="${H-1}" text-anchor="middle" font-size="5.5" fill="#122030" font-family="sans-serif">${lbl[co]}</text>`;
+  });
+  svg.innerHTML=h;
+}
+
+function renderHM(){
+  const drugs=['Eliquis','Ozempic','Jardiance','Humira'];
+  let h='<table style="width:100%;border-collapse:collapse">';
+  h+='<tr><td style="font-size:11px;color:#0E2030;padding:0 2px;width:44px"></td>';
+  drugs.forEach(d=>{
+    h+=`<td style="text-align:center;padding:0 1px;font-size:${d===aD?11:9}px;font-weight:${d===aD?600:400};color:${d===aD?'#3A80B8':'#102030'}">${d.slice(0,4)}</td>`;
+  });
+  h+='</tr>';
+  PLANS.forEach(p=>{
+    h+=`<tr><td style="font-size:11px;color:#0E2030;padding:1px 2px;white-space:nowrap;overflow:hidden;max-width:44px">${p.n}</td>`;
+    drugs.forEach(d=>{
+      const t=p.t[d]||5;
+      h+=`<td style="text-align:center;padding:1px"><div style="background:${TC[t-1]};color:${TT[t-1]};font-size:8px;font-weight:600;border-radius:2px;padding:1px 0;${d===aD?'outline:1px solid #E8A520':''}">T${t}</div></td>`;
+    });
+    h+='</tr>';
+  });
+  document.getElementById('hm').innerHTML=h+'</table>';
+}
+
+function renderSankey(){
+  const svg=document.getElementById('sksvg');
+  const lN=[{n:'CA',y:3,h:24,c:'#0C3A6A'},{n:'TX',y:29,h:17,c:'#1258A0'},{n:'FL',y:48,h:13,c:'#1A7AC8'},{n:'NY',y:63,h:9,c:'#4090C8'},{n:'PA+',y:74,h:7,c:'#60A8D8'}];
+  const mN=[{n:'PPO',y:3,h:35,c:'#085041'},{n:'HMO',y:40,h:27,c:'#1D9E75'},{n:'PDP',y:69,h:13,c:'#5DCAA5'}];
+  const rN=[{n:'Cardio',y:3,h:31,c:'#4840A8'},{n:'Diabetes',y:36,h:27,c:'#7060C8'},{n:'Immuno',y:65,h:16,c:'#9880E0'}];
+  const bands=[
+    [14,3,15,230,3,13,'#0C3A6A',.4],[14,15,24,230,25,32,'#0C3A6A',.28],
+    [14,29,37,230,13,22,'#1258A0',.4],[14,37,43,230,40,46,'#1258A0',.28],
+    [14,48,54,230,46,53,'#1A7AC8',.38],[14,63,68,230,29,34,'#4090C8',.28],
+    [14,74,80,230,69,73,'#60A8D8',.35],
+    [240,3,19,456,3,15,'#085041',.4],[240,19,35,456,28,38,'#085041',.28],
+    [240,40,54,456,15,26,'#1D9E75',.35],[240,54,67,456,36,47,'#1D9E75',.28],
+    [240,69,82,456,65,80,'#5DCAA5',.4],
+  ];
+  let h='';
+  bands.forEach(([x1,y1t,y1b,x2,y2t,y2b,col,op])=>{
+    const cx=(x1+x2)/2;
+    h+=`<path d="M${x1},${y1t} C${cx},${y1t} ${cx},${y2t} ${x2},${y2t} L${x2},${y2b} C${cx},${y2b} ${cx},${y1b} ${x1},${y1b} Z" fill="${col}" opacity="${op}"/>`;
+  });
+  lN.forEach(n=>{h+=`<rect x="4" y="${n.y}" width="10" height="${n.h}" fill="${n.c}" rx="1"/><text x="2" y="${n.y+n.h/2+1}" text-anchor="end" dominant-baseline="central" font-size="5.5" fill="#163A58" font-family="sans-serif">${n.n}</text>`;});
+  mN.forEach(n=>{h+=`<rect x="230" y="${n.y}" width="10" height="${n.h}" fill="${n.c}" rx="1"/><text x="235" y="${n.y-2}" text-anchor="middle" font-size="5" fill="#0A2810" font-family="sans-serif">${n.n}</text>`;});
+  rN.forEach(n=>{h+=`<rect x="456" y="${n.y}" width="10" height="${n.h}" fill="${n.c}" rx="1"/><text x="468" y="${n.y+n.h/2+1}" text-anchor="start" dominant-baseline="central" font-size="5.5" fill="#201878" font-family="sans-serif">${n.n}</text>`;});
+  h+=`<text x="9" y="2" text-anchor="middle" font-size="5" fill="#0C1C2C" font-family="sans-serif">States</text>`;
+  h+=`<text x="235" y="2" text-anchor="middle" font-size="5" fill="#081810" font-family="sans-serif">Plan Types</text>`;
+  h+=`<text x="461" y="2" text-anchor="middle" font-size="5" fill="#160C38" font-family="sans-serif">Drug cats</text>`;
+  h+=`<text x="235" y="88" text-anchor="middle" font-size="5.5" fill="#0E2030" font-family="sans-serif">$142B total Medicare Part D spend · band width = beneficiary volume</text>`;
+  svg.innerHTML=h;
+}
+
+function renderKPI(){
+  const m=DM[aD];
+  document.getElementById('k1').textContent=fmt(m.avg);
+  document.getElementById('k2').textContent=SN[m.cs]||m.cs;
+  document.getElementById('k2s').textContent=fmt(m.cc)+' / claim';
+  document.getElementById('k3').textContent=fmt(m.ms)+'/yr';
+  document.getElementById('k3s').textContent='vs '+m.vco;
+  document.getElementById('k4').textContent='+'+m.yoy+'%';
+}
+
+function renderAll(){renderKPI();renderMap();renderPC();renderLine();renderIntl();renderHM();renderSankey();}
+
+function selD(d){
+  aD=d;
+  const ids={Eliquis:'dp-E',Ozempic:'dp-O',Jardiance:'dp-J',Humira:'dp-H'};
+  document.querySelectorAll('.dp').forEach(p=>p.classList.toggle('on',p.id===ids[d]));
+  renderAll();
+}
+function selS(s,e){
+  if(e)e.stopPropagation();
+  aS=aS===s?null:s;
+  renderMap();
+}
+function selYr(){renderLine();}
+function pClk(id){document.getElementById(id).classList.toggle('on');}
+
+let stT=null;
+function goStep(n){
+  document.querySelectorAll('.st').forEach((el,i)=>el.classList.toggle('on',i+1===n));
+  const lit=SMAP[n]||[];
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.toggle('on',lit.includes(p.id)));
+}
+function runStory(){
+  if(stT){clearInterval(stT);stT=null;document.getElementById('sbtn').textContent='▶ Story';document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));return;}
+  document.getElementById('sbtn').textContent='■ Stop';
+  let s=1;
+  const run=()=>{goStep(s);s=s>5?1:s+1;};
+  run();stT=setInterval(run,1900);
+}
+function runCal(){
+  const si=(document.getElementById('ci').value||'CA').toUpperCase().trim().replace(/[^A-Z]/g,'').slice(0,2);
+  const base=DM[aD].avg*(SM[si]||1);
+  document.getElementById('cal').textContent=`${si||'CA'}: save ~${fmt(Math.round((base-.85*base)*12))}/yr`;
+}
+
+renderAll();goStep(1);
+</script>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlanPilot — Detection Analytics</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="learning.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <div data-nav="learning"></div>
+
+  <main class="dashboard">
+    <!-- Header -->
+    <header class="dash-header">
+      <div class="dash-header-left">
+        <h1 class="dash-title">Detection Analytics</h1>
+        <p class="dash-subtitle">Watch the manipulation detection model get smarter with every case</p>
+      </div>
+      <div class="dash-header-right">
+        <div class="stat-pill">
+          <span class="stat-pill-label">Interactions</span>
+          <span class="stat-pill-value mono" id="statTotal">—</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-label">Enrollment Rate</span>
+          <span class="stat-pill-value mono" id="statConversion">—</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill-label">Model Accuracy</span>
+          <span class="stat-pill-value mono" id="statAccuracy">—</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Row 1: Conversion Trend + Segment Table -->
+    <div class="dash-row dash-row--2">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Enrollment Rate Over Time</h2>
+          <span class="card-badge">Cumulative</span>
+        </div>
+        <div class="chart-container" id="chartConversionTrend"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Vulnerability by Segment</h2>
+          <span class="card-badge">Volume &amp; Rate</span>
+        </div>
+        <div class="table-scroll" id="segmentTable"></div>
+      </section>
+    </div>
+
+    <!-- Row 2: Angle Heatmap -->
+    <section class="card card--full">
+      <div class="card-header">
+        <h2 class="card-title">Tactic Detection Heatmap</h2>
+        <p class="card-desc">Thompson posterior detection confidence per segment × manipulation tactic</p>
+      </div>
+      <div class="chart-container chart-container--tall" id="chartHeatmap"></div>
+    </section>
+
+    <!-- Row 3: Bandit Confidence + Feature Importance -->
+    <div class="dash-row dash-row--2">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Detection Confidence</h2>
+          <p class="card-desc">Beta posterior distributions for selected segment</p>
+        </div>
+        <div class="segment-selector">
+          <label class="field-label">Segment:</label>
+          <select id="banditSegmentSelect" class="field-select field-select--sm"></select>
+        </div>
+        <div class="chart-container chart-container--tall" id="chartBandit"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Vulnerability Factors</h2>
+          <p class="card-desc">Which profile features make consumers most susceptible to manipulation</p>
+        </div>
+        <div class="chart-container chart-container--tall" id="chartFeatureImportance"></div>
+      </section>
+    </div>
+
+    <!-- Row 4: Data Controls -->
+    <section class="card card--full">
+      <div class="card-header">
+        <h2 class="card-title">Data Management</h2>
+        <p class="card-desc">Reset, reseed, or export the detection model data</p>
+      </div>
+      <div class="controls-row">
+        <button id="btnReseed" class="btn btn-secondary">Reseed (100 synthetic)</button>
+        <button id="btnReset" class="btn btn-ghost">Reset All Data</button>
+        <button id="btnExport" class="btn btn-secondary">Export JSON</button>
+        <label class="btn btn-ghost btn-file">
+          Import JSON
+          <input type="file" id="btnImport" accept=".json" hidden>
+        </label>
+      </div>
+    </section>
+  </main>
+
+  <script src="data-store.js"></script>
+  <script src="feature-engineering.js"></script>
+  <script src="learning-engine.js"></script>
+  <script src="ml-model.js"></script>
+  <script src="nav.js"></script>
+  <script src="learning.js"></script>
+</body>
+</html>

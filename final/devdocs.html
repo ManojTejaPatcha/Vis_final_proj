@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For Developers — PlanPilot Technical Docs</title>
+<meta name="description" content="Technical documentation for PlanPilot: ML architecture, data sources, and in-browser model details.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="landing.css">
+<style>
+  .dev-hero {
+    background: var(--ink);
+    color: #fff;
+    padding: var(--s8) 0 var(--s7);
+  }
+  .dev-hero .eyebrow { color: var(--accent); }
+  .dev-hero .hero-title { color: #fff; }
+  .dev-hero .hero-sub { color: rgba(255,255,255,0.65); max-width: 600px; }
+  .dev-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: var(--mono);
+    color: rgba(255,255,255,0.7);
+    margin-bottom: var(--s5);
+  }
+  .dev-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .arch-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: var(--s4);
+  }
+  .arch-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .arch-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    vertical-align: top;
+  }
+  .arch-table tr:hover td { background: var(--surface); }
+  .arch-table code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+  .code-block {
+    background: var(--ink);
+    color: #e8eaf0;
+    border-radius: var(--r);
+    padding: var(--s5);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-top: var(--s4);
+  }
+  .code-block .cm { color: #5c7a5c; }
+  .code-block .kw { color: #c792ea; }
+  .code-block .str { color: #c3e88d; }
+  .code-block .fn { color: #82aaff; }
+  .data-schema-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: var(--s5);
+    margin-top: var(--s4);
+  }
+  .data-schema-card h4 {
+    margin: 0 0 var(--s3);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .schema-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .schema-field:last-child { border-bottom: none; }
+  .schema-key { font-family: var(--mono); color: var(--accent); min-width: 160px; font-size: 12px; }
+  .schema-type { color: var(--muted); min-width: 80px; font-size: 12px; }
+  .schema-desc { color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+<div data-nav="devdocs"></div>
+
+<!-- Dev Hero -->
+<header class="dev-hero">
+  <div class="container">
+    <div class="dev-badge"><span class="dev-badge-dot"></span>Technical Documentation</div>
+    <p class="eyebrow">For Developers &amp; Researchers</p>
+    <h1 class="hero-title" style="font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:var(--s4)">Under the Hood</h1>
+    <p class="hero-sub">
+      PlanPilot runs three ML models entirely in the browser — no server, no data leaving the device.
+      This page documents the architecture, model specifications, data schema, and file structure
+      for contributors and researchers.
+    </p>
+    <div style="margin-top:var(--s6);display:flex;gap:var(--s4);flex-wrap:wrap;font-size:13px;color:rgba(255,255,255,0.5)">
+      <span class="mono">Stack: Vanilla JS · D3.js v7 · TopoJSON · No framework</span>
+      <span>·</span>
+      <span class="mono">Data: CMS Part D PUF 2023 · OECD Pharma Spending</span>
+      <span>·</span>
+      <span class="mono">5 drugs × 8 insurers</span>
+    </div>
+  </div>
+</header>
+
+<!-- ML Models -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">ML Architecture</p>
+    <h2 class="section-title">Three models. All in-browser. All client-side.</h2>
+    <div class="ml-models">
+
+      <div class="ml-model-block">
+        <div class="ml-model-badge mono">Model 1</div>
+        <h3 class="ml-model-name">Thompson Sampling Bandit</h3>
+        <p class="ml-model-role">Tactic detection &amp; confidence scoring · <code style="font-size:12px;background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:4px;font-family:var(--mono)">learning-engine.js</code></p>
+        <div class="ml-cards">
+          <div class="ml-card">
+            <span class="ml-card-label">What it does</span>
+            <p>Maintains a Beta-distribution belief over how effective each of the 7 psychological tactics (anchoring, loss aversion, decoy…) has been on consumers similar to the current user. Samples to rank the tactics most likely being deployed in this pitch.</p>
+          </div>
+          <div class="ml-card">
+            <span class="ml-card-label">Implementation detail</span>
+            <p>Each arm (tactic × segment) has an independent Beta(α, β) prior. α increments on successful conversions for that tactic, β on resistant outcomes. Thompson sampling draws from each Beta distribution to rank tactics without an ε-greedy tradeoff.</p>
+          </div>
+          <div class="ml-card">
+            <span class="ml-card-label">Output</span>
+            <p>The "X% confidence" score on each tactic card in the Pitch Decoder. A 92% anchoring confidence means α/(α+β) ≈ 0.92 for the anchoring arm in this consumer's segment.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ml-model-block">
+        <div class="ml-model-badge mono">Model 2</div>
+        <h3 class="ml-model-name">k-Nearest Neighbors Cohort</h3>
+        <p class="ml-model-role">Peer comparison &amp; social proof verification · <code style="font-size:12px;background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:4px;font-family:var(--mono)">feature-engineering.js</code></p>
+        <div class="ml-cards">
+          <div class="ml-card">
+            <span class="ml-card-label">What it does</span>
+            <p>Encodes the user profile (age, medications, state, budget sensitivity) as a feature vector and retrieves the k=5 most similar consumers from the interaction history using Euclidean distance in normalised feature space.</p>
+          </div>
+          <div class="ml-card">
+            <span class="ml-card-label">Implementation detail</span>
+            <p>Feature vector: [age/100, budgetOrdinal/2, medCount/5, regionOneHot×4]. Distance is L2-normalised. k=5 with no deduplication. Cohort summary computes conversion rate and top-ranked angles across neighbors.</p>
+          </div>
+          <div class="ml-card">
+            <span class="ml-card-label">Output</span>
+            <p>The cohort conversion rate in the narrative: "Of 5 similar consumers, 40% enrolled before seeing alternatives." Seeds: <code style="font-family:var(--mono);font-size:12px">data/seed_interactions.json</code> (100 synthetic interactions across 21 segments).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ml-model-block">
+        <div class="ml-model-badge mono">Model 3</div>
+        <h3 class="ml-model-name">Logistic Regression</h3>
+        <p class="ml-model-role">Vulnerability scoring from profile features · <code style="font-size:12px;background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:4px;font-family:var(--mono)">ml-model.js</code></p>
+        <div class="ml-cards">
+          <div class="ml-card">
+            <span class="ml-card-label">What it does</span>
+            <p>Trains on logged outcomes (converted / resisted) to learn which profile features predict susceptibility to sales tactics. Outputs a 0–100% vulnerability score using a sigmoid-activated weighted sum of the user's feature vector.</p>
+          </div>
+          <div class="ml-card">
+            <span class="ml-card-label">Implementation detail</span>
+            <p>Gradient descent, learning rate 0.01, 100 iterations. Weights initialised at zero. Features: age, budgetSensitivity (ordinal 1–3), medCount, valuesConvenience (binary), region (one-hot). Trained fresh from localStorage on each page load.</p>
+          </div>
+          <div class="ml-card">
+            <span class="ml-card-label">Output</span>
+            <p>The red/amber/green Vulnerability Score in the Pitch Decoder, plus the plain-English explanation below it ("Score elevated by: price-sensitive profile; 70+ age cohort"). Threshold: ≥70% = High, 40–70% = Moderate, &lt;40% = Low.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider container-rule">
+
+<!-- File Architecture -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">File Structure</p>
+    <h2 class="section-title">Key files and responsibilities.</h2>
+
+    <table class="arch-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Role</th>
+          <th>Depends on</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>admin.js</code></td>
+          <td>Pitch Decoder logic: form state, validation, recommendation generation, rendering, debrief modal, localStorage persistence</td>
+          <td>data-store.js, feature-engineering.js, learning-engine.js, ml-model.js</td>
+        </tr>
+        <tr>
+          <td><code>learning-engine.js</code></td>
+          <td>Thompson Sampling bandit, k-NN cohort, cohort summary, angle ranking</td>
+          <td>data-store.js, feature-engineering.js</td>
+        </tr>
+        <tr>
+          <td><code>ml-model.js</code></td>
+          <td>Logistic Regression: train, predict, sigmoid, gradient descent</td>
+          <td>feature-engineering.js</td>
+        </tr>
+        <tr>
+          <td><code>feature-engineering.js</code></td>
+          <td>Profile → feature vector encoding, segment derivation, normalization</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <td><code>data-store.js</code></td>
+          <td>localStorage CRUD for interactions, getInteractions(), saveInteraction()</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <td><code>app.js</code></td>
+          <td>All 9 D3.js charts on Plan Comparison page: choropleth, stream, parallel coords, bar, lollipop, trend, donut, treemap, scatter, SPLOM</td>
+          <td>D3 v7, TopoJSON</td>
+        </tr>
+        <tr>
+          <td><code>insurer_pricing.json</code></td>
+          <td>Real-ish pricing: 5 drugs × 8 insurers. Fields: patient_copay, prior_auth_required, step_therapy, mail_order_available, network_size, market_share</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <td><code>data/seed_interactions.json</code></td>
+          <td>100 synthetic interactions seeding ML models across 21 consumer segments</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <td><code>nav.js</code></td>
+          <td>Shared top navigation injected via <code>&lt;div data-nav="..."&gt;</code></td>
+          <td>None</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divider container-rule">
+
+<!-- Data Schema -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Data Schema</p>
+    <h2 class="section-title">insurer_pricing.json — one record per drug × insurer pair.</h2>
+
+    <div class="data-schema-card">
+      <h4>Pricing record (40 records total: 5 drugs × 8 insurers)</h4>
+      <div class="schema-field">
+        <span class="schema-key">drug_id</span>
+        <span class="schema-type">string</span>
+        <span class="schema-desc">Lowercase drug identifier: <code style="font-family:var(--mono);font-size:12px">"eliquis"</code>, <code style="font-family:var(--mono);font-size:12px">"trulicity"</code>, <code style="font-family:var(--mono);font-size:12px">"ozempic"</code>, <code style="font-family:var(--mono);font-size:12px">"jardiance"</code>, <code style="font-family:var(--mono);font-size:12px">"xarelto"</code></span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">drug_name</span>
+        <span class="schema-type">string</span>
+        <span class="schema-desc">Display name: "Trulicity (Dulaglutide)"</span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">insurer</span>
+        <span class="schema-type">string</span>
+        <span class="schema-desc">Exact insurer name matching the dropdown. Must match exactly: "Kaiser Permanente", not "Kaiser".</span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">patient_copay</span>
+        <span class="schema-type">number</span>
+        <span class="schema-desc">Monthly copay in USD. Annual cost = patient_copay × 12. Used for verdict banner savings calculation.</span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">prior_auth_required</span>
+        <span class="schema-type">boolean</span>
+        <span class="schema-desc">If true, triggers the Hidden Requirements card "Prior Authorization Required" warning.</span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">step_therapy</span>
+        <span class="schema-type">boolean</span>
+        <span class="schema-desc">If true, triggers "Step Therapy Required" warning. Critical for GLP-1 drugs (Trulicity, Ozempic).</span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">mail_order_available</span>
+        <span class="schema-type">boolean</span>
+        <span class="schema-desc">Shown in comparison table. Also exploitable as a convenience upsell tactic.</span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">network_size</span>
+        <span class="schema-type">string</span>
+        <span class="schema-desc">"Nationwide", "Regional", or "Limited".</span>
+      </div>
+      <div class="schema-field">
+        <span class="schema-key">market_share</span>
+        <span class="schema-type">number</span>
+        <span class="schema-desc">Percentage (0–100). Used in hero metrics and social proof tactic detection.</span>
+      </div>
+    </div>
+
+    <div class="code-block" style="margin-top:var(--s5)">
+<span class="cm">// Example: Trulicity × Kaiser Permanente</span>
+{
+  <span class="str">"drug_id"</span>: <span class="str">"trulicity"</span>,
+  <span class="str">"drug_name"</span>: <span class="str">"Trulicity (Dulaglutide)"</span>,
+  <span class="str">"insurer"</span>: <span class="str">"Kaiser Permanente"</span>,
+  <span class="str">"patient_copay"</span>: <span class="kw">95</span>,
+  <span class="str">"prior_auth_required"</span>: <span class="kw">true</span>,
+  <span class="str">"step_therapy"</span>: <span class="kw">true</span>,   <span class="cm">// triggers Hidden Req card</span>
+  <span class="str">"mail_order_available"</span>: <span class="kw">true</span>,
+  <span class="str">"network_size"</span>: <span class="str">"Regional"</span>,
+  <span class="str">"market_share"</span>: <span class="kw">5</span>
+}</div>
+  </div>
+</section>
+
+<hr class="divider container-rule">
+
+<!-- localStorage Keys -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">State &amp; Persistence</p>
+    <h2 class="section-title">localStorage keys used across pages.</h2>
+    <table class="arch-table">
+      <thead>
+        <tr><th>Key</th><th>Written by</th><th>Read by</th><th>Expires</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>planpilot_context</code></td>
+          <td>admin.js after analysis</td>
+          <td>customer.html gate + context banner</td>
+          <td>1 hour (3600000 ms)</td>
+        </tr>
+        <tr>
+          <td><code>planpilot_interactions</code></td>
+          <td>data-store.js on debrief submit</td>
+          <td>learning-engine.js, ml-model.js on every analysis</td>
+          <td>Never (grows indefinitely)</td>
+        </tr>
+        <tr>
+          <td><code>planpilot_ml_params</code></td>
+          <td>ml-model.js after training</td>
+          <td>admin.js on page load</td>
+          <td>Overwritten on each analysis</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <span class="brand-mark">Plan<span class="dot" style="color:var(--accent)">Pilot</span></span>
+      <p class="footer-fine" style="margin-top:12px">Technical documentation for PlanPilot — Decision Intelligence &amp; Persuasion Defense.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Pages</h5>
+      <a href="index.html">Overview</a>
+      <a href="admin.html">Pitch Decoder</a>
+      <a href="customer.html">Plan Comparison</a>
+      <a href="learning.html">Detection Analytics</a>
+    </div>
+    <div class="footer-col">
+      <h5>Data sources</h5>
+      <p>CMS Medicare Part D PUF 2023</p>
+      <p>OECD Health Statistics</p>
+    </div>
+  </div>
+</footer>
+
+<script src="nav.js"></script>
+</body>
+</html>

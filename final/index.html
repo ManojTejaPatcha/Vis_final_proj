@@ -2,147 +2,184 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>DrugWatch · Prescription Cost Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlanPilot — Decision Intelligence & Persuasion Defense</title>
+<meta name="description" content="PlanPilot detects when a health insurance pitch is using psychological manipulation tactics, and shows the consumer the objectively best plan for their situation instead.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<link rel="stylesheet" href="landing.css">
 </head>
 <body>
 
-<!-- ROW 1: HEADER -->
-<header id="header">
-  <div class="hdr-left">
-    <div class="logo"><span class="logo-a">DRUG</span><span class="logo-b" id="logo-accent">WATCH</span></div>
-    <div class="logo-sub">Prescription Cost Intelligence · Medicare Part D · Illustrative data based on CMS Part D PUF 2023 &amp; OECD Pharma Spending orders of magnitude</div>
-  </div>
-  <div class="hdr-center" id="drug-pills">
-    <button class="drug-pill active" data-drug="ozempic" tabindex="0" role="button" aria-label="Select Ozempic">Ozempic</button>
-    <button class="drug-pill" data-drug="trulicity" tabindex="0" role="button" aria-label="Select Trulicity">Trulicity</button>
-    <button class="drug-pill" data-drug="jardiance" tabindex="0" role="button" aria-label="Select Jardiance">Jardiance</button>
-    <button class="drug-pill" data-drug="eliquis" tabindex="0" role="button" aria-label="Select Eliquis">Eliquis</button>
-    <button class="drug-pill" data-drug="xarelto" tabindex="0" role="button" aria-label="Select Xarelto">Xarelto</button>
-  </div>
-  <div class="hdr-right">
-    <div class="breadcrumb" id="breadcrumb">
-      <span class="bc-arrow">▸</span>
-      <span class="bc-drug" id="bc-drug">Trulicity</span>
-      <span class="bc-sep">·</span>
-      <span class="bc-region" id="bc-region">National</span>
-      <span class="bc-sep">·</span>
-      <span class="bc-plan" id="bc-plan">All Plans</span>
+<div data-nav="landing"></div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container hero-inner">
+    <p class="eyebrow">Decision Intelligence &amp; Persuasion Defense</p>
+    <h1 class="hero-title">Detect when you're being<br>manipulated into the wrong plan.</h1>
+    <p class="hero-sub">
+      PlanPilot reverse-engineers health insurance sales pitches to expose the psychological
+      manipulation tactics being used against you&nbsp;— anchoring, decoy pricing, fear framing,
+      misleading statistics&nbsp;— and shows you the objectively best plan for your situation instead.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary btn-lg" href="admin.html">Decode a Pitch</a>
+      <a class="btn btn-ghost btn-lg" href="customer.html">Compare Plans Objectively</a>
     </div>
-    <button id="reset-btn" aria-label="Reset all filters">↺ Reset</button>
+    <p class="hero-trust">
+      100% client-side. No backend, no API keys, total privacy. Data calibrated to CMS Medicare Part&nbsp;D PUF&nbsp;2023.
+    </p>
+
+    <div class="metric-strip">
+      <div class="metric"><span class="metric-num mono">7</span><span class="metric-lbl">tactics detected</span></div>
+      <div class="metric"><span class="metric-num mono">8</span><span class="metric-lbl">insurers analyzed</span></div>
+      <div class="metric"><span class="metric-num mono">100</span><span class="metric-lbl">case patterns learned</span></div>
+      <div class="metric"><span class="metric-num mono">21</span><span class="metric-lbl">consumer segments</span></div>
+    </div>
   </div>
 </header>
 
-<!-- ROW 2: KPI ROW -->
-<section id="kpi-row">
-  <div class="kpi-card" id="kpi-1">
-    <span class="kpi-label">COST / CLAIM</span>
-    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-1-val">$1,385</span><span class="kpi-sub" id="kpi-1-sub">National avg · 2023</span></span>
-  </div>
-  <div class="kpi-card" id="kpi-2">
-    <span class="kpi-label">TOTAL SPENDING</span>
-    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-2-val">$7.4B</span><span class="kpi-sub" id="kpi-2-sub">Medicare Part D · 2023</span></span>
-  </div>
-  <div class="kpi-card" id="kpi-3">
-    <span class="kpi-label">BENEFICIARIES</span>
-    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-3-val">0.9M</span><span class="kpi-sub" id="kpi-3-sub">Medicare Part D patients</span></span>
-  </div>
-  <div class="kpi-card" id="kpi-4">
-    <span class="kpi-label" title="5-year compound annual growth rate of unit cost. Green (↓) = costs falling = good for patients. Red (↑) = costs rising = higher burden.">5-YR CAGR</span>
-    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-4-val">+6.1%</span><span class="kpi-sub" id="kpi-4-sub">unit cost 2019→2023 · ↓ green = falling</span></span>
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">How it works</p>
+    <h2 class="section-title">Three steps to see through the sales pitch.</h2>
+    <div class="steps">
+      <article class="step">
+        <span class="step-idx mono">01</span>
+        <h3>Enter your profile</h3>
+        <p>Record your conditions, medications, income, and coverage preferences. This is what makes the analysis personal to you.</p>
+      </article>
+      <article class="step">
+        <span class="step-idx mono">02</span>
+        <h3>Submit the pitch</h3>
+        <p>Select the plan being pushed on you. PlanPilot's ML engine identifies which psychological techniques are being deployed and why.</p>
+      </article>
+      <article class="step">
+        <span class="step-idx mono">03</span>
+        <h3>See the truth</h3>
+        <p>Get an annotated breakdown: what the pitch wants you to believe vs. what the objective data actually shows, with the dollar gap calculated.</p>
+      </article>
+    </div>
   </div>
 </section>
 
-<!-- ROW A -->
-<section id="row-a" class="chart-row">
-  <div class="chart-card">
-    <div class="card-header">
-      <span class="card-title">US COST MAP · 4 REGIONS</span>
-      <span class="card-hint">choropleth · cost/claim by state · click state</span>
+<hr class="divider container-rule">
+
+<!-- WHAT YOU'LL SEE -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">What you'll see in your results</p>
+    <h2 class="section-title">Three things the agent doesn't want you to know.</h2>
+    <div class="steps">
+      <article class="step">
+        <span class="step-idx mono">01</span>
+        <h3>Are you overpaying — and by how much?</h3>
+        <p>A clear red, amber, or green verdict at the top of your results tells you instantly. It shows the exact dollar amount you could save per year by switching to a better plan for your specific drug.</p>
+      </article>
+      <article class="step">
+        <span class="step-idx mono">02</span>
+        <h3>What the agent isn't telling you</h3>
+        <p>Some plans require prior authorization or step therapy for your medication — meaning your access could be delayed by weeks or you may be forced to try a different drug first. These requirements rarely come up during the sales call.</p>
+      </article>
+      <article class="step">
+        <span class="step-idx mono">03</span>
+        <h3>Exactly what to say back</h3>
+        <p>For each manipulation tactic detected, you get a ready-to-use script: the specific question to ask the agent to shift the conversation back to objective data. You don't need to memorize anything.</p>
+      </article>
     </div>
-    <div class="chart-area" id="chart-geomap"></div>
-  </div>
-  <div class="chart-card">
-    <div class="card-header">
-      <span class="card-title">SPENDING STREAM</span>
-      <span class="card-hint">2019–2023 · stacked area · click band = select drug</span>
-    </div>
-    <div class="chart-area" id="chart-stream"></div>
-  </div>
-  <div class="chart-card">
-    <div class="card-header">
-      <span class="card-title">DRUG PROFILES</span>
-      <span class="card-hint">parallel coords · 5 drugs × 5 axes · brush axis to filter</span>
-    </div>
-    <div class="chart-area" id="chart-parallel"></div>
   </div>
 </section>
 
-<!-- ROW B -->
-<section id="row-b" class="chart-row">
-  <div class="chart-card">
-    <div class="card-header">
-      <span class="card-title">BEST INSURANCE PLANS</span>
-      <span class="card-hint">annual cost · click bar to filter all charts</span>
+<hr class="divider container-rule">
+
+<!-- TRUST / PRIVACY -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Your privacy</p>
+    <h2 class="section-title">Everything stays on your device. Always.</h2>
+    <div class="steps">
+      <article class="step">
+        <span class="step-idx mono">🔒</span>
+        <h3>No account needed</h3>
+        <p>You never log in, create a profile, or hand over personal data. Everything you enter stays in your browser and is never sent anywhere.</p>
+      </article>
+      <article class="step">
+        <span class="step-idx mono">📡</span>
+        <h3>No backend, no server</h3>
+        <p>PlanPilot is 100% client-side. The analysis runs entirely in your browser tab — there is no server receiving your age, medications, or insurance details.</p>
+      </article>
+      <article class="step">
+        <span class="step-idx mono">🗑</span>
+        <h3>Delete anytime</h3>
+        <p>Any information saved for learning (your past outcomes) lives in your browser's localStorage. Clear your browser data at any time to wipe it completely.</p>
+      </article>
     </div>
-    <div class="chart-area" id="chart-plans"></div>
   </div>
-  <div class="chart-card chart-card-split" id="card-lollipop">
-    <div class="card-header">
-      <span class="card-title">WHAT WILL I PAY?</span>
-      <span class="card-hint">annual cost · reacts to plan + drug selection</span>
-    </div>
-    <div class="chart-area chart-area-split">
-      <div class="split-left" id="chart-lollipop"></div>
-      <div class="split-divider"></div>
-      <div class="split-right">
-        <div class="split-right-title">TREND</div>
-        <div id="chart-trend" class="chart-trend-area"></div>
+</section>
+
+<hr class="divider container-rule">
+
+<!-- DEV CALLOUT -->
+<section class="section" style="padding:var(--s6) 0">
+  <div class="container">
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s6) var(--s7);display:flex;align-items:center;justify-content:space-between;gap:var(--s5);flex-wrap:wrap;">
+      <div>
+        <p class="eyebrow" style="margin-bottom:4px">For Developers &amp; Researchers</p>
+        <h3 style="margin:0 0 6px;font-size:1.1rem;font-weight:600">Curious about the ML architecture?</h3>
+        <p style="margin:0;font-size:14px;color:var(--muted);max-width:480px">The technical docs cover the three in-browser models (Thompson Sampling bandit, k-NN cohort, Logistic Regression), the data schema, localStorage keys, and file structure.</p>
       </div>
+      <a class="btn btn-ghost" href="devdocs.html" style="white-space:nowrap">View Technical Docs &rarr;</a>
     </div>
-  </div>
-  <div class="chart-card">
-    <div class="card-header">
-      <span class="card-title">SPENDING SHARE</span>
-      <span class="card-hint">donut · click slice = select drug</span>
-    </div>
-    <div class="chart-area" id="chart-donut"></div>
   </div>
 </section>
 
-<!-- ROW C -->
-<section id="row-c" class="chart-row">
-  <div class="chart-card">
-    <div class="card-header">
-      <span class="card-title">SPENDING TREE MAP</span>
-      <span class="card-hint">drug × region · national excluded · click cell = drug + region</span>
+<!-- PORTALS -->
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Two tools</p>
+    <h2 class="section-title">Defense and clarity, on every side of the decision.</h2>
+    <div class="portals">
+      <a class="portal" href="admin.html">
+        <div class="portal-head"><span class="pill"><span class="pill-dot"></span>Persuasion defense</span></div>
+        <h3>Pitch Decoder</h3>
+        <p>Enter the plan being pushed on you and your profile. The system reverse-engineers the pitch, exposes manipulation tactics, and shows you the objectively best alternative.</p>
+        <span class="portal-link">Decode a pitch &rarr;</span>
+      </a>
+      <a class="portal" href="customer.html">
+        <div class="portal-head"><span class="pill"><span class="pill-dot"></span>Objective comparison</span></div>
+        <h3>Plan Comparison</h3>
+        <p>A transparent analytics dashboard for comparing plan costs, drug coverage, and regional price variation across all insurers&nbsp;— no manipulation, just data.</p>
+        <span class="portal-link">Compare plans &rarr;</span>
+      </a>
     </div>
-    <div class="chart-area" id="chart-treemap"></div>
-  </div>
-  <div class="chart-card">
-    <div class="card-header">
-      <span class="card-title">COST vs BENEFICIARIES</span>
-      <span class="card-hint">bubble size = spending · click bubble → selects drug + region</span>
-    </div>
-    <div class="chart-area" id="chart-scatter"></div>
-  </div>
-  <div class="chart-card" id="card-splom">
-    <div class="card-header">
-      <span class="card-title">DRUG PROFILES — SPLOM</span>
-      <span class="card-hint">scatterplot matrix · 3 dims · click dot = select drug</span>
-    </div>
-    <div class="chart-area" id="chart-splom"></div>
   </div>
 </section>
 
-<!-- TOOLTIP -->
-<div id="tooltip"></div>
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <span class="brand-mark">Plan<span class="dot" style="color:var(--accent)">Pilot</span></span>
+      <p class="footer-fine" style="margin-top:12px">A consumer-protection tool exposing psychological manipulation in health insurance sales through in-browser machine learning.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Tools</h5>
+      <a href="admin.html">Pitch Decoder</a>
+      <a href="customer.html">Plan Comparison</a>
+      <a href="learning.html">Detection Analytics</a>
+    </div>
+    <div class="footer-col">
+      <h5>Data sources</h5>
+      <p>CMS Medicare Part&nbsp;D PUF 2023</p>
+      <p>OECD Health Statistics</p>
+    </div>
+  </div>
+</footer>
 
-<script src="app.js"></script>
+<script src="nav.js"></script>
 </body>
 </html>

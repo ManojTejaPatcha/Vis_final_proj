@@ -1,0 +1,23 @@
+{
+  "name": "planpilot-agent-tests",
+  "version": "1.0.0",
+  "description": "Tier-2 AI agent tests for PlanPilot using Playwright + Gemini",
+  "main": "agent-runner.js",
+  "scripts": {
+    "test": "node agent-runner.js --all",
+    "test:single": "node agent-runner.js --persona",
+    "test:category": "node agent-runner.js --category",
+    "test:step-therapy": "node agent-runner.js --category B",
+    "test:edge": "node agent-runner.js --category G",
+    "test:quickmode": "node agent-runner.js --category E",
+    "test:crosspage": "node agent-runner.js --category F",
+    "install:browsers": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "playwright": "^1.44.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

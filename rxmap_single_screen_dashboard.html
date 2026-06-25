@@ -1,0 +1,392 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.rx{border:0.5px solid var(--color-border-tertiary);border-radius:12px;overflow:hidden;background:var(--color-background-secondary);font-family:var(--font-sans);}
+.rx-hdr{background:#071929;padding:0 14px;height:44px;display:flex;align-items:center;justify-content:space-between;}
+.rx-tit{font-size:14px;font-weight:500;color:#D4E6F8;display:flex;align-items:center;gap:6px;}
+.rx-sub{font-size:10px;color:#3D6080;margin-top:1px;}
+.dpill{font-size:11px;padding:3px 9px;border-radius:20px;border:0.5px solid #153050;color:#3D6080;background:transparent;cursor:pointer;transition:all 0.12s;}
+.dpill.on{background:#0D2440;color:#7ABDE8;border-color:#1E6FAD;}
+.dpill:hover:not(.on){background:#0A1E30;color:#7ABDE8;}
+.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:7px 8px 5px;}
+.kc{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:6px 9px;}
+.kl{font-size:10px;color:var(--color-text-tertiary);margin-bottom:2px;}
+.kv{font-size:15px;font-weight:500;color:var(--color-text-primary);line-height:1;}
+.ks{font-size:10px;margin-top:2px;}
+.mbody{display:grid;grid-template-columns:252px 1fr 160px;gap:5px;padding:0 6px 5px;height:208px;}
+.panel{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:6px 8px;overflow:hidden;}
+.plbl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;}
+.ccol{display:flex;flex-direction:column;gap:5px;height:100%;}
+.mfoot{display:grid;grid-template-columns:1fr 196px;gap:5px;padding:0 6px 6px;}
+.tile-g{cursor:pointer;}
+.tile-g:hover rect{opacity:0.8;}
+.trow{display:grid;grid-template-columns:1fr 50px 40px;gap:2px;padding:3px 1px;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px;cursor:pointer;border-radius:2px;transition:background 0.08s;}
+.trow:hover{background:var(--color-background-secondary);}
+.trow.trsel{background:#E6F1FB;}
+.trow.trhdr{font-size:10px;font-weight:500;color:var(--color-text-tertiary);cursor:default;}
+.trow.trhdr:hover{background:transparent;}
+.schip{font-size:10px;padding:2px 6px;border-radius:10px;background:var(--color-background-info);color:var(--color-text-info);border:0.5px solid var(--color-border-info);display:inline-flex;align-items:center;gap:3px;}
+.calbtn{width:100%;padding:5px;font-size:11px;font-weight:500;background:#185FA5;color:#E6F1FB;border:none;border-radius:6px;cursor:pointer;margin-top:3px;transition:background 0.12s;}
+.calbtn:hover{background:#0C447C;}
+input[type=text]{font-size:11px;padding:3px 7px;height:24px;border:0.5px solid var(--color-border-secondary);border-radius:6px;background:var(--color-background-secondary);color:var(--color-text-primary);width:100%;margin-bottom:3px;}
+.vbtn{font-size:10px;padding:1px 6px;border-radius:3px;cursor:pointer;transition:all 0.1s;}
+.vbtn.von{background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB;}
+.vbtn.voff{background:var(--color-background-tertiary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);}
+</style>
+
+<h2 class="sr-only">RxMap — single-screen Medicare Part D drug price navigator with coordinated interactive charts</h2>
+
+<div class="rx">
+
+  <div class="rx-hdr">
+    <div>
+      <div class="rx-tit"><i class="ti ti-heart-rate-monitor" style="font-size:16px;color:#1E6FAD;" aria-hidden="true"></i>RxMap — Medicare Drug Price Navigator</div>
+      <div class="rx-sub">Medicare Part D · 27,418 CMS Plans · OECD 38 countries · 2019–2023</div>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center;">
+      <div id="dpills" style="display:flex;gap:4px;">
+        <span class="dpill on" onclick="selDrug('Eliquis')">Eliquis</span>
+        <span class="dpill" onclick="selDrug('Ozempic')">Ozempic</span>
+        <span class="dpill" onclick="selDrug('Jardiance')">Jardiance</span>
+        <span class="dpill" onclick="selDrug('Humira')">Humira</span>
+      </div>
+      <div style="width:0.5px;height:18px;background:#153050;margin:0 5px;"></div>
+      <span style="font-size:10px;color:#3D6080;">Year</span>
+      <select id="yrsel" style="background:#0A1929;color:#3D6080;border:0.5px solid #153050;font-size:11px;padding:2px 4px;height:22px;border-radius:4px;width:56px;" onchange="selYear(parseInt(this.value))">
+        <option>2023</option><option>2022</option><option>2021</option><option>2020</option><option>2019</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="krow">
+    <div class="kc"><div class="kl">US avg cost / claim</div><div class="kv" id="k-avg">$487</div><div class="ks"><span id="k-yoy" style="font-size:10px;padding:1px 5px;border-radius:3px;background:#FCEBEB;color:#791F1F;">+8.2% YoY</span></div></div>
+    <div class="kc"><div class="kl">Cheapest US state</div><div class="kv" id="k-cs" style="font-size:13px;">North Dakota</div><div id="k-cv" class="ks" style="color:var(--color-text-success);font-size:10px;">$312 / claim</div></div>
+    <div class="kc"><div class="kl">Max intl saving / yr</div><div class="kv" id="k-ms" style="color:#1D9E75;">$9,240</div><div id="k-mv" class="ks" style="color:var(--color-text-secondary);font-size:10px;">vs Germany</div></div>
+    <div class="kc" style="overflow:hidden;"><div class="kl">Active filters</div><div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;"><span class="schip" id="sc-drug"><i class="ti ti-pill" style="font-size:10px;" aria-hidden="true"></i><span id="sc-dt">Eliquis</span></span><span class="schip" id="sc-state" style="display:none;"><i class="ti ti-map-pin" style="font-size:10px;" aria-hidden="true"></i><span id="sc-st"></span></span><span class="schip" id="sc-co" style="display:none;background:var(--color-background-warning);color:var(--color-text-warning);border-color:var(--color-border-warning);"><i class="ti ti-world" style="font-size:10px;" aria-hidden="true"></i><span id="sc-ct"></span></span></div></div>
+  </div>
+
+  <div class="mbody">
+
+    <div class="panel">
+      <div class="plbl">Geographic price map — click state <span style="display:flex;gap:3px;"><span id="vus" class="vbtn von" onclick="setView('us')">US</span><span id="vintl" class="vbtn voff" onclick="setView('intl')">Intl</span></span></div>
+      <svg id="msvg" width="100%" viewBox="0 0 252 130" style="display:block;"></svg>
+      <div style="display:flex;align-items:center;gap:4px;margin-top:3px;">
+        <span style="font-size:9px;color:var(--color-text-tertiary);">Low</span>
+        <div style="display:flex;flex:1;height:4px;border-radius:3px;overflow:hidden;"><div style="flex:1;background:#E6F1FB;"></div><div style="flex:1;background:#B5D4F4;"></div><div style="flex:1;background:#378ADD;"></div><div style="flex:1;background:#185FA5;"></div><div style="flex:1;background:#0C447C;"></div></div>
+        <span style="font-size:9px;color:var(--color-text-tertiary);">High cost</span>
+      </div>
+    </div>
+
+    <div class="ccol">
+      <div class="panel" style="flex:1;min-height:0;">
+        <div class="plbl">Price trend 2019–2023 <span id="tr-lbl" style="color:#185FA5;font-weight:500;text-transform:none;font-size:10px;letter-spacing:0;"></span></div>
+        <svg id="tsvg" width="100%" viewBox="0 0 188 72" style="display:block;overflow:visible;"></svg>
+        <div style="display:flex;gap:10px;margin-top:2px;">
+          <span style="font-size:9px;color:var(--color-text-secondary);display:flex;align-items:center;gap:2px;"><span style="width:12px;height:2px;background:#378ADD;display:inline-block;"></span>State</span>
+          <span style="font-size:9px;color:var(--color-text-secondary);display:flex;align-items:center;gap:2px;"><span style="width:12px;height:1px;background:#888780;display:inline-block;"></span>US avg</span>
+          <span style="font-size:9px;color:var(--color-text-secondary);display:flex;align-items:center;gap:2px;"><span style="width:12px;height:1px;background:#1D9E75;display:inline-block;"></span>Intl ref</span>
+        </div>
+      </div>
+      <div class="panel" style="flex:0 0 76px;">
+        <div class="plbl">Formulary heatmap — plan × drug tier</div>
+        <div id="hmcont"></div>
+      </div>
+    </div>
+
+    <div class="ccol">
+      <div class="panel" style="flex:1;min-height:0;">
+        <div class="plbl">Best rate finder</div>
+        <div class="trow trhdr"><span>Drug</span><span style="text-align:right;">Best state</span><span style="text-align:right;">Save</span></div>
+        <div id="rtable"></div>
+      </div>
+      <div class="panel" style="flex:0 0 104px;">
+        <div class="plbl">Savings calculator</div>
+        <input type="text" id="ci-st" placeholder="State abbr (e.g. CA)">
+        <input type="text" id="ci-dr" placeholder="Drug name">
+        <div id="calout" style="display:none;background:var(--color-background-secondary);border-radius:4px;padding:4px 7px;margin-bottom:3px;font-size:11px;">
+          <div style="font-weight:500;color:var(--color-text-primary);margin-bottom:1px;" id="cal-plan"></div>
+          <div style="font-size:13px;font-weight:500;color:#1D9E75;" id="cal-save"></div>
+          <div style="font-size:10px;color:var(--color-text-tertiary);" id="cal-note"></div>
+        </div>
+        <button class="calbtn" onclick="runCal()">Find best plan</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mfoot">
+    <div class="panel" style="padding:6px 8px;">
+      <div class="plbl">International benchmark (USD PPP per capita) — click country to compare</div>
+      <svg id="isvg" width="100%" viewBox="0 0 340 64" style="display:block;overflow:visible;"></svg>
+    </div>
+    <div class="panel" style="padding:6px 8px;">
+      <div class="plbl">Top plans — <span id="dd-lbl" style="color:#185FA5;font-weight:500;text-transform:none;letter-spacing:0;font-size:10px;"></span></div>
+      <div id="ddcont" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const DM = {
+  Eliquis:  {avg:487,  yoy:8.2,  cs:'ND',cc:312, ms:9240, vco:'Germany',trend:[412,435,458,471,487]},
+  Ozempic:  {avg:1100, yoy:23.5, cs:'WI',cc:890, ms:18500,vco:'Canada', trend:[680,780,890,980,1100]},
+  Jardiance:{avg:380,  yoy:5.1,  cs:'MN',cc:201, ms:7100, vco:'Germany',trend:[310,330,350,365,380]},
+  Humira:   {avg:2200, yoy:12.8, cs:'IA',cc:1840,ms:45000,vco:'UK',     trend:[1800,1900,2000,2100,2200]},
+};
+
+const OECD = {
+  Eliquis:  {US:487, CA:198,UK:142,DE:215,FR:167,JP:124},
+  Ozempic:  {US:1100,CA:312,UK:240,DE:289,FR:215,JP:178},
+  Jardiance:{US:380, CA:167,UK:125,DE:188,FR:145,JP:112},
+  Humira:   {US:2200,CA:780,UK:540,DE:820,FR:690,JP:420},
+};
+
+const SM = {
+  WA:1.05,OR:1.02,CA:1.12,NV:1.08,ID:0.92,MT:0.88,WY:0.86,CO:1.01,UT:0.97,AZ:1.09,NM:0.95,
+  ND:0.64,SD:0.72,NE:0.80,KS:0.83,OK:0.89,TX:1.03,MN:0.78,IA:0.82,MO:0.90,AR:0.92,
+  LA:1.05,MS:1.07,AL:1.06,GA:1.02,FL:1.10,SC:1.01,NC:0.98,TN:0.93,KY:0.88,WV:0.86,
+  WI:0.85,MI:0.92,IL:1.08,IN:0.88,OH:0.93,PA:1.02,NY:1.12,NJ:1.15,CT:1.10,MA:1.13,
+  RI:1.08,VT:1.01,NH:1.02,ME:0.98,VA:1.02,MD:1.07,DE:1.04,AK:0.92,HI:1.04
+};
+
+const TILES=[
+  {s:'ME',c:10,r:0},{s:'VT',c:9,r:0},
+  {s:'WA',c:0,r:1},{s:'MT',c:1,r:1},{s:'ND',c:3,r:1},{s:'MN',c:4,r:1},{s:'WI',c:5,r:1},{s:'MI',c:6,r:1},{s:'NY',c:8,r:1},{s:'NH',c:10,r:1},
+  {s:'OR',c:0,r:2},{s:'ID',c:1,r:2},{s:'WY',c:2,r:2},{s:'SD',c:3,r:2},{s:'IA',c:4,r:2},{s:'IL',c:5,r:2},{s:'IN',c:6,r:2},{s:'OH',c:7,r:2},{s:'PA',c:8,r:2},{s:'NJ',c:9,r:2},{s:'MA',c:10,r:2},
+  {s:'CA',c:0,r:3},{s:'NV',c:1,r:3},{s:'UT',c:2,r:3},{s:'CO',c:3,r:3},{s:'NE',c:4,r:3},{s:'MO',c:5,r:3},{s:'KY',c:6,r:3},{s:'WV',c:7,r:3},{s:'VA',c:8,r:3},{s:'MD',c:9,r:3},{s:'CT',c:10,r:3},
+  {s:'AZ',c:1,r:4},{s:'NM',c:2,r:4},{s:'KS',c:4,r:4},{s:'AR',c:5,r:4},{s:'TN',c:6,r:4},{s:'NC',c:7,r:4},{s:'SC',c:8,r:4},{s:'DE',c:9,r:4},{s:'RI',c:10,r:4},
+  {s:'TX',c:3,r:5},{s:'OK',c:4,r:5},{s:'LA',c:5,r:5},{s:'MS',c:6,r:5},{s:'AL',c:7,r:5},{s:'GA',c:8,r:5},
+  {s:'FL',c:9,r:6},
+  {s:'AK',c:0,r:7},{s:'HI',c:1,r:7},
+];
+
+const PLANS=[
+  {n:'AARP MRx',   ins:'UHC',    t:{Eliquis:1,Ozempic:3,Jardiance:2,Humira:4}},
+  {n:'Humana Prem',ins:'Humana', t:{Eliquis:2,Ozempic:2,Jardiance:1,Humira:3}},
+  {n:'SilverScr+', ins:'CVS',    t:{Eliquis:3,Ozempic:1,Jardiance:2,Humira:4}},
+  {n:'WellCare',   ins:'WC',     t:{Eliquis:2,Ozempic:4,Jardiance:3,Humira:2}},
+];
+
+const TC=['#085041','#1D9E75','#5DCAA5','#9FE1CB','#E1F5EE'];
+const TT=['#E1F5EE','#E1F5EE','#04342C','#04342C','#04342C'];
+const SN={ND:'North Dakota',WI:'Wisconsin',MN:'Minnesota',IA:'Iowa'};
+const CONAMES={US:'USA',CA:'Canada',UK:'UK',DE:'Germany',FR:'France',JP:'Japan'};
+
+let ST={drug:'Eliquis',state:null,country:null,year:2023};
+
+const fmt=n=>'$'+Math.round(n).toLocaleString();
+
+function cCol(m){
+  const t=Math.max(0,Math.min(1,(m-0.64)/0.51));
+  if(t<0.2)return'#E6F1FB';
+  if(t<0.4)return'#B5D4F4';
+  if(t<0.6)return'#378ADD';
+  if(t<0.8)return'#185FA5';
+  return'#0C447C';
+}
+
+function renderMap(){
+  const svg=document.getElementById('msvg');
+  const tw=21,th=14,tg=2;
+  let h='';
+  for(const t of TILES){
+    const x=t.c*(tw+tg),y=t.r*(th+tg);
+    const m=SM[t.s]||1;
+    const fill=cCol(m);
+    const sel=ST.state===t.s;
+    const stroke=sel?'#EF9F27':'rgba(0,0,0,0.1)';
+    const sw=sel?'1.5':'0.4';
+    const tc=m<0.80?'#0C447C':'#ffffff';
+    h+=`<g class="tile-g" onclick="selState('${t.s}')"><rect x="${x}" y="${y}" width="${tw}" height="${th}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" rx="2"/><text x="${x+10.5}" y="${y+7.5}" text-anchor="middle" dominant-baseline="central" fill="${tc}" font-size="5.5" font-family="sans-serif" font-weight="500">${t.s}</text></g>`;
+  }
+  svg.innerHTML=h;
+}
+
+function renderTrend(){
+  const svg=document.getElementById('tsvg');
+  const{drug,state:sel,year}=ST;
+  const tr=DM[drug].trend;
+  const W=188,H=72,ml=28,mt=6,mr=6,mb=14;
+  const cw=W-ml-mr,ch=H-mt-mb;
+  const yrs=[2019,2020,2021,2022,2023];
+  const mn=Math.min(...tr)*0.86,mx=Math.max(...tr)*1.08;
+  const px=i=>ml+i*(cw/4);
+  const py=v=>mt+ch-(v-mn)/(mx-mn)*ch;
+  let h='';
+  for(let i=0;i<3;i++){
+    const yy=mt+i*(ch/2);
+    h+=`<line x1="${ml}" y1="${yy}" x2="${W-mr}" y2="${yy}" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>`;
+  }
+  h+=`<line x1="${ml}" y1="${mt+ch}" x2="${W-mr}" y2="${mt+ch}" stroke="var(--color-border-secondary)" stroke-width="0.5"/>`;
+  const ip=tr.map((v,i)=>`${px(i)},${py(v*0.41)}`).join(' ');
+  h+=`<polyline points="${ip}" fill="none" stroke="#1D9E75" stroke-width="1" stroke-dasharray="3 2"/>`;
+  const up=tr.map((v,i)=>`${px(i)},${py(v)}`).join(' ');
+  h+=`<polyline points="${up}" fill="none" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="2 2"/>`;
+  if(sel){
+    const m=SM[sel]||1;
+    const sp=tr.map((v,i)=>`${px(i)},${py(v*m)}`).join(' ');
+    h+=`<polyline points="${sp}" fill="none" stroke="#378ADD" stroke-width="1.5"/>`;
+    tr.forEach((v,i)=>{h+=`<circle cx="${px(i)}" cy="${py(v*m)}" r="2.5" fill="#378ADD" stroke="#fff" stroke-width="0.5"/>`;});
+  }
+  yrs.forEach((yr,i)=>{
+    const isY=yr===year;
+    if(isY)h+=`<line x1="${px(i)}" y1="${mt}" x2="${px(i)}" y2="${mt+ch}" stroke="#EF9F27" stroke-width="0.75" stroke-dasharray="2 2"/>`;
+    h+=`<text x="${px(i)}" y="${H-1}" text-anchor="middle" font-size="7" fill="var(--color-text-tertiary)" font-family="sans-serif">${yr}</text>`;
+  });
+  [[mn,0],[(mn+mx)/2,ch/2],[mx,ch]].forEach(([v,offset])=>{
+    h+=`<text x="${ml-2}" y="${py(v)}" text-anchor="end" dominant-baseline="central" font-size="6.5" fill="var(--color-text-tertiary)" font-family="sans-serif">$${Math.round(v/100)*100}</text>`;
+  });
+  svg.innerHTML=h;
+  document.getElementById('tr-lbl').textContent=sel?`— ${sel}`:'';
+}
+
+function renderHeatmap(){
+  const{drug}=ST;
+  const drugs=['Eliquis','Ozempic','Jardiance','Humira'];
+  let h='<table style="width:100%;border-collapse:collapse;">';
+  h+='<tr><td style="padding:0 2px;font-size:8px;color:var(--color-text-tertiary);width:54px;"></td>';
+  drugs.forEach(d=>{
+    const a=d===drug;
+    h+=`<td style="text-align:center;padding:1px;font-size:${a?9:8}px;font-weight:${a?500:400};color:${a?'#0C447C':'var(--color-text-secondary)'};">${d.slice(0,4)}</td>`;
+  });
+  h+='</tr>';
+  PLANS.forEach(p=>{
+    h+=`<tr><td style="padding:1px 2px;font-size:8px;color:var(--color-text-secondary);white-space:nowrap;">${p.ins}</td>`;
+    drugs.forEach(d=>{
+      const tier=p.t[d]||5;
+      const bg=TC[tier-1],fg=TT[tier-1];
+      const active=d===drug;
+      h+=`<td style="text-align:center;padding:1px;"><div style="background:${bg};color:${fg};font-size:8px;font-weight:500;border-radius:2px;padding:2px 0;${active?'outline:1.5px solid #EF9F27;':''}">T${tier}</div></td>`;
+    });
+    h+='</tr>';
+  });
+  h+='</table>';
+  document.getElementById('hmcont').innerHTML=h;
+}
+
+function renderIntl(){
+  const svg=document.getElementById('isvg');
+  const d=OECD[ST.drug];
+  const cos=['US','CA','UK','DE','FR','JP'];
+  const lbl={US:'USA',CA:'CAN',UK:'GBR',DE:'DEU',FR:'FRA',JP:'JPN'};
+  const W=340,H=64,tp=6,bp=16,ch=H-tp-bp;
+  const bw=32,bg=22,sx=12;
+  let h='';
+  cos.forEach((co,i)=>{
+    const val=d[co],bh=(val/d.US)*ch;
+    const x=sx+i*(bw+bg),y=tp+ch-bh;
+    const isUS=co==='US',isSel=ST.country===co;
+    const fill=isUS?'#0C447C':isSel?'#D85A30':'#85B7EB';
+    const tFill=isUS?'#0C447C':isSel?'#993C1D':'var(--color-text-secondary)';
+    h+=`<g style="cursor:pointer;" onclick="selCountry('${co}')">
+      <rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${fill}" rx="2"/>
+      <text x="${x+bw/2}" y="${y-2}" text-anchor="middle" font-size="7" fill="${tFill}" font-family="sans-serif" font-weight="${isUS?500:400}">$${Math.round(val)}</text>
+      <text x="${x+bw/2}" y="${H-2}" text-anchor="middle" font-size="7.5" fill="var(--color-text-secondary)" font-family="sans-serif" font-weight="${isUS?500:400}">${lbl[co]}</text>
+    </g>`;
+    if(isSel&&!isUS){
+      const pct=Math.round((1-val/d.US)*100);
+      const mx=x+bw/2;
+      h+=`<line x1="${mx}" y1="${tp}" x2="${mx}" y2="${y}" stroke="#1D9E75" stroke-width="0.75" stroke-dasharray="2 1"/>`;
+      h+=`<rect x="${mx+2}" y="${(tp+y)/2-7}" width="26" height="12" fill="var(--color-background-primary)" rx="2" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>`;
+      h+=`<text x="${mx+15}" y="${(tp+y)/2+1}" text-anchor="middle" font-size="7" fill="#1D9E75" font-family="sans-serif" font-weight="500">-${pct}% save</text>`;
+    }
+  });
+  h+=`<line x1="${sx}" y1="${tp}" x2="${sx+cos.length*(bw+bg)-bg}" y2="${tp}" stroke="#0C447C" stroke-width="0.5" stroke-dasharray="3 2"/>`;
+  svg.innerHTML=h;
+}
+
+function renderTable(){
+  const drugs=['Eliquis','Ozempic','Jardiance','Humira'];
+  let h='';
+  drugs.forEach(drug=>{
+    const m=DM[drug];
+    const sp=Math.round((m.avg-m.cc)/m.avg*100);
+    const isSel=drug===ST.drug;
+    h+=`<div class="trow ${isSel?'trsel':''}" onclick="selDrug('${drug}')">
+      <span style="font-weight:${isSel?500:400};color:${isSel?'#0C447C':'var(--color-text-primary)'};">${drug}</span>
+      <div style="text-align:right;">
+        <div style="font-size:11px;font-weight:500;color:#085041;">${m.cs}</div>
+        <div style="font-size:9px;color:var(--color-text-secondary);">${fmt(m.cc)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;font-weight:500;color:#1D9E75;">-${sp}%</div>
+        <div style="height:3px;border-radius:2px;background:#1D9E75;margin-top:2px;width:${sp}%;"></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('rtable').innerHTML=h;
+}
+
+function renderDrill(){
+  const el=document.getElementById('ddcont');
+  const nl=document.getElementById('dd-lbl');
+  if(!ST.state){
+    nl.textContent='select a state on map';
+    el.innerHTML='<div style="font-size:11px;color:var(--color-text-tertiary);grid-column:span 3;padding:4px 0;">Click any state to compare plans</div>';
+    return;
+  }
+  nl.textContent=ST.state;
+  const m=SM[ST.state]||1,base=DM[ST.drug].avg*m;
+  const plans=[
+    {n:'AARP Gold',  bg:'#E6F1FB',tc:'#0C447C',cm:0.88,tier:'Gold'},
+    {n:'Humana Plat',bg:'#EEEDFE',tc:'#3C3489',cm:0.83,tier:'Plat'},
+    {n:'SilverScr+', bg:'#E6F1FB',tc:'#185FA5',cm:0.95,tier:'Silv'},
+    {n:'WellCare',   bg:'#FAECE7',tc:'#712B13',cm:1.09,tier:'Brnz'},
+    {n:'Cigna PPO',  bg:'#E1F5EE',tc:'#085041',cm:0.90,tier:'Gold'},
+    {n:'CVS Health', bg:'#E6F1FB',tc:'#185FA5',cm:0.99,tier:'Silv'},
+  ].sort((a,b)=>a.cm-b.cm);
+  el.innerHTML=plans.map(p=>`<div style="background:${p.bg};border-radius:3px;padding:4px 5px;">
+    <div style="font-size:9px;color:${p.tc};font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.n}</div>
+    <div style="font-size:11px;color:${p.tc};font-weight:500;">${fmt(base*p.cm)}</div>
+    <div style="font-size:9px;color:${p.tc};opacity:0.7;">${p.tier}</div>
+  </div>`).join('');
+}
+
+function renderKPI(){
+  const m=DM[ST.drug];
+  document.getElementById('k-avg').textContent=fmt(m.avg);
+  document.getElementById('k-yoy').textContent=`+${m.yoy}% YoY`;
+  document.getElementById('k-cs').textContent=SN[m.cs]||m.cs;
+  document.getElementById('k-cv').textContent=fmt(m.cc)+' / claim';
+  document.getElementById('k-ms').textContent=fmt(m.ms)+'/yr';
+  document.getElementById('k-mv').textContent='vs '+m.vco;
+  document.getElementById('sc-dt').textContent=ST.drug;
+  const ss=document.getElementById('sc-state');
+  if(ST.state){ss.style.display='';document.getElementById('sc-st').textContent=ST.state;}
+  else ss.style.display='none';
+  const sc=document.getElementById('sc-co');
+  if(ST.country){sc.style.display='';document.getElementById('sc-ct').textContent=CONAMES[ST.country]||ST.country;}
+  else sc.style.display='none';
+}
+
+function renderAll(){renderKPI();renderMap();renderTrend();renderHeatmap();renderIntl();renderTable();renderDrill();}
+
+function selDrug(d){
+  ST.drug=d;
+  document.querySelectorAll('.dpill').forEach(p=>p.classList.toggle('on',p.textContent.trim()===d));
+  document.getElementById('ci-dr').value=d;
+  renderAll();
+}
+function selState(s){ST.state=ST.state===s?null:s;renderAll();}
+function selCountry(c){ST.country=ST.country===c?null:c;renderIntl();renderKPI();}
+function selYear(y){ST.year=y;renderTrend();}
+function setView(v){
+  document.getElementById('vus').className='vbtn '+(v==='us'?'von':'voff');
+  document.getElementById('vintl').className='vbtn '+(v==='intl'?'von':'voff');
+}
+function runCal(){
+  const si=document.getElementById('ci-st').value.toUpperCase().trim()||'CA';
+  const di=document.getElementById('ci-dr').value;
+  const drug=['Eliquis','Ozempic','Jardiance','Humira'].find(d=>d.toLowerCase().includes(di.toLowerCase()))||ST.drug;
+  const m=SM[si]||1;
+  const base=DM[drug].avg*m;
+  const best=base*0.85;
+  const save=Math.round((base-best)*12);
+  document.getElementById('cal-plan').textContent='AARP MedicareRx Gold';
+  document.getElementById('cal-save').textContent='~'+fmt(save)+' saved / year';
+  document.getElementById('cal-note').textContent=`${si}: ${fmt(base)} → ${fmt(best)}/claim`;
+  document.getElementById('calout').style.display='block';
+}
+renderAll();
+</script>

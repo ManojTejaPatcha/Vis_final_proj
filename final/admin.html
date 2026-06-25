@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pitch Decoder — PlanPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Navigation injected by nav.js -->
+  <div data-nav="admin"></div>
+
+  <!-- Admin Layout -->
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <!-- Pitched Plan Selector -->
+        <div class="sidebar-section">
+          <label class="field-label">Plan Being Pitched to You</label>
+          <select id="targetInsurer" class="field-select">
+            <option value="">Which plan is an agent pushing?</option>
+            <option value="UnitedHealthcare">UnitedHealthcare</option>
+            <option value="Blue Cross Blue Shield">Blue Cross Blue Shield</option>
+            <option value="Humana">Humana</option>
+            <option value="Aetna">Aetna</option>
+            <option value="Cigna">Cigna</option>
+            <option value="WellCare">WellCare</option>
+            <option value="Kaiser Permanente">Kaiser Permanente</option>
+            <option value="CVS Caremark">CVS Caremark</option>
+          </select>
+        </div>
+
+        <hr class="sidebar-divider">
+
+        <!-- Quick / Full Mode Toggle -->
+        <div class="mode-toggle-bar">
+          <button id="quickModeBtn" class="mode-btn mode-btn--active">⚡ Quick</button>
+          <button id="fullModeBtn" class="mode-btn">Full Profile</button>
+        </div>
+
+        <!-- Your Profile -->
+        <div class="sidebar-section">
+          <div class="section-header">
+            <span class="eyebrow">Your Profile</span>
+          </div>
+
+          <div class="field-group full-mode-field">
+            <label class="field-label">Name <span style="text-transform:none;font-weight:400;color:var(--faint)">(optional, stays in your browser)</span></label>
+            <input type="text" id="customerName" class="field-input" placeholder="e.g., John Smith">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Age</label>
+            <input type="number" id="customerAge" class="field-input" placeholder="65" min="18" max="100">
+          </div>
+
+          <div class="field-row full-mode-field">
+            <div class="field-group">
+              <div class="field-group" style="margin-bottom:0">&nbsp;</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">State</label>
+              <select id="customerState" class="field-select">
+                <option value="">Select...</option>
+                <option value="CA">California</option>
+                <option value="TX">Texas</option>
+                <option value="FL">Florida</option>
+                <option value="NY">New York</option>
+                <option value="OH">Ohio</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="IL">Illinois</option>
+                <option value="GA">Georgia</option>
+                <option value="NC">North Carolina</option>
+                <option value="MI">Michigan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group full-mode-field">
+            <label class="field-label">Conditions</label>
+            <input type="text" id="customerConditions" class="field-input" placeholder="e.g., Type 2 Diabetes, Atrial Fibrillation">
+          </div>
+
+          <div class="field-group full-mode-field">
+            <label class="field-label">Medications (free text)</label>
+            <input type="text" id="customerMeds" class="field-input" placeholder="e.g., Jardiance, Eliquis">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Primary Drug (for pricing lookup)</label>
+            <select id="primaryMed" class="field-select">
+              <option value="">Select your main medication...</option>
+              <option value="eliquis">Eliquis (Apixaban)</option>
+              <option value="xarelto">Xarelto (Rivaroxaban)</option>
+              <option value="ozempic">Ozempic (Semaglutide)</option>
+              <option value="trulicity">Trulicity (Dulaglutide)</option>
+              <option value="jardiance">Jardiance (Empagliflozin)</option>
+            </select>
+          </div>
+
+          <div class="field-group quick-mode-field">
+            <label class="field-label">Budget</label>
+            <div class="quick-budget-btns">
+              <button class="qb-btn" data-budget="high" title="Price is my main concern — find the cheapest option">Tight</button>
+              <button class="qb-btn" data-budget="medium" title="Balance between cost and coverage quality">Moderate</button>
+              <button class="qb-btn" data-budget="low" title="Coverage quality matters more than price">Flexible</button>
+            </div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px">Tight = price is #1 priority &nbsp;·&nbsp; Flexible = coverage first</div>
+          </div>
+
+          <div class="field-group full-mode-field">
+            <label class="field-label">Budget Sensitivity</label>
+            <select id="budgetSensitivity" class="field-select">
+              <option value="">Select...</option>
+              <option value="low">Low — Price is secondary</option>
+              <option value="medium">Medium — Balanced consideration</option>
+              <option value="high">High — Price is primary concern</option>
+            </select>
+          </div>
+
+          <div class="field-group full-mode-field">
+            <label class="field-label">Convenience Preference</label>
+            <div class="field-checkbox">
+              <input type="checkbox" id="valuesConvenience">
+              <label for="valuesConvenience">Prefers mail order / fewer refills</label>
+            </div>
+          </div>
+        </div>
+
+        <hr class="sidebar-divider">
+
+        <!-- Tactics to Scan For -->
+        <div class="sidebar-section">
+          <div class="section-header">
+            <span class="eyebrow">Tactics to Scan For</span>
+          </div>
+          <div class="toggles-grid">
+            <div class="field-checkbox">
+              <input type="checkbox" id="principle-anchoring" checked>
+              <div>
+                <label for="principle-anchoring">Anchoring</label>
+                <div class="tactic-hint">Comparing to a fake high price to make the deal look good</div>
+              </div>
+            </div>
+            <div class="field-checkbox">
+              <input type="checkbox" id="principle-lossAversion" checked>
+              <div>
+                <label for="principle-lossAversion">Loss Aversion</label>
+                <div class="tactic-hint">Using fear of what you'll lose instead of showing real comparisons</div>
+              </div>
+            </div>
+            <div class="field-checkbox">
+              <input type="checkbox" id="principle-framing" checked>
+              <div>
+                <label for="principle-framing">Framing</label>
+                <div class="tactic-hint">Breaking cost into tiny daily amounts to hide the annual total</div>
+              </div>
+            </div>
+            <div class="field-checkbox">
+              <input type="checkbox" id="principle-socialProof" checked>
+              <div>
+                <label for="principle-socialProof">Social Proof</label>
+                <div class="tactic-hint">Claiming "most people choose this" without matching your profile</div>
+              </div>
+            </div>
+            <div class="field-checkbox">
+              <input type="checkbox" id="principle-decoy" checked>
+              <div>
+                <label for="principle-decoy">Decoy Effect</label>
+                <div class="tactic-hint">Showing a clearly bad plan to make the pitched one look smart</div>
+              </div>
+            </div>
+            <div class="field-checkbox">
+              <input type="checkbox" id="principle-default" checked>
+              <div>
+                <label for="principle-default">Default Effect</label>
+                <div class="tactic-hint">Positioning this as the "standard choice" for your profile</div>
+              </div>
+            </div>
+            <div class="field-checkbox">
+              <input type="checkbox" id="principle-authority" checked>
+              <div>
+                <label for="principle-authority">Authority</label>
+                <div class="tactic-hint">Citing CMS ratings that may not apply to your specific drugs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analyze Button -->
+        <div class="sidebar-actions">
+          <button id="generateBtn" class="btn btn-primary btn-lg btn-full">
+            Analyze This Pitch
+          </button>
+          <button id="loadDemoBtn" class="btn btn-ghost btn-sm btn-full">
+            Load Example Scenario
+          </button>
+          <button id="saveReportBtn" class="btn btn-ghost btn-sm btn-full hidden">
+            Save Report (Print)
+          </button>
+          <button id="debriefBtn" class="btn btn-ghost btn-sm btn-full hidden">
+            Log Outcome
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div class="main-inner">
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <h2>Ready to Decode</h2>
+          <p>Enter your profile on the left and select the plan an agent is pitching you. PlanPilot will analyze which psychological manipulation tactics are being used and show you the objective truth.</p>
+        </div>
+
+        <!-- Recommendation Dashboard (Hidden by default) -->
+        <div id="recommendationDashboard" class="dashboard hidden">
+          <!-- Verdict Banner -->
+          <div id="verdictBanner" class="verdict-banner verdict-banner--danger">
+            <div class="verdict-body">
+              <div class="verdict-amount mono" id="verdictAmount">$1,400/yr more expensive</div>
+              <div class="verdict-text" id="verdictText">This plan costs more than the best alternative for your medication</div>
+            </div>
+            <a class="btn btn-sm verdict-cta" href="customer.html" id="verdictCta">Compare All Plans &rarr;</a>
+          </div>
+          <!-- Hero Recommendation Card -->
+          <div class="card hero-card">
+            <div class="card-header">
+              <span class="eyebrow">Pitched Plan Under Analysis</span>
+              <div class="insurer-badge" id="heroInsurerBadge">WellCare</div>
+            </div>
+            <div class="hero-content">
+              <h1 class="hero-title" id="heroTitle">Pitch Analysis</h1>
+              <p class="hero-narrative" id="heroNarrative">
+                Analysis of the plan being pitched to you and the manipulation tactics detected.
+              </p>
+              <div class="hero-metrics">
+                <div class="hero-metric">
+                  <span class="metric-label">Annual Cost</span>
+                  <span class="metric-value mono" id="heroDailyCost">$1,704</span>
+                </div>
+                <div class="hero-metric">
+                  <span class="metric-label">You Overpay By</span>
+                  <span class="metric-value metric-value--risk mono" id="heroSavings">$1,720</span>
+                </div>
+                <div class="hero-metric">
+                  <span class="metric-label">Market Share</span>
+                  <span class="metric-value mono" id="heroMarketShare">12%</span>
+                </div>
+                <div class="hero-metric">
+                  <span class="metric-label">Vulnerability Score</span>
+                  <span class="metric-value metric-value--accent mono" id="heroPrediction">72%</span>
+                </div>
+              </div>
+              <div class="risk-meter">
+                <div class="risk-meter-bar">
+                  <div class="risk-meter-fill" id="riskMeterFill" style="width:72%;background:var(--risk)"></div>
+                </div>
+                <div class="risk-meter-labels">
+                  <span>Low Risk</span>
+                  <span class="risk-meter-status" id="riskMeterStatus">High Vulnerability</span>
+                  <span>Critical</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Metrics Row -->
+          <div class="metrics-row">
+            <div class="metric-card">
+              <span class="metric-card-label">Monthly Copay</span>
+              <span class="metric-card-value mono" id="metricCopay">$142</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card-label">Annual OOP</span>
+              <span class="metric-card-value mono" id="metricOOP">$1,704</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card-label">Convenience Score</span>
+              <span class="metric-card-value mono" id="metricConvenience">8.2/10</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-card-label">Network</span>
+              <span class="metric-card-value" id="metricNetwork">Nationwide</span>
+            </div>
+          </div>
+
+          <!-- 3-Column Plan Comparison -->
+          <div class="card comparison-card">
+            <div class="card-header">
+              <span class="eyebrow">What They’re Hiding: Better Alternatives</span>
+            </div>
+            <div class="comparison-table">
+              <div class="comparison-col comparison-col--economy">
+                <div class="col-header">
+                  <span class="col-label">Best For You</span>
+                  <span class="col-sub" id="economyInsurer">CVS Caremark</span>
+                </div>
+                <div class="col-rows">
+                  <div class="col-row">
+                    <span class="row-label">Monthly Copay</span>
+                    <span class="row-value mono" id="economyCopay">$125</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Annual Cost</span>
+                    <span class="row-value mono row-value--accent" id="economyAnnual">$1,500</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Mail Order</span>
+                    <span class="row-value" id="economyMailOrder">No</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Prior Auth</span>
+                    <span class="row-value" id="economyPriorAuth">Required</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Step Therapy</span>
+                    <span class="row-value" id="economyStepTherapy">Yes</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Network</span>
+                    <span class="row-value" id="economyNetwork">Limited</span>
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-col comparison-col--recommended">
+                <div class="col-header col-header--recommended">
+                  <span class="recommended-badge">⚠ Plan Being Pitched</span>
+                  <span class="col-label" id="recommendedInsurer">WellCare</span>
+                </div>
+                <div class="col-rows">
+                  <div class="col-row">
+                    <span class="row-label">Monthly Copay</span>
+                    <span class="row-value mono row-value--highlight" id="recommendedCopay">$142</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Annual Cost</span>
+                    <span class="row-value mono row-value--highlight" id="recommendedAnnual">$1,704</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Mail Order</span>
+                    <span class="row-value row-value--highlight" id="recommendedMailOrder">Yes</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Prior Auth</span>
+                    <span class="row-value row-value--highlight" id="recommendedPriorAuth">Not Required</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Step Therapy</span>
+                    <span class="row-value row-value--highlight" id="recommendedStepTherapy">No</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Network</span>
+                    <span class="row-value row-value--highlight" id="recommendedNetwork">Nationwide</span>
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-col comparison-col--premium">
+                <div class="col-header">
+                  <span class="col-label">Higher-Cost Option</span>
+                  <span class="col-sub" id="premiumInsurer" style="font-size:11px;color:var(--muted)">shown for comparison only</span>
+                </div>
+                <div class="col-rows">
+                  <div class="col-row">
+                    <span class="row-label">Monthly Copay</span>
+                    <span class="row-value mono" id="premiumCopay">$180</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Annual Cost</span>
+                    <span class="row-value mono" id="premiumAnnual">$2,160</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Mail Order</span>
+                    <span class="row-value" id="premiumMailOrder">Yes</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Prior Auth</span>
+                    <span class="row-value" id="premiumPriorAuth">Not Required</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Step Therapy</span>
+                    <span class="row-value" id="premiumStepTherapy">No</span>
+                  </div>
+                  <div class="col-row">
+                    <span class="row-label">Network</span>
+                    <span class="row-value" id="premiumNetwork">Nationwide</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden Requirements Warning -->
+          <div class="card hidden-req-card hidden" id="hiddenReqCard">
+            <div class="card-header">
+              <span class="eyebrow" style="color:var(--risk)">Hidden Requirements — This Plan</span>
+            </div>
+            <div class="hidden-req-list" id="hiddenReqList"></div>
+          </div>
+
+          <!-- Best Plan For You -->
+          <div class="card best-plan-card">
+            <div class="best-plan-content">
+              <div class="best-plan-text">
+                <span class="best-plan-title">Your Best Option: <span id="bestPlanName">CVS Caremark</span></span>
+                <span class="best-plan-detail" id="bestPlanDetail">Based on your medications and profile, this plan offers the same coverage at a lower annual cost.</span>
+              </div>
+              <div style="text-align:right">
+                <span class="best-plan-savings mono" id="bestPlanSavings">Save $1,720/yr</span>
+                <div style="margin-top:8px"><a class="btn btn-primary btn-sm" href="customer.html">Compare All Plans &rarr;</a></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Persuasion Angles Panel -->
+          <div class="card angles-card">
+            <div class="card-header">
+              <span class="eyebrow">Manipulation Tactics Detected</span>
+            </div>
+            <div class="angles-grid" id="anglesGrid">
+              <!-- Angles will be dynamically inserted here -->
+            </div>
+          </div>
+
+          <!-- Questions to Ask the Agent -->
+          <div class="card questions-card">
+            <div class="card-header">
+              <span class="eyebrow">Questions to Ask the Agent</span>
+            </div>
+            <div class="questions-list" id="questionsList">
+              <!-- Questions will be dynamically inserted here -->
+            </div>
+          </div>
+
+          <!-- Loss Aversion Warning -->
+          <div class="card warning-card">
+            <div class="warning-content">
+              <div class="warning-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+              <div class="warning-text">
+                <span class="warning-title">The real cost of this pitch</span>
+                <span class="warning-detail">you would overpay by <span class="mono" id="lossAmount">$2,340</span>/year vs. the objectively best plan</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Profile Summary -->
+          <div class="card profile-card">
+            <div class="card-header">
+              <span class="eyebrow">Your Profile Summary</span>
+            </div>
+            <div class="profile-summary" id="profileSummary">
+              <!-- Profile details will be dynamically inserted here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h5>PlanPilot</h5>
+        <p>Persuasion Defense for Medicare Part D</p>
+        <a href="index.html">Overview</a>
+        <a href="admin.html">Pitch Decoder</a>
+        <a href="customer.html">Plan Comparison</a>
+      </div>
+      <div class="footer-col">
+        <h5>Data Sources</h5>
+        <p>CMS Medicare Part D 2023</p>
+        <p>OECD Health Statistics</p>
+      </div>
+      <div class="footer-col">
+        <h5>Built For</h5>
+        <p>Visualization Course Project</p>
+        <p class="footer-fine">Exposing psychological manipulation in insurance sales through in-browser machine learning and interactive data visualization.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Debrief Modal -->
+  <div id="debriefModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Log Interaction Outcome</h2>
+        <button id="closeModalBtn" class="modal-close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="debrief-section">
+          <label class="field-label">Did you end up enrolling in the pitched plan?</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="converted" value="true">
+              <span>Yes</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="converted" value="false">
+              <span>No</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="converted" value="undecided">
+              <span>Undecided (needs follow-up)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="debrief-section">
+          <label class="field-label">Which tactics did you feel influenced by?</label>
+          <div class="chips-group" id="resonatedAngles">
+            <label class="chip-label">
+              <input type="checkbox" value="anchoring">
+              <span>Anchoring</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="lossAversion">
+              <span>Loss Aversion</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="framing">
+              <span>Framing</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="socialProof">
+              <span>Social Proof</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="decoy">
+              <span>Decoy Effect</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="default">
+              <span>Default Effect</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="authority">
+              <span>Authority</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="debrief-section">
+          <label class="field-label">What concerns did you have about the pitch?</label>
+          <div class="chips-group" id="objections">
+            <label class="chip-label">
+              <input type="checkbox" value="price">
+              <span>Too expensive</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="trust">
+              <span>Don't trust insurer</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="complexity">
+              <span>Too complicated</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="loyalty">
+              <span>Loyal to current plan</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="coverage">
+              <span>Doubts coverage</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="family">
+              <span>Wants spouse/family input</span>
+            </label>
+            <label class="chip-label">
+              <input type="checkbox" value="none">
+              <span>None</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="debrief-section">
+          <label class="field-label">How much did price factor into your decision? (1-5)</label>
+          <div class="slider-group">
+            <input type="range" id="priceConcern" min="1" max="5" value="3" class="slider">
+            <div class="slider-labels">
+              <span>Not sensitive</span>
+              <span>Very sensitive</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="debrief-section">
+          <label class="field-label">How quickly did you decide?</label>
+          <select id="decisionSpeed" class="field-select">
+            <option value="instant">Instant</option>
+            <option value="deliberate" selected>Deliberate</option>
+            <option value="needsFollowup">Needs follow-up</option>
+          </select>
+        </div>
+
+        <div class="debrief-section">
+          <label class="field-label">Were you shown a competing plan?</label>
+          <input type="text" id="competitorMentioned" class="field-input" placeholder="e.g., Aetna, or leave blank if none">
+        </div>
+
+        <div class="debrief-section">
+          <label class="field-label">Notes (optional)</label>
+          <textarea id="adminNotes" class="field-textarea" rows="3" placeholder="Anything else about your experience with this pitch..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelDebriefBtn" class="btn btn-ghost">Cancel</button>
+        <button id="submitDebriefBtn" class="btn btn-primary">Submit & Improve Detection</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data-store.js"></script>
+  <script src="feature-engineering.js"></script>
+  <script src="learning-engine.js"></script>
+  <script src="ml-model.js"></script>
+  <script src="nav.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+/* ============================================================================
+ * PlanPilot — Learning Dashboard Styles
+ * ==========================================================================*/
+
+.dashboard {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ----------------------------- Header ------------------------------------ */
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.dash-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+.dash-subtitle {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+.dash-header-right {
+  display: flex;
+  gap: 1rem;
+}
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  min-width: 100px;
+}
+.stat-pill-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.stat-pill-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ----------------------------- Grid -------------------------------------- */
+.dash-row {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.dash-row--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ----------------------------- Cards ------------------------------------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  overflow: hidden;
+}
+.card--full {
+  margin-bottom: 1.5rem;
+}
+.card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+.card-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--canvas);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+.card-desc {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ----------------------------- Charts ------------------------------------ */
+.chart-container {
+  width: 100%;
+  min-height: 220px;
+  position: relative;
+}
+.chart-container--tall {
+  min-height: 320px;
+}
+.chart-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ----------------------------- Segment Selector -------------------------- */
+.segment-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.field-select--sm {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  max-width: 300px;
+}
+
+/* ----------------------------- Table ------------------------------------- */
+.table-scroll {
+  overflow-x: auto;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.table-scroll th,
+.table-scroll td {
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.table-scroll th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+}
+.table-scroll td {
+  color: var(--ink);
+}
+.table-scroll .rate-bar {
+  display: inline-block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--accent);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ----------------------------- Controls ---------------------------------- */
+.controls-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.btn-secondary {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.btn-secondary:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-file {
+  cursor: pointer;
+}
+
+/* ----------------------------- D3 Specific ------------------------------- */
+.axis text {
+  font-size: 0.7rem;
+  fill: var(--muted);
+}
+.axis line,
+.axis path {
+  stroke: var(--line);
+}
+.grid line {
+  stroke: var(--line);
+  stroke-opacity: 0.4;
+  stroke-dasharray: 2 2;
+}
+.trend-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.trend-area {
+  fill: var(--accent);
+  opacity: 0.08;
+}
+.tooltip {
+  position: absolute;
+  background: var(--ink);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+  white-space: nowrap;
+}
+.heatmap-cell {
+  stroke: var(--surface);
+  stroke-width: 1.5;
+  rx: 3;
+}
+.beta-curve {
+  fill-opacity: 0.15;
+  stroke-width: 1.8;
+}
+.importance-bar {
+  rx: 3;
+}
+.importance-bar--positive {
+  fill: var(--accent);
+}
+.importance-bar--negative {
+  fill: #b3261e;
+}
+
+/* ----------------------------- Responsive -------------------------------- */
+@media (max-width: 900px) {
+  .dash-row--2 { grid-template-columns: 1fr; }
+  .dash-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .dash-header-right { flex-wrap: wrap; }
+}

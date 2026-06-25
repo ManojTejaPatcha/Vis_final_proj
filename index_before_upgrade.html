@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HealthLens | Drug Cost Intelligence</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#F8FAFC;--card:#fff;--subtle:#F1F5F9;--border:#E2E8F0;
+  --txt:#0F172A;--txt2:#64748B;--muted:#94A3B8;
+  --primary:#1D4ED8;--blue:#3B82F6;--green:#059669;--amber:#D97706;
+  --red:#DC2626;--purple:#7C3AED;--teal:#0891B2;
+  --sh1:0 1px 3px rgba(0,0,0,.05);--sh2:0 4px 14px rgba(0,0,0,.1);
+}
+html,body{height:100vh;overflow:hidden;font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:12px;}
+
+/* HEADER */
+.hdr{height:46px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;box-shadow:var(--sh1);flex-shrink:0;z-index:10;}
+.brand{display:flex;align-items:center;gap:9px;}
+.bicon{width:28px;height:28px;background:linear-gradient(135deg,#1D4ED8,#059669);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;}
+.bname h1{font-size:14px;font-weight:700;letter-spacing:-.3px;}
+.bname p{font-size:9px;color:var(--txt2);}
+.dpills{display:flex;gap:2px;background:var(--subtle);padding:3px;border-radius:8px;}
+.dpill{padding:4px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:500;color:var(--txt2);background:transparent;border:none;font-family:inherit;transition:all .15s;}
+.dpill:hover{color:var(--txt);}
+.dpill.active{background:var(--card);color:var(--primary);box-shadow:var(--sh1);font-weight:600;}
+
+/* LAYOUT */
+.main{height:calc(100vh - 46px);display:grid;grid-template-columns:248px 1fr;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-sec{padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-ttl{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.state-badge{background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;border-radius:8px;padding:1px 6px;font-size:8px;font-weight:700;}
+.country-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+.cflag{padding:4px 2px;border:1px solid var(--border);border-radius:5px;cursor:pointer;background:var(--subtle);text-align:center;transition:all .15s;font-size:8px;line-height:1.5;color:var(--txt2);}
+.cflag:hover{border-color:var(--blue);background:#EFF6FF;}
+.cflag.active{background:#DBEAFE;border-color:var(--primary);color:var(--primary);font-weight:600;}
+.cflag .fl{font-size:13px;display:block;}
+
+/* STATE CARD */
+.state-card{margin:8px 10px;background:linear-gradient(135deg,#EFF6FF,#F0FDF4);border:1px solid #BFDBFE;border-radius:8px;padding:9px 11px;flex-shrink:0;}
+.sc-hed{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--primary);margin-bottom:3px;}
+.sc-state{font-size:22px;font-weight:800;color:var(--txt);line-height:1;}
+.sc-drug{font-size:9px;color:var(--txt2);margin-bottom:6px;}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.sc-cell{background:rgba(255,255,255,.75);border-radius:4px;padding:4px 6px;}
+.sc-lbl{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.sc-val{font-size:12px;font-weight:700;color:var(--txt);}
+.sc-val.good{color:var(--green);}
+.sc-val.bad{color:var(--red);}
+
+/* RIGHT PANEL */
+.rpanel{display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:7px 10px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;}
+.kpi{background:var(--subtle);border-radius:7px;padding:6px 9px;border:1px solid var(--border);transition:all .3s;}
+.kpi.hi{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#BFDBFE;}
+.kpi.changed{animation:kpipop .4s ease;}
+@keyframes kpipop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.klbl{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:1px;}
+.kval{font-size:14px;font-weight:700;color:var(--txt);line-height:1.1;}
+.ksub{font-size:8.5px;color:var(--txt2);margin-top:1px;}
+.kdelta{font-size:8.5px;font-weight:600;}
+.kdelta.up{color:var(--red);}
+.kdelta.dn{color:var(--green);}
+
+/* CHART GRID */
+.cgrid{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:7px;padding:7px 10px;min-height:0;overflow:hidden;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;min-height:0;box-shadow:var(--sh1);transition:box-shadow .2s,border-color .3s;}
+.panel:hover{box-shadow:var(--sh2);}
+.panel.updated{border-color:#93C5FD;}
+.panel.wide{grid-column:span 2;}
+.ph{display:flex;justify-content:space-between;align-items:center;padding:6px 9px 5px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ptitle{font-size:10px;font-weight:600;color:var(--txt);}
+.psub{font-size:8px;color:var(--muted);}
+.pbody{flex:1;min-height:0;overflow:hidden;position:relative;}
+
+/* TOOLTIP */
+.tt{position:fixed;background:rgba(15,23,42,.93);color:#fff;border-radius:8px;padding:9px 13px;font-size:11px;pointer-events:none;display:none;z-index:9999;max-width:230px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.tth{font-weight:700;font-size:12px;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:3px;}
+.ttr{display:flex;justify-content:space-between;gap:14px;opacity:.9;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="brand">
+    <div class="bicon">H</div>
+    <div class="bname"><h1>HealthLens</h1><p>Prescription Drug Cost Intelligence</p></div>
+  </div>
+  <div class="dpills" id="dpills"></div>
+</div>
+
+<div class="main">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────── -->
+  <div class="sidebar">
+
+    <div class="sb-sec">
+      <div class="sb-ttl">Geographic Price Map <span class="state-badge" id="sbadge" style="display:none"></span></div>
+      <div id="map-wrap"></div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-ttl">Compare Countries</div>
+      <div class="country-grid" id="cflags"></div>
+    </div>
+
+    <div class="state-card" id="state-card">
+      <div class="sc-hed">Selected Region</div>
+      <div class="sc-state" id="sc-name">National</div>
+      <div class="sc-drug" id="sc-drug"></div>
+      <div class="sc-grid" id="sc-cells"></div>
+    </div>
+
+  </div>
+
+  <!-- ── RIGHT PANEL ─────────────────────────────────────── -->
+  <div class="rpanel">
+
+    <div class="kpi-strip" id="kstrip"></div>
+
+    <div class="cgrid">
+      <div class="panel" id="p-para">
+        <div class="ph">
+          <span class="ptitle">Drug Profiles</span>
+          <span class="psub" id="para-sub">Parallel coordinates · 6 dimensions</span>
+        </div>
+        <div class="pbody" id="para-body"></div>
+      </div>
+
+      <div class="panel" id="p-stream">
+        <div class="ph">
+          <span class="ptitle">Spending Flows</span>
+          <span class="psub">2019–2023 · Medicare Part D ($B)</span>
+        </div>
+        <div class="pbody" id="stream-body"></div>
+      </div>
+
+      <div class="panel" id="p-heat">
+        <div class="ph">
+          <span class="ptitle">Formulary Heatmap</span>
+          <span class="psub">Tier by insurer × drug</span>
+        </div>
+        <div class="pbody" id="heat-body"></div>
+      </div>
+
+      <div class="panel wide" id="p-glob">
+        <div class="ph">
+          <span class="ptitle">Global Benchmark</span>
+          <span class="psub" id="glob-sub">Per-capita pharma spending · USD</span>
+        </div>
+        <div class="pbody" id="glob-body"></div>
+      </div>
+
+      <div class="panel" id="p-plan">
+        <div class="ph">
+          <span class="ptitle">Best Plans</span>
+          <span class="psub" id="plan-sub">Annual cost · state-adjusted</span>
+        </div>
+        <div class="pbody" id="plan-body"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════
+const DC={eliquis:'#2563EB',ozempic:'#059669',jardiance:'#D97706',trulicity:'#7C3AED',xarelto:'#DC2626'};
+const DORDER=['eliquis','ozempic','jardiance','trulicity','xarelto'];
+
+const IP={
+  'UnitedHealthcare':{p:62},'Blue Cross Blue Shield':{p:58},'Humana':{p:51},
+  'Aetna':{p:46},'Cigna':{p:43},'WellCare':{p:38},'Kaiser Permanente':{p:69},'CVS Caremark':{p:41}
+};
+
+const SM={
+  WA:1.05,OR:1.02,CA:1.12,NV:1.08,ID:0.92,MT:0.88,WY:0.86,CO:1.01,UT:0.97,AZ:1.09,NM:0.95,
+  ND:0.64,SD:0.72,NE:0.80,KS:0.83,OK:0.89,TX:1.03,MN:0.78,IA:0.82,MO:0.90,AR:0.92,LA:1.05,
+  MS:1.07,AL:1.06,GA:1.02,FL:1.10,SC:1.01,NC:0.98,TN:0.93,KY:0.88,WV:0.86,WI:0.85,MI:0.92,
+  IL:1.08,IN:0.88,OH:0.93,PA:1.02,NY:1.12,NJ:1.15,CT:1.10,MA:1.13,RI:1.08,VT:1.01,NH:1.02,
+  ME:0.98,VA:1.02,MD:1.07,DE:1.04,AK:0.92,HI:1.04,DC:1.10
+};
+
+const TILES=[
+  {s:'ME',c:10,r:0},{s:'VT',c:9,r:0},
+  {s:'WA',c:0,r:1},{s:'MT',c:1,r:1},{s:'ND',c:3,r:1},{s:'MN',c:4,r:1},{s:'WI',c:5,r:1},{s:'MI',c:6,r:1},{s:'NY',c:8,r:1},{s:'NH',c:10,r:1},
+  {s:'OR',c:0,r:2},{s:'ID',c:1,r:2},{s:'WY',c:2,r:2},{s:'SD',c:3,r:2},{s:'IA',c:4,r:2},{s:'IL',c:5,r:2},{s:'IN',c:6,r:2},{s:'OH',c:7,r:2},{s:'PA',c:8,r:2},{s:'NJ',c:9,r:2},{s:'MA',c:10,r:2},
+  {s:'CA',c:0,r:3},{s:'NV',c:1,r:3},{s:'UT',c:2,r:3},{s:'CO',c:3,r:3},{s:'NE',c:4,r:3},{s:'MO',c:5,r:3},{s:'KY',c:6,r:3},{s:'WV',c:7,r:3},{s:'VA',c:8,r:3},{s:'MD',c:9,r:3},{s:'CT',c:10,r:3},
+  {s:'AZ',c:1,r:4},{s:'NM',c:2,r:4},{s:'KS',c:4,r:4},{s:'AR',c:5,r:4},{s:'TN',c:6,r:4},{s:'NC',c:7,r:4},{s:'SC',c:8,r:4},{s:'DE',c:9,r:4},{s:'RI',c:10,r:4},
+  {s:'OK',c:3,r:5},{s:'TX',c:4,r:5},{s:'LA',c:5,r:5},{s:'MS',c:6,r:5},{s:'AL',c:7,r:5},{s:'GA',c:8,r:5},
+  {s:'HI',c:0,r:6},{s:'AK',c:1,r:6},{s:'FL',c:9,r:6}
+];
+
+const CCOLORS={
+  'United States':'#DC2626','Germany':'#F59E0B','Canada':'#3B82F6',
+  'Switzerland':'#EF4444','Japan':'#EC4899','United Kingdom':'#10B981',
+  'France':'#8B5CF6','Australia':'#06B6D4'
+};
+
+const $=id=>document.getElementById(id);
+const fmt=v=>'$'+Math.round(v).toLocaleString();
+const ec=base=>base*(SM[selState]||1);
+const lat=drug=>drug.yearly_data[drug.yearly_data.length-1];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let drugs=[], insData=[], globData=[], globPrices=[];
+let selDrug='eliquis', selState=null;
+let selCountries=new Set(['United States']);
+
+// ═══════════════════════════════════════════════════════════════
+// DATA LOAD
+// ═══════════════════════════════════════════════════════════════
+Promise.all([
+  d3.json('data/drug_trends.json'),
+  d3.json('data/insurer_pricing.json'),
+  d3.json('data/global_trends.json'),
+  d3.json('data/global_prices.json').catch(()=>[])
+]).then(([d,i,g,gp])=>{
+  drugs=d; insData=i; globPrices=gp;
+  // Inject USA into global data
+  g.unshift({country:'United States',iso_code:'USA',flag:'🇺🇸',system:'Private/Medicare',
+    yearly_data:[
+      {year:2010,spending_per_capita:984},{year:2011,spending_per_capita:1005},
+      {year:2012,spending_per_capita:1026},{year:2013,spending_per_capita:1094},
+      {year:2014,spending_per_capita:1162},{year:2015,spending_per_capita:1217},
+      {year:2016,spending_per_capita:1272},{year:2017,spending_per_capita:1303},
+      {year:2018,spending_per_capita:1334},{year:2019,spending_per_capita:1376},
+      {year:2020,spending_per_capita:1404},{year:2021,spending_per_capita:1421},{year:2022,spending_per_capita:1432}
+    ],latest_spending:1432,first_spending:984,growth_pct:45.5,latest_year:2022,first_year:2010
+  });
+  globData=g;
+  buildUI();
+  renderAll();
+}).catch(e=>console.error('Load error:',e));
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD STATIC UI
+// ═══════════════════════════════════════════════════════════════
+function buildUI(){
+  // Drug pills
+  d3.select('#dpills').selectAll('.dpill').data(drugs).join('button')
+    .attr('class',d=>'dpill'+(d.id===selDrug?' active':''))
+    .attr('data-id',d=>d.id)
+    .text(d=>d.brand_name)
+    .on('click',(e,d)=>{selDrug=d.id;renderAll();});
+
+  // Country flag buttons
+  d3.select('#cflags').selectAll('.cflag').data(globData).join('div')
+    .attr('class',d=>'cflag'+(selCountries.has(d.country)?' active':''))
+    .html(d=>`<span class="fl">${d.flag}</span>${d.country.replace('United States','USA').replace('United Kingdom','UK')}`)
+    .on('click',function(e,d){
+      if(selCountries.has(d.country)&&selCountries.size>1) selCountries.delete(d.country);
+      else selCountries.add(d.country);
+      d3.selectAll('.cflag').classed('active',dd=>selCountries.has(dd.country));
+      renderGlobal(); renderKPIs(); renderStateCard();
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════════════════════════
+function renderAll(){
+  // Update drug pills active state
+  d3.selectAll('.dpill').classed('active',function(d){return d&&d.id===selDrug;});
+  renderKPIs();
+  renderMap();
+  renderParallel();
+  renderStream();
+  renderHeatmap();
+  renderGlobal();
+  renderBestPlan();
+  renderStateCard();
+  // Flash updated panels
+  d3.selectAll('.panel').classed('updated',true);
+  setTimeout(()=>d3.selectAll('.panel').classed('updated',false),600);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════════════════
+function tt(e,html){
+  const el=$('tt');
+  el.innerHTML=html;el.style.display='block';
+  el.style.left=Math.min(e.clientX+14,window.innerWidth-250)+'px';
+  el.style.top=Math.min(e.clientY-10,window.innerHeight-210)+'px';
+}
+function ht(){$('tt').style.display='none';}
+function ttRow(l,v){return`<div class="ttr"><span>${l}</span><span><b>${v}</b></span></div>`;}
+
+// ═══════════════════════════════════════════════════════════════
+// KPI STRIP
+// ═══════════════════════════════════════════════════════════════
+function renderKPIs(){
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  const yd=lat(drug);
+  const nat=yd.cost_per_claim;
+  const adj=ec(nat);
+  const mults=Object.values(SM);
+  const bestMult=Math.min(...mults), worstMult=Math.max(...mults);
+  const gp=globPrices.find(g=>g.drug_id===selDrug);
+  const selCArr=[...selCountries].filter(c=>c!=='United States');
+  const cmpName=selCArr[0]||null;
+  const cmpData=cmpName?globData.find(g=>g.country===cmpName):null;
+  const usData=globData.find(g=>g.iso_code==='USA');
+  const gap=cmpData&&usData?Math.round((usData.latest_spending-cmpData.latest_spending)/cmpData.latest_spending*100):null;
+
+  const cards=[
+    {
+      lbl:'National Avg / Claim', val:fmt(nat),
+      sub:drug.brand_name+' · 2023 Medicare',
+      delta:null, hi:false
+    },{
+      lbl:(selState||'State')+' Cost / Claim', val:fmt(adj),
+      sub:selState?`×${(SM[selState]||1).toFixed(2)} state factor`:'Click a state on map',
+      delta:selState?(adj>nat?`↑${Math.round((adj/nat-1)*100)}% vs avg`:`↓${Math.round((1-adj/nat)*100)}% vs avg`):null,
+      hi:!!selState
+    },{
+      lbl:'Best vs Worst State', val:fmt(nat*bestMult),
+      sub:`ND best · NJ worst · ${fmt(nat*worstMult)}`,
+      delta:'save '+fmt(nat*(worstMult-bestMult))+'/claim',
+      hi:false
+    },{
+      lbl:cmpName?'vs '+cmpName.split(' ').pop():'Intl Comparison',
+      val:gap!=null?gap+'% more':cmpData?'—':'Select country',
+      sub:cmpName?cmpName+' per-capita gap':'Toggle flag below',
+      delta:cmpData?'US: $'+usData.latest_spending+' vs $'+cmpData.latest_spending:null,
+      hi:!!cmpName
+    },{
+      lbl:'Annual Savings Potential', val:gp?fmt((adj-gp.canada_price)*12):fmt(nat*.35*12),
+      sub:gp?'vs Canada price · state-adj':'vs retail average',
+      delta:null, hi:false
+    }
+  ];
+
+  const strip=$('kstrip'); strip.innerHTML='';
+  cards.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='kpi'+(c.hi?' hi':'');
+    div.innerHTML=`<div class="klbl">${c.lbl}</div><div class="kval">${c.val}</div>`
+      +(c.sub?`<div class="ksub">${c.sub}</div>`:''  )
+      +(c.delta?`<div class="kdelta ${c.delta.startsWith('↑')?'up':'dn'}">${c.delta}</div>`:'');
+    strip.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE CARD (sidebar bottom)
+// ═══════════════════════════════════════════════════════════════
+function renderStateCard(){
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  const yd=lat(drug);
+  const nat=yd.cost_per_claim;
+  const m=SM[selState]||1, adj=nat*m;
+  const bestMult=Math.min(...Object.values(SM));
+  const savAnn=Math.round((m-bestMult)*nat*12);
+
+  $('sc-name').textContent=selState||'National';
+  $('sc-drug').textContent=drug.brand_name+' ('+drug.generic_name+')';
+
+  const cells=[
+    {l:'Cost/Claim',v:fmt(adj),cls:''},
+    {l:'Annual Est.',v:fmt(adj*12),cls:''},
+    {l:'vs Best State',v:savAnn>0?'+'+fmt(savAnn)+'/yr':'Cheapest!',cls:savAnn>0?'bad':'good'},
+    {l:'Multiplier',v:'×'+m.toFixed(2),cls:m<1?'good':m>1?'bad':''}
+  ];
+  $('sc-cells').innerHTML=cells.map(c=>`
+    <div class="sc-cell">
+      <div class="sc-lbl">${c.l}</div>
+      <div class="sc-val ${c.cls}">${c.v}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TILE CARTOGRAM MAP
+// ═══════════════════════════════════════════════════════════════
+function renderMap(){
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+  const yd=lat(drug);
+  const cont=d3.select('#map-wrap');cont.selectAll('*').remove();
+
+  const TZ=19, GAP=1.5, COLS=11, ROWS=7;
+  const W=COLS*(TZ+GAP)+GAP, H=ROWS*(TZ+GAP)+GAP+14;
+  const colorScale=d3.scaleSequential()
+    .domain([0.6,1.2])
+    .interpolator(d3.interpolateRgb('#93C5FD','#B91C1C'));
+
+  const svg=cont.append('svg').attr('width','100%').attr('viewBox',`0 0 ${W} ${H}`).attr('preserveAspectRatio','xMidYMid meet');
+
+  // Gradient legend
+  const defs=svg.append('defs');
+  const grad=defs.append('linearGradient').attr('id','lgrd').attr('x1','0%').attr('x2','100%');
+  grad.append('stop').attr('offset','0%').attr('stop-color','#93C5FD');
+  grad.append('stop').attr('offset','100%').attr('stop-color','#B91C1C');
+
+  TILES.forEach(t=>{
+    const x=GAP+t.c*(TZ+GAP), y=GAP+t.r*(TZ+GAP);
+    const m=SM[t.s]||1, isSel=t.s===selState;
+    const col=colorScale(m);
+
+    svg.append('rect')
+      .attr('x',x).attr('y',y).attr('width',TZ).attr('height',TZ).attr('rx',3)
+      .attr('fill',col)
+      .attr('stroke',isSel?'#F59E0B':'rgba(255,255,255,.25)')
+      .attr('stroke-width',isSel?2.5:0.8)
+      .style('cursor','pointer')
+      .style('filter',isSel?'drop-shadow(0 0 3px rgba(245,158,11,.9))':'none')
+      .on('click',()=>{
+        selState = (selState===t.s) ? null : t.s;
+        renderAll();
+      })
+      .on('mousemove',e=>{
+        const adjCost=yd.cost_per_claim*m;
+        tt(e,`<div class="tth">📍 ${t.s}</div>`
+          +ttRow('Cost/Claim',fmt(adjCost))
+          +ttRow('vs National',(m>=1?'↑':'↓')+Math.abs(Math.round((m-1)*100))+'%')
+          +ttRow('Annual Est.',fmt(adjCost*12))
+          +ttRow('Multiplier','×'+m.toFixed(2)));
+      })
+      .on('mouseout',ht);
+
+    svg.append('text')
+      .attr('x',x+TZ/2).attr('y',y+TZ/2+3.5)
+      .attr('text-anchor','middle').attr('font-size',5.5)
+      .attr('fill','rgba(255,255,255,.92)').attr('pointer-events','none').attr('font-weight',600)
+      .text(t.s);
+  });
+
+  // Legend bar
+  const lgy=H-10;
+  svg.append('rect').attr('x',GAP).attr('y',lgy).attr('width',90).attr('height',5).attr('rx',2).attr('fill','url(#lgrd)');
+  svg.append('text').attr('x',GAP).attr('y',lgy-2).attr('font-size',5).attr('fill','#94A3B8').text('Lower cost');
+  svg.append('text').attr('x',94).attr('y',lgy-2).attr('text-anchor','end').attr('font-size',5).attr('fill','#94A3B8').text('Higher cost');
+
+  // State badge in title
+  const badge=$('sbadge');
+  if(selState){badge.textContent=selState+' selected';badge.style.display='inline';}
+  else badge.style.display='none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PARALLEL COORDINATES
+// ═══════════════════════════════════════════════════════════════
+function renderParallel(){
+  const cont=d3.select('#para-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!drugs.length)return;
+  const W=node.clientWidth||360, H=node.clientHeight||200;
+  const mx={t:24,r:55,b:20,l:10};
+  const w=W-mx.l-mx.r, h=H-mx.t-mx.b;
+
+  const DIMS=['cost','claims','benefic','cagr','growth','intl'];
+  const LABS=['Cost/Claim','Claims M','Benefic M','CAGR%','Growth%','US÷Intl'];
+
+  const rows=drugs.map(d=>{
+    const yd=lat(d);
+    const gp=globPrices.find(g=>g.drug_id===d.id);
+    const adjCost=ec(yd.cost_per_claim);
+    return{
+      id:d.id, name:d.brand_name,
+      cost:adjCost,
+      claims:yd.claims/1e6,
+      benefic:yd.beneficiaries/1e6,
+      cagr:d.cagr_cost_per_unit,
+      growth:d.total_spending_growth_pct,
+      intl:gp ? adjCost/(gp.canada_price||adjCost*.5) : 2.5
+    };
+  });
+
+  const scales={};
+  DIMS.forEach(dim=>{
+    scales[dim]=d3.scaleLinear().domain(d3.extent(rows,r=>r[dim])).range([h,0]).nice();
+  });
+  const xSc=d3.scalePoint().domain(DIMS).range([0,w]);
+
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${mx.l},${mx.t})`);
+
+  // Grid lines
+  DIMS.forEach(dim=>{
+    g.append('line').attr('x1',xSc(dim)).attr('y1',0).attr('x2',xSc(dim)).attr('y2',h)
+      .attr('stroke','#E2E8F0').attr('stroke-width',1);
+    g.append('text').attr('x',xSc(dim)).attr('y',h+13).attr('text-anchor','middle')
+      .attr('font-size',8).attr('fill','#94A3B8').text(LABS[DIMS.indexOf(dim)]);
+    scales[dim].ticks(3).forEach(v=>{
+      g.append('text').attr('x',xSc(dim)+3).attr('y',scales[dim](v)+3)
+        .attr('font-size',6.5).attr('fill','#CBD5E1')
+        .text(v>999?'$'+Math.round(v/1000)+'k':v.toFixed(1));
+    });
+  });
+
+  // Lines per drug
+  rows.forEach(r=>{
+    const isSel=r.id===selDrug;
+    const path='M'+DIMS.map(dim=>`${xSc(dim)},${scales[dim](r[dim])}`).join('L');
+    g.append('path').attr('fill','none').attr('stroke',DC[r.id])
+      .attr('stroke-width',isSel?3:1.2).attr('opacity',isSel?1:.3)
+      .attr('d',path)
+      .style('cursor','pointer')
+      .on('mousemove',e=>tt(e,`<div class="tth">${r.name}</div>`
+        +ttRow('Cost/Claim',fmt(r.cost))+(selState?ttRow('State Adj','×'+(SM[selState]||1).toFixed(2)):'')
+        +ttRow('CAGR',r.cagr.toFixed(1)+'%')+ttRow('US÷Intl',r.intl.toFixed(1)+'×')))
+      .on('mouseout',ht)
+      .on('click',()=>{selDrug=r.id;renderAll();});
+
+    if(isSel){
+      g.append('text').attr('x',xSc(DIMS[0])-5).attr('y',scales[DIMS[0]](r[DIMS[0]])+4)
+        .attr('text-anchor','end').attr('font-size',9).attr('fill',DC[r.id]).attr('font-weight',700)
+        .text(r.name);
+    }
+  });
+
+  // State annotation
+  if(selState){
+    const m=SM[selState]||1;
+    g.append('text').attr('x',w/2).attr('y',-10).attr('text-anchor','middle')
+      .attr('font-size',8.5).attr('fill','#D97706').attr('font-weight',600)
+      .text(`📍 ${selState}: ×${m.toFixed(2)} — cost axis reflects state adjustment`);
+  }
+
+  $('para-sub').textContent=selState?`${selState}-adjusted · click line to focus drug`:'National avg · click line to focus drug';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STREAM GRAPH
+// ═══════════════════════════════════════════════════════════════
+function renderStream(){
+  const cont=d3.select('#stream-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!drugs.length)return;
+  const W=node.clientWidth||360, H=node.clientHeight||200;
+  const mx={t:14,r:12,b:22,l:38};
+
+  const YEARS=[2019,2020,2021,2022,2023];
+  const tableData=YEARS.map(yr=>{
+    const row={year:yr};
+    drugs.forEach(d=>{
+      const yd=d.yearly_data.find(y=>y.year===yr)||d.yearly_data[0];
+      row[d.id]=yd?yd.total_spending_billions:0;
+    });
+    return row;
+  });
+
+  const stack=d3.stack().keys(DORDER).offset(d3.stackOffsetWiggle)(tableData);
+  const xSc=d3.scaleLinear().domain([2019,2023]).range([mx.l,W-mx.r]);
+  const yExt=d3.extent(stack.flat(2));
+  const ySc=d3.scaleLinear().domain(yExt).range([H-mx.b,mx.t]);
+  const area=d3.area()
+    .x(d=>xSc(d.data.year))
+    .y0(d=>ySc(d[0])).y1(d=>ySc(d[1]))
+    .curve(d3.curveCatmullRom);
+
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  svg.append('g').attr('transform',`translate(0,${H-mx.b})`)
+    .call(d3.axisBottom(xSc).ticks(5).tickFormat(d3.format('d')))
+    .call(g=>{g.select('.domain').remove();g.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+  svg.append('g').attr('transform',`translate(${mx.l},0)`)
+    .call(d3.axisLeft(ySc).ticks(3).tickFormat(v=>`$${Math.abs(v).toFixed(0)}B`))
+    .call(g=>{g.select('.domain').remove();g.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+
+  stack.forEach((layer,i)=>{
+    const drugId=DORDER[i];
+    const isSel=drugId===selDrug;
+    svg.append('path').datum(layer)
+      .attr('fill',DC[drugId]).attr('opacity',isSel?0.88:0.35)
+      .attr('d',area)
+      .style('cursor','pointer')
+      .on('mousemove',e=>{
+        const d=drugs.find(x=>x.id===drugId);
+        const yd=lat(d);
+        tt(e,`<div class="tth">${d.brand_name}</div>`
+          +ttRow('2023 Spending','$'+yd.total_spending_billions.toFixed(1)+'B')
+          +ttRow('Growth 2019-23','+'+d.total_spending_growth_pct.toFixed(0)+'%')
+          +ttRow('Beneficiaries',d.latest_beneficiaries_m.toFixed(1)+'M'));
+      })
+      .on('mouseout',ht)
+      .on('click',()=>{selDrug=drugId;renderAll();});
+
+    // Label for selected drug
+    if(isSel){
+      const midPt=layer[Math.floor(layer.length/2)];
+      if(midPt){
+        const midY=ySc((midPt[0]+midPt[1])/2);
+        const midX=xSc(midPt.data.year);
+        svg.append('text').attr('x',midX).attr('y',midY+4)
+          .attr('text-anchor','middle').attr('font-size',9).attr('font-weight',700)
+          .attr('fill','#0F172A').attr('pointer-events','none')
+          .text(drugs.find(d=>d.id===selDrug)?.brand_name||'');
+      }
+    }
+  });
+
+  // State annotation banner
+  if(selState){
+    const m=SM[selState]||1;
+    svg.append('rect').attr('x',W-mx.r-88).attr('y',4).attr('width',86).attr('height',14).attr('rx',4).attr('fill','#FEF3C7').attr('opacity',.9);
+    svg.append('text').attr('x',W-mx.r-44).attr('y',14).attr('text-anchor','middle').attr('font-size',8).attr('fill','#92400E').attr('font-weight',600)
+      .text(`📍 ${selState}: ×${m.toFixed(2)}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORMULARY HEATMAP
+// ═══════════════════════════════════════════════════════════════
+function renderHeatmap(){
+  const cont=d3.select('#heat-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!insData.length)return;
+  const W=node.clientWidth||280, H=node.clientHeight||200;
+
+  const INSURERS=[...new Set(insData.map(d=>d.insurer))];
+  const DRUGS=DORDER.map(id=>drugs.find(d=>d.id===id)).filter(Boolean);
+  const LEFT=64, TOP=18, BOT=16;
+  const cellW=(W-LEFT)/DRUGS.length;
+  const cellH=Math.min((H-TOP-BOT)/INSURERS.length, 20);
+
+  const TIER_COL={'2':'#22C55E','3':'#F59E0B','4':'#EF4444','5':'#991B1B',
+    'Tier 2':'#22C55E','Tier 3':'#F59E0B','Tier 4':'#EF4444','Tier 5':'#991B1B'};
+
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+
+  // Drug column headers
+  DRUGS.forEach((d,j)=>{
+    svg.append('text').attr('x',LEFT+j*cellW+cellW/2).attr('y',12)
+      .attr('text-anchor','middle').attr('font-size',8).attr('fill',DC[d.id]).attr('font-weight',600)
+      .text(d.brand_name.slice(0,7));
+  });
+
+  INSURERS.forEach((ins,i)=>{
+    const cy=TOP+i*cellH;
+    // Insurer label
+    svg.append('text').attr('x',LEFT-4).attr('y',cy+cellH/2+4)
+      .attr('text-anchor','end').attr('font-size',7.5).attr('fill','#64748B')
+      .text(ins.replace('Blue Cross Blue Shield','BCBS').replace('Kaiser Permanente','Kaiser').replace('UnitedHealthcare','United'));
+
+    DRUGS.forEach((d,j)=>{
+      const rec=insData.find(r=>r.drug_id===d.id&&r.insurer===ins);
+      const tier=rec?String(rec.tier):'?';
+      const col=TIER_COL[tier]||'#E2E8F0';
+      const isSel=d.id===selDrug;
+      const cx=LEFT+j*cellW;
+
+      svg.append('rect')
+        .attr('x',cx+1).attr('y',cy+1).attr('width',cellW-2).attr('height',cellH-2).attr('rx',2)
+        .attr('fill',col).attr('opacity',isSel?1:.45)
+        .attr('stroke',isSel?'#0F172A':'transparent').attr('stroke-width',1.5)
+        .style('cursor','pointer')
+        .on('mousemove',e=>{
+          if(!rec)return;
+          tt(e,`<div class="tth">${d.brand_name} · ${ins}</div>`
+            +ttRow('Tier',rec.tier)
+            +ttRow('Patient Copay','$'+rec.patient_copay+'/mo')
+            +ttRow('Mail Order','$'+(rec.mail_order_copay||'—')+'/mo')
+            +ttRow('Prior Auth',rec.prior_auth_required?'⚠️ Yes':'✓ No')
+            +(rec.step_therapy?ttRow('Step Therapy','⚠️ Required'):''));
+        })
+        .on('mouseout',ht)
+        .on('click',()=>{selDrug=d.id;renderAll();});
+
+      svg.append('text').attr('x',cx+cellW/2).attr('y',cy+cellH/2+4)
+        .attr('text-anchor','middle').attr('font-size',8).attr('fill','#fff')
+        .attr('font-weight',700).attr('pointer-events','none').text('T'+tier);
+
+      // PA badge
+      if(rec?.prior_auth_required){
+        svg.append('text').attr('x',cx+cellW-2).attr('y',cy+7)
+          .attr('text-anchor','end').attr('font-size',6).attr('fill','rgba(255,255,255,.8)').attr('pointer-events','none')
+          .text('PA');
+      }
+    });
+  });
+
+  // Legend
+  const LY=H-9;
+  [['T2 Pref','#22C55E'],['T3 Std','#F59E0B'],['T4 Non-Pref','#EF4444']].forEach(([l,c],i)=>{
+    svg.append('rect').attr('x',LEFT+i*64).attr('y',LY-6).attr('width',7).attr('height',7).attr('rx',1).attr('fill',c);
+    svg.append('text').attr('x',LEFT+i*64+9).attr('y',LY).attr('font-size',7).attr('fill','#94A3B8').text(l);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL BENCHMARK
+// ═══════════════════════════════════════════════════════════════
+function renderGlobal(){
+  const cont=d3.select('#glob-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!globData.length)return;
+  const W=node.clientWidth||540, H=node.clientHeight||200;
+  const mx={t:22,r:110,b:26,l:44};
+  const w=W-mx.l-mx.r, h=H-mx.t-mx.b;
+
+  const allYears=[...new Set(globData.flatMap(c=>c.yearly_data.map(y=>y.year)))].sort();
+  const xSc=d3.scaleLinear().domain(d3.extent(allYears)).range([0,w]);
+
+  // Compute max value (state-adjusted US if state selected)
+  const allVals=globData.flatMap(c=>{
+    const isUSA=c.iso_code==='USA';
+    return c.yearly_data.map(y=>isUSA&&selState ? y.spending_per_capita*(SM[selState]||1) : y.spending_per_capita);
+  });
+  const ySc=d3.scaleLinear().domain([0,d3.max(allVals)*1.12]).range([h,0]).nice();
+
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${mx.l},${mx.t})`);
+
+  g.append('g').attr('transform',`translate(0,${h})`)
+    .call(d3.axisBottom(xSc).ticks(6).tickFormat(d3.format('d')))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+  g.append('g')
+    .call(d3.axisLeft(ySc).ticks(4).tickFormat(v=>'$'+v))
+    .call(ax=>{ax.select('.domain').remove();ax.selectAll('line').style('stroke','#F1F5F9');ax.selectAll('text').style('font-size','8px').style('fill','#94A3B8');});
+
+  const lineGen=d3.line()
+    .x(d=>xSc(d.year)).y(d=>ySc(d.v))
+    .defined(d=>d.v!=null).curve(d3.curveCatmullRom);
+
+  globData.forEach(ctr=>{
+    const isUSA=ctr.iso_code==='USA';
+    const isSel=selCountries.has(ctr.country);
+    const col=CCOLORS[ctr.country]||'#94A3B8';
+
+    // Build value array; for USA apply state multiplier if selected
+    const pts=ctr.yearly_data.map(y=>({
+      year:y.year,
+      v:isUSA&&selState ? y.spending_per_capita*(SM[selState]||1) : y.spending_per_capita
+    }));
+
+    // Background fill for USA
+    if(isUSA&&isSel){
+      const areaGen=d3.area().x(d=>xSc(d.year)).y0(h).y1(d=>ySc(d.v)).defined(d=>d.v!=null).curve(d3.curveCatmullRom);
+      g.append('path').datum(pts).attr('fill','#FCA5A5').attr('opacity',.12).attr('d',areaGen);
+    }
+
+    g.append('path').datum(pts)
+      .attr('fill','none').attr('stroke',col)
+      .attr('stroke-width',isSel?(isUSA?3:2.5):1)
+      .attr('opacity',isSel?1:.18)
+      .attr('stroke-dasharray',isUSA&&selState?'6,3':'none')
+      .attr('d',lineGen)
+      .style('cursor','pointer')
+      .on('mousemove',e=>tt(e,`<div class="tth">${ctr.flag} ${ctr.country}</div>`
+        +ttRow('Latest','$'+ctr.latest_spending+'/capita')
+        +ttRow('Growth','+'+ctr.growth_pct.toFixed(1)+'%')
+        +(isUSA&&selState?ttRow('State Adj ('+selState+')','×'+(SM[selState]||1).toFixed(2)):'')))
+      .on('mouseout',ht);
+
+    // End label for selected countries
+    if(isSel){
+      const last=pts[pts.length-1];
+      g.append('text').attr('x',w+5).attr('y',ySc(last.v)+4)
+        .attr('font-size',9).attr('fill',col).attr('font-weight',700)
+        .text(ctr.country.replace('United States',selState?'US·'+selState:'USA').replace('United Kingdom','UK').replace('Switzerland','Swiss'));
+    }
+  });
+
+  // Gap annotation between USA and first selected comparison country
+  const usD=globData.find(c=>c.iso_code==='USA');
+  const cmpName=[...selCountries].find(c=>c!=='United States');
+  const cmpD=cmpName?globData.find(c=>c.country===cmpName):null;
+  if(usD&&cmpD){
+    const usAdj=selState?(usD.latest_spending*(SM[selState]||1)):usD.latest_spending;
+    const gap=Math.round((usAdj-cmpD.latest_spending)/cmpD.latest_spending*100);
+    g.append('text').attr('x',w/2).attr('y',-8).attr('text-anchor','middle')
+      .attr('font-size',9.5).attr('fill','#DC2626').attr('font-weight',700)
+      .text(`${selState?selState+' (adj)':'US'} is ${gap}% more than ${cmpD.country} per capita`);
+  }
+
+  $('glob-sub').textContent=selState?`${selState}-adjusted US line vs selected countries`:'Per-capita pharma spending · USD · select countries on left';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BEST PLANS
+// ═══════════════════════════════════════════════════════════════
+function renderBestPlan(){
+  const cont=d3.select('#plan-body');cont.selectAll('*').remove();
+  const node=cont.node();if(!node||!insData.length)return;
+  const W=node.clientWidth||260, H=node.clientHeight||200;
+  const mx={t:8,r:12,b:20,l:76};
+  const drug=drugs.find(d=>d.id===selDrug);if(!drug)return;
+
+  const recs=insData.filter(r=>r.drug_id===selDrug);
+  const plans=recs.map(r=>{
+    const annCopay=ec(r.patient_copay)*12;
+    const annPrem=(IP[r.insurer]?.p||50)*12;
+    return{
+      ins:r.insurer,
+      short:r.insurer.replace('Blue Cross Blue Shield','BCBS').replace('Kaiser Permanente','Kaiser').replace('UnitedHealthcare','United').replace('CVS Caremark','CVS'),
+      total:annCopay+annPrem, copay:annCopay, prem:annPrem,
+      tier:r.tier, pa:r.prior_auth_required
+    };
+  }).sort((a,b)=>a.total-b.total);
+
+  const xSc=d3.scaleLinear().domain([0,d3.max(plans,p=>p.total)*1.08]).range([0,W-mx.l-mx.r]);
+  const bH=Math.min((H-mx.t-mx.b)/plans.length-2, 18);
+
+  const svg=cont.append('svg').attr('width',W).attr('height',H);
+  const g=svg.append('g').attr('transform',`translate(${mx.l},${mx.t})`);
+
+  plans.forEach((p,i)=>{
+    const y=i*(bH+2);
+    const isBest=i===0;
+    const col=isBest?'#059669':'#64748B';
+
+    // Label
+    g.append('text').attr('x',-4).attr('y',y+bH/2+4)
+      .attr('text-anchor','end').attr('font-size',8)
+      .attr('fill',col).attr('font-weight',isBest?700:400)
+      .text(p.short+(p.pa?' ⚠':''));
+
+    // Copay bar
+    g.append('rect').attr('x',0).attr('y',y).attr('width',xSc(p.copay)).attr('height',bH).attr('rx',2)
+      .attr('fill',DC[selDrug]).attr('opacity',isBest?.85:.6);
+    // Premium bar
+    g.append('rect').attr('x',xSc(p.copay)).attr('y',y).attr('width',xSc(p.prem)).attr('height',bH).attr('rx',2)
+      .attr('fill','#CBD5E1');
+
+    // Total label
+    g.append('text').attr('x',xSc(p.total)+4).attr('y',y+bH/2+4)
+      .attr('font-size',8.5).attr('fill',col).attr('font-weight',isBest?700:400)
+      .text(fmt(p.total));
+
+    if(isBest){
+      g.append('text').attr('x',xSc(p.copay/2)).attr('y',y+bH/2+3.5)
+        .attr('text-anchor','middle').attr('font-size',7).attr('fill','#fff')
+        .attr('font-weight',700).attr('pointer-events','none').text('BEST');
+    }
+
+    // Hover area
+    g.append('rect').attr('x',0).attr('y',y).attr('width',W-mx.l-mx.r).attr('height',bH)
+      .attr('fill','transparent')
+      .on('mousemove',e=>tt(e,`<div class="tth">${p.ins}</div>`
+        +ttRow('Annual Copay',fmt(p.copay))+(selState?ttRow('State ('+selState+')','×'+(SM[selState]||1).toFixed(2)):'')
+        +ttRow('Annual Premium',fmt(p.prem))
+        +ttRow('Total Annual',fmt(p.total))
+        +ttRow('Formulary Tier','T'+p.tier)
+        +(p.pa?ttRow('Prior Auth','⚠️ Required'):'')))
+      .on('mouseout',ht);
+  });
+
+  // Legend
+  const LY=H-9;
+  g.append('rect').attr('x',0).attr('y',LY-7).attr('width',8).attr('height',7).attr('fill',DC[selDrug]).attr('opacity',.8);
+  g.append('text').attr('x',10).attr('y',LY).attr('font-size',7).attr('fill','#94A3B8').text('Drug copay');
+  g.append('rect').attr('x',64).attr('y',LY-7).attr('width',8).attr('height',7).attr('fill','#CBD5E1');
+  g.append('text').attr('x',74).attr('y',LY).attr('font-size',7).attr('fill','#94A3B8').text('Premium');
+
+  $('plan-sub').textContent=(selState?selState+'-adjusted':'National avg')+' · '+drug.brand_name;
+}
+</script>
+</body>
+</html>
