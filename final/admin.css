@@ -509,6 +509,45 @@
   line-height: 1.5;
 }
 
+/* ----------------------------- Next Steps Card --------------------------- */
+.next-steps-card {
+  padding: var(--s5);
+}
+.next-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  margin-top: var(--s3);
+}
+.next-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+.next-step-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.next-step-body {
+  flex: 1;
+}
+.next-step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.next-step-detail {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
 /* ----------------------------- Tactic Tooltip ----------------------------- */
 .tactic-hint {
   font-size: 11px;

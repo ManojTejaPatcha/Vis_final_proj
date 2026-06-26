@@ -169,7 +169,8 @@
     saveReportBtn: document.getElementById("saveReportBtn"),
     economyAnnual: document.getElementById("economyAnnual"),
     recommendedAnnual: document.getElementById("recommendedAnnual"),
-    premiumAnnual: document.getElementById("premiumAnnual")
+    premiumAnnual: document.getElementById("premiumAnnual"),
+    nextStepsList: document.getElementById("nextStepsList")
   };
 
   // ============================================================================
@@ -346,6 +347,7 @@
     else if (savings > 100) cls = "verdict-banner--warning";
 
     elements.verdictBanner.className = "verdict-banner " + cls;
+    elements.verdictBanner.classList.remove("hidden");
 
     if (savings > 100) {
       elements.verdictAmount.textContent = "$" + savings.toLocaleString() + "/yr more expensive";
@@ -408,8 +410,8 @@
     const medCount = (customer.medications || "").split(",").filter(s => s.trim()).length;
     if (medCount >= 2 || customer.primaryMed) factors.push("high-cost or multiple medications (increases urgency framing)");
     if (customer.valuesConvenience) factors.push("convenience preference (can be exploited via mail-order upsells)");
-    if (factors.length === 0) return "Your profile has average resistance to sales tactics.";
-    return "Score elevated by: " + factors.join("; ") + ".";
+    if (factors.length === 0) return "Your profile has average exposure to sales pressure.";
+    return "Intensity elevated by: " + factors.join("; ") + ".";
   }
 
   // ============================================================================
@@ -529,7 +531,7 @@
 
     // Build analysis narrative
     const predText = prediction != null ? `${Math.round(prediction * 100)}%` : "N/A";
-    const narrative = `Analysis for ${state.customer.name} (${segment} segment): ${insurer} is being pitched at $${copay}/month. ${neighbors.length > 0 ? `Of ${neighbors.length} similar consumers who were pitched this way, ${Math.round(cohortSummary.conversionRate * 100)}% ended up enrolling — many before seeing better alternatives.` : ""} Your vulnerability score is ${predText} — this measures how likely the pitch's psychological framing is to bypass your rational decision-making based on your profile.`;
+    const narrative = `Analysis for ${state.customer.name} (${segment} segment): ${insurer} is being pitched at $${copay}/month. ${neighbors.length > 0 ? `Of ${neighbors.length} similar consumers who were pitched this way, ${Math.round(cohortSummary.conversionRate * 100)}% ended up enrolling — many before seeing better alternatives.` : ""} The sales intensity is ${predText} — this measures how aggressively the pitch uses psychological framing to steer your decision based on your profile.`;
 
     return {
       targetInsurer: insurer,
@@ -606,7 +608,7 @@
       pitchedMailOrder: pitchedEntry ? pitchedEntry.mail_order_available : true,
       primaryDrugName: drugName,
       primaryDrugId: drugId || "",
-      narrative: `Analysis for ${state.customer.name}: ${insurer} is being pitched at $${copay}/month for your medications (${state.customer.medications}). The market average for comparable coverage is significantly lower. ${state.customer.valuesConvenience ? "The pitch may emphasize mail-order convenience to distract from price." : "The pitch may emphasize network breadth to justify a premium."} With ${state.customer.budgetSensitivity} budget sensitivity, you are ${state.customer.budgetSensitivity === "high" ? "especially" : "moderately"} vulnerable to anchoring tactics.`,
+      narrative: `Analysis for ${state.customer.name}: ${insurer} is being pitched at $${copay}/month for your medications (${state.customer.medications}). The market average for comparable coverage is significantly lower. ${state.customer.valuesConvenience ? "The pitch may emphasize mail-order convenience to distract from price." : "The pitch may emphasize network breadth to justify a premium."} With ${state.customer.budgetSensitivity} budget sensitivity, the sales tactics are ${state.customer.budgetSensitivity === "high" ? "especially" : "moderately"} likely to influence your decision.`,
       angles: [
         {
           principle: "Anchoring",
@@ -747,7 +749,7 @@
     elements.heroDailyCost.textContent = `$${rec.annualOOP.toLocaleString()}`;
     elements.heroBestAlt.textContent = rec.decoys.economy.insurer;
     elements.heroMarketShare.textContent = `${rec.marketShare}%`;
-    elements.heroPrediction.textContent = rec.predictedConversion ? `${Math.round(rec.predictedConversion * 100)}%` : "N/A";  // vulnerability score
+    elements.heroPrediction.textContent = rec.predictedConversion ? `${Math.round(rec.predictedConversion * 100)}%` : "N/A";  // sales intensity
 
     // Update metrics row
     elements.metricCopay.textContent = `$${rec.monthlyCopay}`;
@@ -833,15 +835,15 @@
       elements.riskMeterFill.style.width = `${vulnScore}%`;
       if (vulnScore >= 70) {
         elements.riskMeterFill.style.background = "var(--risk)";
-        if (elements.riskMeterStatus) elements.riskMeterStatus.textContent = "High Vulnerability";
+        if (elements.riskMeterStatus) elements.riskMeterStatus.textContent = "High Sales Pressure";
         elements.riskMeterStatus.style.color = "var(--risk)";
       } else if (vulnScore >= 40) {
         elements.riskMeterFill.style.background = "#e8a317";
-        if (elements.riskMeterStatus) elements.riskMeterStatus.textContent = "Moderate Vulnerability";
+        if (elements.riskMeterStatus) elements.riskMeterStatus.textContent = "Moderate Sales Pressure";
         elements.riskMeterStatus.style.color = "#e8a317";
       } else {
         elements.riskMeterFill.style.background = "var(--accent)";
-        if (elements.riskMeterStatus) elements.riskMeterStatus.textContent = "Low Vulnerability";
+        if (elements.riskMeterStatus) elements.riskMeterStatus.textContent = "Low Sales Pressure";
         elements.riskMeterStatus.style.color = "var(--accent)";
       }
     }
@@ -871,7 +873,69 @@
       `).join("");
     }
 
-    // Vulnerability score plain-English explanation (P8)
+    // Render "What Do I Do Next?" section (Fix #10)
+    if (elements.nextStepsList) {
+      const bestInsurer = rec.decoys.economy.insurer;
+      const drugName = rec.primaryDrugName || "your medication";
+      const steps = [];
+
+      if (rec.annualSavings > 100) {
+        steps.push({
+          icon: "compare",
+          title: "Compare the pitched plan side-by-side with " + bestInsurer,
+          detail: "Use the Plan Comparison tool to see exactly how " + rec.targetInsurer + " stacks up against " + bestInsurer + " for " + drugName + ". You could save $" + rec.annualSavings.toLocaleString() + "/year.",
+          cta: "Open Plan Comparison \u2192",
+          ctaHref: "customer.html"
+        });
+      }
+
+      steps.push({
+        icon: "ask",
+        title: "Ask your agent these " + generateQuestions(rec.angles).length + " questions",
+        detail: "The questions above are designed to shift the conversation back to objective data. Print them out or screenshot them before your next call.",
+        cta: null
+      });
+
+      if (rec.pitchedPriorAuth || rec.pitchedStepTherapy) {
+        steps.push({
+          icon: "warn",
+          title: "Verify hidden requirements with your doctor",
+          detail: (rec.pitchedPriorAuth ? "This plan requires prior authorization" : "This plan requires step therapy") + " for " + drugName + ". Ask your doctor if they'll support the approval process, or if " + bestInsurer + " would be simpler.",
+          cta: null
+        });
+      }
+
+      steps.push({
+        icon: "time",
+        title: "Take 48 hours before deciding",
+        detail: "You are not obligated to enroll during the sales call. Tell the agent you need time to review the options. Any plan that pressures you to decide immediately is a red flag.",
+        cta: null
+      });
+
+      steps.push({
+        icon: "enroll",
+        title: "Ready to switch? Here's how.",
+        detail: "Visit Medicare Plan Finder at medicare.gov/find-plans to compare and enroll in " + bestInsurer + " or any other plan. You can also call 1-800-MEDICARE (1-800-633-4227) for free, unbiased help.",
+        cta: "Go to medicare.gov \u2192",
+        ctaHref: "https://www.medicare.gov/find-plans"
+      });
+
+      elements.nextStepsList.innerHTML = steps.map(s => `
+        <div class="next-step-item">
+          <span class="next-step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 3"/>
+            </svg>
+          </span>
+          <div class="next-step-body">
+            <div class="next-step-title">${s.title}</div>
+            <div class="next-step-detail">${s.detail}</div>
+            ${s.cta ? `<a class="btn btn-primary btn-sm" href="${s.ctaHref}" target="${s.ctaHref.startsWith('http') ? '_blank' : ''}" rel="${s.ctaHref.startsWith('http') ? 'noopener' : ''}" style="margin-top:8px">${s.cta}</a>` : ""}
+          </div>
+        </div>`).join("");
+    }
+
+    // Sales intensity plain-English explanation (P8)
     const riskMeterEl = document.querySelector(".risk-meter");
     if (riskMeterEl) {
       let vulnEl = riskMeterEl.querySelector(".vuln-explanation");
@@ -1036,7 +1100,7 @@
       }
 
       closeDebriefModal();
-      showError("Outcome logged. Detection model improved with your feedback.");
+      showError("Thank you — your feedback helps PlanPilot improve its detection accuracy.");
       // Change error color to green for success
       const errorEl = document.getElementById("inlineError");
       if (errorEl) {

@@ -12,7 +12,7 @@
 </head>
 <body>
   <!-- Navigation injected by nav.js -->
-  <div data-nav="admin"></div>
+  <div data-nav="decoder"></div>
 
   <!-- Admin Layout -->
   <div class="admin-layout">
@@ -42,6 +42,7 @@
           <button id="quickModeBtn" class="mode-btn mode-btn--active">⚡ Quick</button>
           <button id="fullModeBtn" class="mode-btn">Full Profile</button>
         </div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;margin-bottom:8px">Quick = just pick a drug &amp; budget &nbsp;·&nbsp; Full Profile = enter age, state, conditions for deeper analysis</div>
 
         <!-- Your Profile -->
         <div class="sidebar-section">
@@ -204,7 +205,7 @@
             Save Report (Print)
           </button>
           <button id="debriefBtn" class="btn btn-ghost btn-sm btn-full hidden">
-            Log Outcome
+            Share Your Experience
           </button>
         </div>
       </div>
@@ -229,10 +230,10 @@
         <!-- Recommendation Dashboard (Hidden by default) -->
         <div id="recommendationDashboard" class="dashboard hidden">
           <!-- Verdict Banner -->
-          <div id="verdictBanner" class="verdict-banner verdict-banner--danger">
+          <div id="verdictBanner" class="verdict-banner verdict-banner--danger hidden">
             <div class="verdict-body">
-              <div class="verdict-amount mono" id="verdictAmount">$0/yr more expensive</div>
-              <div class="verdict-text" id="verdictText">This plan costs more than the best alternative for your medication</div>
+              <div class="verdict-amount mono" id="verdictAmount">—</div>
+              <div class="verdict-text" id="verdictText">—</div>
             </div>
             <a class="btn btn-sm verdict-cta" href="customer.html" id="verdictCta">Compare All Plans &rarr;</a>
           </div>
@@ -240,17 +241,17 @@
           <div class="card hero-card">
             <div class="card-header">
               <span class="eyebrow">Pitched Plan Under Analysis</span>
-              <div class="insurer-badge" id="heroInsurerBadge">WellCare</div>
+              <div class="insurer-badge" id="heroInsurerBadge">—</div>
             </div>
             <div class="hero-content">
               <h1 class="hero-title" id="heroTitle">Pitch Analysis</h1>
               <p class="hero-narrative" id="heroNarrative">
-                Analysis of the plan being pitched to you and the manipulation tactics detected.
+                Enter your profile and select the plan being pitched to you, then click "Analyze This Pitch" to see the results.
               </p>
               <div class="hero-metrics">
                 <div class="hero-metric">
                   <span class="metric-label">Annual Cost</span>
-                  <span class="metric-value mono" id="heroDailyCost">$1,704</span>
+                  <span class="metric-value mono" id="heroDailyCost">—</span>
                 </div>
                 <div class="hero-metric">
                   <span class="metric-label">Best Alternative</span>
@@ -258,21 +259,21 @@
                 </div>
                 <div class="hero-metric">
                   <span class="metric-label">Market Share</span>
-                  <span class="metric-value mono" id="heroMarketShare">12%</span>
+                  <span class="metric-value mono" id="heroMarketShare">—</span>
                 </div>
                 <div class="hero-metric">
-                  <span class="metric-label">Vulnerability Score</span>
-                  <span class="metric-value metric-value--accent mono" id="heroPrediction">72%</span>
+                  <span class="metric-label">Sales Intensity</span>
+                  <span class="metric-value metric-value--accent mono" id="heroPrediction">—</span>
                 </div>
               </div>
               <div class="risk-meter">
                 <div class="risk-meter-bar">
-                  <div class="risk-meter-fill" id="riskMeterFill" style="width:72%;background:var(--risk)"></div>
+                  <div class="risk-meter-fill" id="riskMeterFill" style="width:0%;background:var(--risk)"></div>
                 </div>
                 <div class="risk-meter-labels">
-                  <span>Low Risk</span>
-                  <span class="risk-meter-status" id="riskMeterStatus">High Vulnerability</span>
-                  <span>Critical</span>
+                  <span>Low</span>
+                  <span class="risk-meter-status" id="riskMeterStatus">—</span>
+                  <span>High</span>
                 </div>
               </div>
             </div>
@@ -282,19 +283,19 @@
           <div class="metrics-row">
             <div class="metric-card">
               <span class="metric-card-label">Monthly Copay</span>
-              <span class="metric-card-value mono" id="metricCopay">$142</span>
+              <span class="metric-card-value mono" id="metricCopay">—</span>
             </div>
             <div class="metric-card">
               <span class="metric-card-label">Annual OOP</span>
-              <span class="metric-card-value mono" id="metricOOP">$1,704</span>
+              <span class="metric-card-value mono" id="metricOOP">—</span>
             </div>
             <div class="metric-card">
               <span class="metric-card-label">Convenience Score</span>
-              <span class="metric-card-value mono" id="metricConvenience">8.2/10</span>
+              <span class="metric-card-value mono" id="metricConvenience">—</span>
             </div>
             <div class="metric-card">
               <span class="metric-card-label">Network</span>
-              <span class="metric-card-value" id="metricNetwork">Nationwide</span>
+              <span class="metric-card-value" id="metricNetwork">—</span>
             </div>
           </div>
 
@@ -307,16 +308,16 @@
               <div class="comparison-col comparison-col--economy">
                 <div class="col-header">
                   <span class="col-label">Best For You</span>
-                  <span class="col-sub" id="economyInsurer">CVS Caremark</span>
+                  <span class="col-sub" id="economyInsurer">—</span>
                 </div>
                 <div class="col-rows">
                   <div class="col-row">
                     <span class="row-label">Monthly Copay</span>
-                    <span class="row-value mono" id="economyCopay">$125</span>
+                    <span class="row-value mono" id="economyCopay">—</span>
                   </div>
                   <div class="col-row">
                     <span class="row-label">Annual Cost</span>
-                    <span class="row-value mono row-value--accent" id="economyAnnual">$1,500</span>
+                    <span class="row-value mono row-value--accent" id="economyAnnual">—</span>
                   </div>
                   <div class="col-row">
                     <span class="row-label">Mail Order</span>
@@ -339,16 +340,16 @@
               <div class="comparison-col comparison-col--recommended">
                 <div class="col-header col-header--recommended">
                   <span class="recommended-badge">⚠ Plan Being Pitched</span>
-                  <span class="col-label" id="recommendedInsurer">WellCare</span>
+                  <span class="col-label" id="recommendedInsurer">—</span>
                 </div>
                 <div class="col-rows">
                   <div class="col-row">
                     <span class="row-label">Monthly Copay</span>
-                    <span class="row-value mono row-value--highlight" id="recommendedCopay">$142</span>
+                    <span class="row-value mono row-value--highlight" id="recommendedCopay">—</span>
                   </div>
                   <div class="col-row">
                     <span class="row-label">Annual Cost</span>
-                    <span class="row-value mono row-value--highlight" id="recommendedAnnual">$1,704</span>
+                    <span class="row-value mono row-value--highlight" id="recommendedAnnual">—</span>
                   </div>
                   <div class="col-row">
                     <span class="row-label">Mail Order</span>
@@ -371,16 +372,16 @@
               <div class="comparison-col comparison-col--premium">
                 <div class="col-header">
                   <span class="col-label">Higher-Cost Option</span>
-                  <span class="col-sub" id="premiumInsurer" style="font-size:11px;color:var(--muted)">shown for comparison only</span>
+                  <span class="col-sub" id="premiumInsurer" style="font-size:11px;color:var(--muted)">—</span>
                 </div>
                 <div class="col-rows">
                   <div class="col-row">
                     <span class="row-label">Monthly Copay</span>
-                    <span class="row-value mono" id="premiumCopay">$180</span>
+                    <span class="row-value mono" id="premiumCopay">—</span>
                   </div>
                   <div class="col-row">
                     <span class="row-label">Annual Cost</span>
-                    <span class="row-value mono" id="premiumAnnual">$2,160</span>
+                    <span class="row-value mono" id="premiumAnnual">—</span>
                   </div>
                   <div class="col-row">
                     <span class="row-label">Mail Order</span>
@@ -415,11 +416,11 @@
           <div class="card best-plan-card">
             <div class="best-plan-content">
               <div class="best-plan-text">
-                <span class="best-plan-title">Your Best Option: <span id="bestPlanName">CVS Caremark</span></span>
-                <span class="best-plan-detail" id="bestPlanDetail">Based on your medications and profile, this plan offers the same coverage at a lower annual cost.</span>
+                <span class="best-plan-title">Your Best Option: <span id="bestPlanName">—</span></span>
+                <span class="best-plan-detail" id="bestPlanDetail">—</span>
               </div>
               <div style="text-align:right">
-                <span class="best-plan-savings mono" id="bestPlanSavings">Save $0/yr</span>
+                <span class="best-plan-savings mono" id="bestPlanSavings">—</span>
                 <div style="margin-top:8px"><a class="btn btn-primary btn-sm" href="customer.html">Compare All Plans &rarr;</a></div>
               </div>
             </div>
@@ -445,6 +446,16 @@
             </div>
           </div>
 
+          <!-- What Do I Do Next? -->
+          <div class="card next-steps-card">
+            <div class="card-header">
+              <span class="eyebrow">What Do I Do Next?</span>
+            </div>
+            <div class="next-steps-list" id="nextStepsList">
+              <!-- Next steps will be dynamically inserted here -->
+            </div>
+          </div>
+
           <!-- Customer Profile Summary -->
           <div class="card profile-card">
             <div class="card-header">
@@ -466,18 +477,13 @@
         <h5>PlanPilot</h5>
         <p>Persuasion Defense for Medicare Part D</p>
         <a href="index.html">Overview</a>
-        <a href="admin.html">Pitch Decoder</a>
+        <a href="decoder.html">Pitch Decoder</a>
         <a href="customer.html">Plan Comparison</a>
       </div>
       <div class="footer-col">
         <h5>Data Sources</h5>
         <p>CMS Medicare Part D 2023</p>
         <p>OECD Health Statistics</p>
-      </div>
-      <div class="footer-col">
-        <h5>Built For</h5>
-        <p>Visualization Course Project</p>
-        <p class="footer-fine">Exposing psychological manipulation in insurance sales through in-browser machine learning and interactive data visualization.</p>
       </div>
     </div>
   </footer>
@@ -487,7 +493,7 @@
     <div class="modal-backdrop"></div>
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Log Interaction Outcome</h2>
+        <h2>Share Your Experience</h2>
         <button id="closeModalBtn" class="modal-close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>

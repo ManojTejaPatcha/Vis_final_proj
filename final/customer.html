@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlanPilot · Plan Comparison — Prescription Cost Intelligence</title>
+<title>PlanPilot · Plan Comparison — Compare Drug Costs Across Insurers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
 <div id="pitchContextBanner" style="display:none; background:var(--accent-soft); border-bottom:1px solid var(--accent); padding:10px 24px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px;">
   <span style="font-weight:600; color:var(--accent-ink)">&#8594; From your analysis:</span>
   <span id="pitchContextText" style="color:var(--ink-2)"></span>
-  <a href="admin.html" style="margin-left:auto; color:var(--accent); font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">&#8592; Back to Pitch Decoder</a>
+  <a href="decoder.html" style="margin-left:auto; color:var(--accent); font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">&#8592; Back to Pitch Decoder</a>
   <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;">&#x2715;</button>
 </div>
 
@@ -28,7 +28,7 @@
 <div id="pitchHintBanner" style="display:none; background:#fff8ec; border-bottom:1px solid #e8a317; padding:10px 24px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px;">
   <span style="font-weight:600; color:#8a6d00">💡 Tip:</span>
   <span style="color:var(--ink-2)">This dashboard compares drug costs across insurers, states, and countries. Run a <strong>Pitch Decoder</strong> analysis first and your drug &amp; insurer will be pre-highlighted here.</span>
-  <a href="admin.html" style="margin-left:auto; color:#8a6d00; font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">Go to Pitch Decoder &rarr;</a>
+  <a href="decoder.html" style="margin-left:auto; color:#8a6d00; font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">Go to Pitch Decoder &rarr;</a>
   <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;">&#x2715;</button>
 </div>
 
@@ -120,21 +120,21 @@
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">Does your state pay more or less than average?</span>
-      <span class="card-hint">cost/claim by region · click state to filter</span>
+      <span class="card-hint">This map shows how much your drug costs per claim in each state. Darker = more expensive. Click your state to filter all charts below.</span>
     </div>
     <div class="chart-area" id="chart-geomap"></div>
   </div>
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">How has your drug's cost changed over 5 years?</span>
-      <span class="card-hint">2019–2023 · click a band to select that drug</span>
+      <span class="card-hint">This chart tracks how the total spending on each drug has grown from 2019 to 2023. Click a colored band to focus on that drug.</span>
     </div>
     <div class="chart-area" id="chart-stream"></div>
   </div>
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">How do these drugs compare across price, coverage &amp; usage?</span>
-      <span class="card-hint">5 drugs × 5 axes · brush an axis to filter · click a drug name below to select</span>
+      <span class="card-hint">Each line is a drug. The closer a drug is to the left on "Cost", the cheaper it is. Drag along any axis to filter. Click a drug name below to highlight it.</span>
     </div>
     <div class="chart-area" id="chart-parallel"></div>
   </div>
@@ -145,14 +145,14 @@
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">Which insurer is cheapest for your drug?</span>
-      <span class="card-hint">annual cost · click a bar to filter all charts</span>
+      <span class="card-hint">This bar chart shows the annual cost for your selected drug under each insurer's plan. Shorter bars = cheaper. Click a bar to filter all charts to that insurer.</span>
     </div>
     <div class="chart-area" id="chart-plans"></div>
   </div>
   <div class="chart-card chart-card-split" id="card-lollipop">
     <div class="card-header">
       <span class="card-title">What will you actually pay per year?</span>
-      <span class="card-hint">US & international plans shown · click a plan bar above to personalize</span>
+      <span class="card-hint">This chart shows your estimated yearly out-of-pocket cost for each insurer, plus international benchmarks for context. Click a plan bar above to personalize.</span>
     </div>
     <div class="chart-area chart-area-split">
       <div class="split-left" id="chart-lollipop"></div>
@@ -166,7 +166,7 @@
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">Where does the money go?</span>
-      <span class="card-hint">spending share by drug · click slice to select</span>
+      <span class="card-hint">This pie chart shows how total drug spending is split across all five medications. Click a slice to focus on that drug.</span>
     </div>
     <div class="chart-area" id="chart-donut"></div>
   </div>
@@ -177,21 +177,21 @@
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">Which drugs cost the most by region?</span>
-      <span class="card-hint">drug × region · click a cell to filter both</span>
+      <span class="card-hint">This grid breaks down drug spending by U.S. region. Darker cells = higher cost. Click a cell to filter by both drug and region.</span>
     </div>
     <div class="chart-area" id="chart-treemap"></div>
   </div>
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">Which drugs cost the most vs. how many people take them?</span>
-      <span class="card-hint">bubble size = total spending · click to select drug + region</span>
+      <span class="card-hint">Each bubble is a drug. Higher up = more expensive. Further right = more patients. Bubble size = total spending. Click a bubble to select that drug.</span>
     </div>
     <div class="chart-area" id="chart-scatter"></div>
   </div>
   <div class="chart-card" id="card-splom">
     <div class="card-header">
       <span class="card-title">How do these drugs compare side by side?</span>
-      <span class="card-hint">price × coverage × usage · click a dot to select drug</span>
+      <span class="card-hint">This grid compares every pair of metrics (price, coverage, usage) against each other. Each dot is a drug. Click a dot to highlight that drug across all charts.</span>
     </div>
     <div class="chart-area" id="chart-splom"></div>
   </div>
