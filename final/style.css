@@ -160,7 +160,7 @@ body > nav.nav {
 .card-hint{font-family:'Outfit',sans-serif;font-size:10px;color:var(--text-muted);text-transform:none;letter-spacing:0;}
 
 .chart-area{flex:1;overflow:hidden;position:relative;min-height:0;min-width:0;}
-.chart-area svg{display:block;width:100%;height:100%;}
+.chart-area svg{display:block;width:100%;height:100%;overflow:hidden;}
 
 /* split card for lollipop + trend */
 .chart-area-split{display:flex;}

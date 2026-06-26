@@ -86,5 +86,5 @@ open reports/report-<timestamp>.html
 
 Each run generates `tests/reports/report-<timestamp>.html` containing:
 - Overall pass rate + breakdown by category
-- Per-persona: assertion table, Gemini response (expandable), screenshot (expandable)
+- Per-persona: assertion table, Gemini response (expandable), screenshot (expandable).
 - Screenshots saved to `tests/reports/screenshots/P01.png` … `P50.png`

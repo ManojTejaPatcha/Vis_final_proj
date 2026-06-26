@@ -806,7 +806,7 @@ function initParallel(){
   // lines group
   const lineG = svg.append("g").attr("class","par-lines");
 
-  parState = { svg, dims, xScale, axisG, lineG, W, H, m, brushSelections:{}, buildYScales, linesDrawn:false };
+  parState = { svg, dims, xScale, axisG, lineG, W, H, m, brushSelections:{}, buildYScales, linesDrawn:false, lastRegion: state.selectedRegion };
 
   drawParallel();
 
@@ -868,11 +868,14 @@ function drawParallel(){
     const g = d3.select(this);
     g.select(".par-axis").call(d3.axisLeft(dim.y).ticks(4).tickFormat(dim.fmt).tickSize(0))
       .call(g => g.select(".domain").remove());
-    // re-extent brush
+    // re-extent brush only if extent actually changed
     if(dim.brush){
       const ext = [[-8, parState.m.top],[8, parState.H - parState.m.bottom]];
-      dim.brush.extent(ext);
-      g.select(".brush").call(dim.brush);
+      const cur = dim.brush.extent();
+      if(cur[0][0] !== ext[0][0] || cur[1][1] !== ext[1][1]){
+        dim.brush.extent(ext);
+        g.select(".brush").call(dim.brush);
+      }
     }
   });
 
@@ -934,8 +937,11 @@ function recomputeBrushed(){
 
 function updateParallel(s){
   if(!parState) return;
-  // re-draw if region changed (data values change)
-  drawParallel();
+  // re-draw only if region changed (data values change)
+  if(parState.lastRegion !== s.selectedRegion){
+    parState.lastRegion = s.selectedRegion;
+    drawParallel();
+  }
 
   // Style national-only axes (CAGR, US÷UK) when region filter is active
   const isRegional = s.selectedRegion !== "National";
@@ -1971,8 +1977,10 @@ d3.select("#reset-btn").on("click", () => {
   // clear parallel brushes
   if(parState){
     parState.brushSelections = {};
-    parState.axisG.selectAll(".brush").each(function(d){
-      try{ d3.select(this).call(d.brush.move, null);}catch(e){}
+    parState.axisG.selectAll("g.dim").each(function(dim){
+      if(dim.brush){
+        try{ d3.select(this).select(".brush").call(dim.brush.move, null);}catch(e){}
+      }
     });
   }
   // clear trend time brush
