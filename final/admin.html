@@ -231,7 +231,7 @@
           <!-- Verdict Banner -->
           <div id="verdictBanner" class="verdict-banner verdict-banner--danger">
             <div class="verdict-body">
-              <div class="verdict-amount mono" id="verdictAmount">$1,400/yr more expensive</div>
+              <div class="verdict-amount mono" id="verdictAmount">$0/yr more expensive</div>
               <div class="verdict-text" id="verdictText">This plan costs more than the best alternative for your medication</div>
             </div>
             <a class="btn btn-sm verdict-cta" href="customer.html" id="verdictCta">Compare All Plans &rarr;</a>
@@ -253,8 +253,8 @@
                   <span class="metric-value mono" id="heroDailyCost">$1,704</span>
                 </div>
                 <div class="hero-metric">
-                  <span class="metric-label">You Overpay By</span>
-                  <span class="metric-value metric-value--risk mono" id="heroSavings">$1,720</span>
+                  <span class="metric-label">Best Alternative</span>
+                  <span class="metric-value mono" id="heroBestAlt" style="color:var(--accent)">—</span>
                 </div>
                 <div class="hero-metric">
                   <span class="metric-label">Market Share</span>
@@ -419,7 +419,7 @@
                 <span class="best-plan-detail" id="bestPlanDetail">Based on your medications and profile, this plan offers the same coverage at a lower annual cost.</span>
               </div>
               <div style="text-align:right">
-                <span class="best-plan-savings mono" id="bestPlanSavings">Save $1,720/yr</span>
+                <span class="best-plan-savings mono" id="bestPlanSavings">Save $0/yr</span>
                 <div style="margin-top:8px"><a class="btn btn-primary btn-sm" href="customer.html">Compare All Plans &rarr;</a></div>
               </div>
             </div>
@@ -442,23 +442,6 @@
             </div>
             <div class="questions-list" id="questionsList">
               <!-- Questions will be dynamically inserted here -->
-            </div>
-          </div>
-
-          <!-- Loss Aversion Warning -->
-          <div class="card warning-card">
-            <div class="warning-content">
-              <div class="warning-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                  <line x1="12" y1="9" x2="12" y2="13"/>
-                  <line x1="12" y1="17" x2="12.01" y2="17"/>
-                </svg>
-              </div>
-              <div class="warning-text">
-                <span class="warning-title">The real cost of this pitch</span>
-                <span class="warning-detail">you would overpay by <span class="mono" id="lossAmount">$2,340</span>/year vs. the objectively best plan</span>
-              </div>
             </div>
           </div>
 

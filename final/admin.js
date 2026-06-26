@@ -121,7 +121,7 @@
     heroTitle: document.getElementById("heroTitle"),
     heroNarrative: document.getElementById("heroNarrative"),
     heroDailyCost: document.getElementById("heroDailyCost"),
-    heroSavings: document.getElementById("heroSavings"),
+    heroBestAlt: document.getElementById("heroBestAlt"),
     heroMarketShare: document.getElementById("heroMarketShare"),
     heroPrediction: document.getElementById("heroPrediction"),
     metricCopay: document.getElementById("metricCopay"),
@@ -129,7 +129,6 @@
     metricConvenience: document.getElementById("metricConvenience"),
     metricNetwork: document.getElementById("metricNetwork"),
     anglesGrid: document.getElementById("anglesGrid"),
-    lossAmount: document.getElementById("lossAmount"),
     profileSummary: document.getElementById("profileSummary"),
 
     // Comparison table elements
@@ -746,7 +745,7 @@
     elements.heroTitle.textContent = `Pitch Analysis: ${rec.targetInsurer}`;
     elements.heroNarrative.textContent = rec.narrative;
     elements.heroDailyCost.textContent = `$${rec.annualOOP.toLocaleString()}`;
-    elements.heroSavings.textContent = `$${rec.annualSavings.toLocaleString()}`;
+    elements.heroBestAlt.textContent = rec.decoys.economy.insurer;
     elements.heroMarketShare.textContent = `${rec.marketShare}%`;
     elements.heroPrediction.textContent = rec.predictedConversion ? `${Math.round(rec.predictedConversion * 100)}%` : "N/A";  // vulnerability score
 
@@ -799,9 +798,6 @@
       </div>`;
       })
       .join("");
-
-    // Update overpay warning
-    elements.lossAmount.textContent = `$${(rec.annualSavings).toLocaleString()}`;
 
     // Update profile summary
     elements.profileSummary.innerHTML = `

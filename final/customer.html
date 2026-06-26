@@ -16,7 +16,7 @@
 
 <div data-nav="customer"></div>
 
-<!-- Context banner (shown above charts once gate is dismissed) -->
+<!-- Soft context banner (dismissble, charts always visible) -->
 <div id="pitchContextBanner" style="display:none; background:var(--accent-soft); border-bottom:1px solid var(--accent); padding:10px 24px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px;">
   <span style="font-weight:600; color:var(--accent-ink)">&#8594; From your analysis:</span>
   <span id="pitchContextText" style="color:var(--ink-2)"></span>
@@ -24,48 +24,13 @@
   <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;">&#x2715;</button>
 </div>
 
-<!-- ═══ GATE OVERLAY — covers charts until user confirms ═══ -->
-<div id="vizGate" style="position:fixed;inset:0;background:rgba(248,248,250,0.97);z-index:9000;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);">
-  <div style="max-width:540px;width:100%;background:#fff;border-radius:20px;padding:52px 48px;box-shadow:0 8px 48px rgba(0,0,0,0.12);text-align:center;border:1px solid var(--line);">
-
-    <!-- State A: no analysis context found -->
-    <div id="gateNoContext">
-      <div style="font-size:52px;margin-bottom:20px;line-height:1">🔍</div>
-      <h2 style="margin:0 0 12px;font-size:1.5rem;font-weight:600;letter-spacing:-0.02em">Analyze a pitch first</h2>
-      <p style="color:var(--muted);margin:0 0 32px;font-size:15px;line-height:1.6">
-        These charts show drug cost breakdowns across every insurer and region.
-        To get the most from them, run a <strong>Pitch Decoder</strong> analysis first —
-        we'll highlight your specific drug and flag the plan being pitched to you.
-      </p>
-      <a href="admin.html" class="btn btn-primary btn-lg" style="display:inline-block;margin-bottom:16px">Go to Pitch Decoder &rarr;</a>
-      <br>
-      <button id="gateBrowseBtn" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;text-decoration:underline;margin-top:4px">
-        Browse charts without analysis
-      </button>
-    </div>
-
-    <!-- State B: analysis context found -->
-    <div id="gateHasContext" style="display:none">
-      <div style="font-size:52px;margin-bottom:20px;line-height:1">📊</div>
-      <h2 style="margin:0 0 8px;font-size:1.5rem;font-weight:600;letter-spacing:-0.02em">Want to see the full picture?</h2>
-      <p style="color:var(--muted);margin:0 0 16px;font-size:15px;line-height:1.6">
-        Your analysis for <strong id="gateCtxDrug">your drug</strong> pitched by
-        <strong id="gateCtxInsurer">the insurer</strong> is ready.
-      </p>
-      <div id="gateCtxSavings" style="background:#f0faf4;border:1px solid #34c17a;border-radius:10px;padding:14px 20px;margin:0 0 20px;font-size:14px;font-weight:600;color:#1a6640;display:none"></div>
-      <p style="color:var(--muted);font-size:13px;margin:0 0 32px;line-height:1.6">
-        The charts below break down costs by insurer, region, and year. Your drug will be pre-selected.
-        You can click through them to understand the full market picture.
-      </p>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <button id="gateConfirmBtn" class="btn btn-primary btn-lg">Yes, show me the charts</button>
-        <a href="admin.html" class="btn btn-ghost btn-lg">&#8592; Back to analysis</a>
-      </div>
-    </div>
-
-  </div>
+<!-- Soft hint banner when no analysis context (dismissble) -->
+<div id="pitchHintBanner" style="display:none; background:#fff8ec; border-bottom:1px solid #e8a317; padding:10px 24px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px;">
+  <span style="font-weight:600; color:#8a6d00">💡 Tip:</span>
+  <span style="color:var(--ink-2)">Run a <strong>Pitch Decoder</strong> analysis first and your drug &amp; insurer will be pre-highlighted in these charts.</span>
+  <a href="admin.html" style="margin-left:auto; color:#8a6d00; font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">Go to Pitch Decoder &rarr;</a>
+  <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;">&#x2715;</button>
 </div>
-<!-- ═══ END GATE ═══ -->
 
 <script>
 (function () {
@@ -74,57 +39,32 @@
     const hasCtx = ctx && ctx.primaryMed && (Date.now() - ctx.timestamp < 3600000);
 
     if (hasCtx) {
-      // Show State B
-      document.getElementById("gateNoContext").style.display = "none";
-      document.getElementById("gateHasContext").style.display = "block";
-      document.getElementById("gateCtxDrug").textContent = ctx.primaryMedName || ctx.primaryMed;
-      document.getElementById("gateCtxInsurer").textContent = ctx.pitchedInsurer;
-      if (ctx.savings > 0) {
-        const savEl = document.getElementById("gateCtxSavings");
-        savEl.textContent = "You could save $" + ctx.savings.toLocaleString() + "/yr by switching to " + ctx.bestInsurer + ".";
-        savEl.style.display = "block";
-      }
+      // Show context banner with analysis details
+      const banner = document.getElementById("pitchContextBanner");
+      const textEl = document.getElementById("pitchContextText");
+      const savings = ctx.savings > 0
+        ? " You could save <strong>$" + ctx.savings.toLocaleString() + "/yr</strong> by switching to <strong>" + ctx.bestInsurer + "</strong>."
+        : "";
+      textEl.innerHTML = "Analyzing <strong>" + (ctx.primaryMedName || ctx.primaryMed) + "</strong> pitched by <strong>" + ctx.pitchedInsurer + "</strong>." + savings;
+      banner.style.display = "flex";
+
+      // Auto-select drug pill once DOM is ready
+      var trySelect = setInterval(function () {
+        var pill = document.querySelector('[data-drug="' + ctx.primaryMed + '"]');
+        if (pill) {
+          clearInterval(trySelect);
+          document.querySelectorAll(".drug-pill").forEach(function (p) { p.classList.remove("active"); });
+          pill.classList.add("active");
+          pill.dispatchEvent(new Event("click", { bubbles: true }));
+        }
+      }, 100);
+    } else {
+      // Show soft hint banner
+      var hint = document.getElementById("pitchHintBanner");
+      if (hint) hint.style.display = "flex";
     }
-
-    function dismissGate() {
-      const gate = document.getElementById("vizGate");
-      gate.style.opacity = "0";
-      gate.style.transition = "opacity 0.25s";
-      setTimeout(function () { gate.style.display = "none"; }, 260);
-
-      // Show context banner and auto-select drug pill
-      if (hasCtx) {
-        const banner = document.getElementById("pitchContextBanner");
-        const textEl = document.getElementById("pitchContextText");
-        const savings = ctx.savings > 0
-          ? " You could save <strong>$" + ctx.savings.toLocaleString() + "/yr</strong> by switching to <strong>" + ctx.bestInsurer + "</strong>."
-          : "";
-        textEl.innerHTML = "Analyzing <strong>" + (ctx.primaryMedName || ctx.primaryMed) + "</strong> pitched by <strong>" + ctx.pitchedInsurer + "</strong>." + savings;
-        banner.style.display = "flex";
-
-        // Auto-select drug pill once DOM is ready
-        var trySelect = setInterval(function () {
-          var pill = document.querySelector('[data-drug="' + ctx.primaryMed + '"]');
-          if (pill) {
-            clearInterval(trySelect);
-            document.querySelectorAll(".drug-pill").forEach(function (p) { p.classList.remove("active"); });
-            pill.classList.add("active");
-            pill.dispatchEvent(new Event("click", { bubbles: true }));
-          }
-        }, 100);
-      }
-    }
-
-    var confirmBtn = document.getElementById("gateConfirmBtn");
-    if (confirmBtn) confirmBtn.addEventListener("click", dismissGate);
-
-    var browseBtn = document.getElementById("gateBrowseBtn");
-    if (browseBtn) browseBtn.addEventListener("click", dismissGate);
-
   } catch (e) {
-    // If anything fails, just remove the gate
-    var g = document.getElementById("vizGate");
-    if (g) g.style.display = "none";
+    // If anything fails, silently continue — charts are still visible
   }
 })();
 </script>
@@ -179,22 +119,22 @@
 <section id="row-a" class="chart-row">
   <div class="chart-card">
     <div class="card-header">
-      <span class="card-title">US COST MAP · 4 REGIONS</span>
-      <span class="card-hint">choropleth · cost/claim by state · click state</span>
+      <span class="card-title">Does your state pay more or less than average?</span>
+      <span class="card-hint">cost/claim by region · click state to filter</span>
     </div>
     <div class="chart-area" id="chart-geomap"></div>
   </div>
   <div class="chart-card">
     <div class="card-header">
-      <span class="card-title">SPENDING STREAM</span>
-      <span class="card-hint">2019–2023 · stacked area · click band = select drug</span>
+      <span class="card-title">How has your drug's cost changed over 5 years?</span>
+      <span class="card-hint">2019–2023 · click a band to select that drug</span>
     </div>
     <div class="chart-area" id="chart-stream"></div>
   </div>
   <div class="chart-card">
     <div class="card-header">
-      <span class="card-title">DRUG PROFILES</span>
-      <span class="card-hint">parallel coords · 5 drugs × 5 axes · brush axis to filter</span>
+      <span class="card-title">How do these drugs compare across price, coverage &amp; usage?</span>
+      <span class="card-hint">5 drugs × 5 axes · brush an axis to filter</span>
     </div>
     <div class="chart-area" id="chart-parallel"></div>
   </div>
@@ -204,15 +144,15 @@
 <section id="row-b" class="chart-row">
   <div class="chart-card">
     <div class="card-header">
-      <span class="card-title">BEST INSURANCE PLANS</span>
-      <span class="card-hint">annual cost · click bar to filter all charts</span>
+      <span class="card-title">Which insurer is cheapest for your drug?</span>
+      <span class="card-hint">annual cost · click a bar to filter all charts</span>
     </div>
     <div class="chart-area" id="chart-plans"></div>
   </div>
   <div class="chart-card chart-card-split" id="card-lollipop">
     <div class="card-header">
-      <span class="card-title">WHAT WILL I PAY?</span>
-      <span class="card-hint">annual cost · reacts to plan + drug selection</span>
+      <span class="card-title">What will you actually pay per year?</span>
+      <span class="card-hint">reacts to your selected plan + drug</span>
     </div>
     <div class="chart-area chart-area-split">
       <div class="split-left" id="chart-lollipop"></div>
@@ -225,8 +165,8 @@
   </div>
   <div class="chart-card">
     <div class="card-header">
-      <span class="card-title">SPENDING SHARE</span>
-      <span class="card-hint">donut · click slice = select drug</span>
+      <span class="card-title">Where does the money go?</span>
+      <span class="card-hint">spending share by drug · click slice to select</span>
     </div>
     <div class="chart-area" id="chart-donut"></div>
   </div>
@@ -236,22 +176,22 @@
 <section id="row-c" class="chart-row">
   <div class="chart-card">
     <div class="card-header">
-      <span class="card-title">SPENDING TREE MAP</span>
-      <span class="card-hint">drug × region · national excluded · click cell = drug + region</span>
+      <span class="card-title">Which drugs cost the most by region?</span>
+      <span class="card-hint">drug × region · click a cell to filter both</span>
     </div>
     <div class="chart-area" id="chart-treemap"></div>
   </div>
   <div class="chart-card">
     <div class="card-header">
-      <span class="card-title">COST vs BENEFICIARIES</span>
-      <span class="card-hint">bubble size = spending · click bubble → selects drug + region</span>
+      <span class="card-title">Which drugs cost the most vs. how many people take them?</span>
+      <span class="card-hint">bubble size = total spending · click to select drug + region</span>
     </div>
     <div class="chart-area" id="chart-scatter"></div>
   </div>
   <div class="chart-card" id="card-splom">
     <div class="card-header">
-      <span class="card-title">DRUG PROFILES — SPLOM</span>
-      <span class="card-hint">scatterplot matrix · 3 dims · click dot = select drug</span>
+      <span class="card-title">How do these drugs compare side by side?</span>
+      <span class="card-hint">price × coverage × usage · click a dot to select drug</span>
     </div>
     <div class="chart-area" id="chart-splom"></div>
   </div>
