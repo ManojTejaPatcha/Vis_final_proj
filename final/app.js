@@ -216,7 +216,28 @@ const dispatch = d3.dispatch("stateChange", "hoverChange");
 
 function applyFilter(newState){
   Object.assign(state, newState);
+  if(newState.selectedStateName) {
+    showRegionToast(`Now showing ${newState.selectedStateName} \u00b7 ${state.selectedRegion} region prices`);
+  }
   dispatch.call("stateChange", null, state);
+}
+
+function showRegionToast(msg) {
+  let toast = document.getElementById("region-toast");
+  if(!toast) {
+    toast = document.createElement("div");
+    toast.id = "region-toast";
+    toast.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e293b;color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:7px 18px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:9000;white-space:nowrap;";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = "1";
+  toast.style.transform = "translateX(-50%) translateY(0)";
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(-50%) translateY(20px)";
+  }, 2500);
 }
 
 function applyHover(drugId){
@@ -246,7 +267,7 @@ function passesFilter(drugId){
   return true;
 }
 
-const T = () => d3.transition().duration(280).ease(d3.easeCubicOut);
+const T = () => d3.transition().duration(180).ease(d3.easeCubicOut);
 
 function pixelToYear(px, xScale){
   const years = MULTI_TREND.map(d => d.year);
@@ -363,7 +384,7 @@ function updateKPI(s){
     d3.select("#kpi-4-val")
       .text((cagr>0?"+":"") + cagr.toFixed(1) + "%")
       .style("color", cagrColor);
-    d3.select("#kpi-4-sub").text("unit cost 2019→2023 · ↓ green = falling");
+    d3.select("#kpi-4-sub").text("how fast this drug's cost is growing per year");
   }
 }
 
@@ -440,7 +461,7 @@ function initGeoMap(us){
   const container = document.getElementById("chart-geomap");
   // Update card hint to reflect state-level color encoding
   const geoCardHint = container.closest(".chart-card")?.querySelector(".card-hint");
-  if(geoCardHint) geoCardHint.textContent = "cost/claim by state · sequential scale · click state to filter";
+  if(geoCardHint) geoCardHint.textContent = "cost/refill by state · click any state to filter all charts";
   const W = container.clientWidth, H = container.clientHeight;
   const svg = d3.select("#chart-geomap").append("svg").attr("viewBox", `0 0 ${W} ${H}`);
   const states = topojson.feature(us, us.objects.states).features;
@@ -506,7 +527,7 @@ function initGeoMap(us){
       .attr("y", d.fy * (H - 14))
       .attr("text-anchor","middle")
       .style("font-family","'Outfit',sans-serif")
-      .style("font-size","7px")
+      .style("font-size","9px")
       .style("font-weight","600")
       .style("fill","rgba(30,41,59,0.55)")
       .style("letter-spacing","0.08em")
@@ -522,8 +543,8 @@ function initGeoMap(us){
   grad.append("stop").attr("offset","0%").attr("stop-color","#f1eef6");
   grad.append("stop").attr("offset","100%").attr("stop-color","#7c3aed");
   legendG.append("rect").attr("width",90).attr("height",legendH).attr("fill","url(#geo-gradient)").attr("rx",2);
-  legendG.append("text").attr("x",-2).attr("y",legendH-1).attr("text-anchor","end").style("font-family","'JetBrains Mono',monospace").style("font-size","7px").style("fill","var(--text-muted)").text("low").attr("class","legend-low");
-  legendG.append("text").attr("x",92).attr("y",legendH-1).style("font-family","'JetBrains Mono',monospace").style("font-size","7px").style("fill","var(--text-muted)").text("high").attr("class","legend-high");
+  legendG.append("text").attr("x",-2).attr("y",legendH-1).attr("text-anchor","end").style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("fill","var(--text-muted)").text("low").attr("class","legend-low");
+  legendG.append("text").attr("x",92).attr("y",legendH-1).style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("fill","var(--text-muted)").text("high").attr("class","legend-high");
 
   dispatch.on("stateChange.geomap", updateGeoMap);
   updateGeoMap(state);
@@ -656,7 +677,7 @@ function initStream(){
     .attr("x", d=>x(d.year)).attr("text-anchor","middle")
     .attr("y", 8)
     .text(d=>d.year)
-    .style("font-family","'JetBrains Mono',monospace").style("font-size","8px").style("fill","var(--text-muted)");
+    .style("font-family","'JetBrains Mono',monospace").style("font-size","10px").style("fill","var(--text-muted)");
 
   // Right-edge spending annotations for 2023
   g.selectAll("text.stream-val")
@@ -704,8 +725,8 @@ function updateStream(s){
   if(!streamState) return;
   // Hint reflects whether region filter applies (it doesn't for stream)
   const streamHint = s.selectedRegion !== "National"
-    ? "Showing national totals — regional trend data not available"
-    : "2019–2023 · stacked area · click band = select drug";
+    ? "Trend is national data — regional breakdown not available for this view"
+    : "2019–2023 · click a band to select that drug";
   const streamHintEl = document.getElementById("chart-stream")?.closest(".chart-card")?.querySelector(".card-hint");
   if(streamHintEl) streamHintEl.textContent = streamHint;
 
@@ -788,6 +809,21 @@ function initParallel(){
   parState = { svg, dims, xScale, axisG, lineG, W, H, m, brushSelections:{}, buildYScales, linesDrawn:false };
 
   drawParallel();
+
+  // Drug color legend — each line's color matches its drug
+  const parLegG = svg.append("g").attr("class","par-legend");
+  const legItemW = Math.min(60, (W - m.left - m.right) / DRUG_LIST.length);
+  DRUG_LIST.forEach((d, i) => {
+    const item = parLegG.append("g").attr("class",`par-leg-${d.id}`)
+      .attr("transform", `translate(${m.left + i * legItemW}, ${H - 2})`)
+      .style("cursor","pointer")
+      .on("click", () => applyFilter({selectedDrug: d.id}));
+    item.append("circle").attr("cx", 4).attr("cy", 0).attr("r", 3.5).attr("fill", d.color);
+    item.append("text").attr("x", 10).attr("y", 0).attr("dy","0.35em")
+      .style("font-family","'Outfit',sans-serif").style("font-size","9px")
+      .style("fill","var(--text-secondary)").text(d.name);
+  });
+  parState.legG = parLegG;
 
   dispatch.on("stateChange.parallel", updateParallel);
 }
@@ -920,7 +956,7 @@ function updateParallel(s){
         lock = g.append("text").attr("class","lock-icon")
           .attr("x", 0).attr("y", parState.m.top - 18)
           .attr("text-anchor","middle")
-          .style("font-size","8px").style("fill","#94a3b8").style("cursor","help")
+          .style("font-size","10px").style("fill","#94a3b8").style("cursor","help")
           .text("🔒");
         lock.on("mousemove",(e)=> showTip("This metric is national only — not affected by region filter", e, "#94a3b8"))
             .on("mouseleave", hideTip);
@@ -934,9 +970,17 @@ function updateParallel(s){
     .transition(T())
     .attr("opacity", d => {
       if(s.brushedDrugs && !s.brushedDrugs.includes(d.id)) return 0.06;
-      return s.selectedDrug === d.id ? 1 : 0.18;
+      return s.selectedDrug === d.id ? 1 : 0.45;
     })
     .attr("stroke-width", d => s.selectedDrug === d.id ? 2.5 : 1.4);
+
+  // Update legend emphasis
+  if(parState.legG) {
+    DRUG_LIST.forEach(d => {
+      parState.legG.select(`.par-leg-${d.id}`)
+        .attr("opacity", d.id === s.selectedDrug ? 1.0 : (s.brushedDrugs && !s.brushedDrugs.includes(d.id) ? 0.2 : 0.55));
+    });
+  }
 }
 
 /* ============================================================
@@ -969,7 +1013,7 @@ function updatePlans(s){
     e => e.append("text").attr("class","plan-name")
       .attr("x", m.left-4).attr("y", d=>y(d.name)+y.bandwidth()/2).attr("dy","0.34em")
       .attr("text-anchor","end")
-      .style("font-family","'Outfit',sans-serif").style("font-size","9px").style("fill","var(--text-secondary)")
+      .style("font-family","'Outfit',sans-serif").style("font-size","11px").style("fill","var(--text-secondary)")
       .text(d=>d.name),
     u => u.transition(T()).attr("y",d=>y(d.name)+y.bandwidth()/2).text(d=>d.name)
   );
@@ -1005,7 +1049,7 @@ function updatePlans(s){
   vals.join(
     e => e.append("text").attr("class","plan-val")
       .attr("y", d=>y(d.name)+y.bandwidth()/2).attr("dy","0.34em")
-      .style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("font-weight","600")
+      .style("font-family","'JetBrains Mono',monospace").style("font-size","11px").style("font-weight","600")
       .style("fill","var(--text-secondary)"),
     u => u
   );
@@ -1045,7 +1089,7 @@ function updatePlans(s){
       .attr("transform", `translate(${x(bestCost)+5 + bestValStr.length*5.5 + 6}, ${y(cheapest.name)+y.bandwidth()/2})`);
     const txt = badge.append("text")
       .attr("y", 0).attr("dy","0.34em")
-      .style("font-family","'Outfit',sans-serif").style("font-size","8px").style("font-weight","600")
+      .style("font-family","'Outfit',sans-serif").style("font-size","10px").style("font-weight","600")
       .style("fill","#16a34a")
       .attr("x", 5)
       .text(badgeText);
@@ -1108,7 +1152,7 @@ function initScatter(){
   groups.append("circle").attr("class","bub-c").attr("r", d=>r(d.r)).attr("fill", d=>d.color);
   groups.append("text").attr("class","bub-l")
     .attr("text-anchor","middle").attr("dy","0.34em")
-    .style("font-family","'JetBrains Mono',monospace").style("font-size","8px").style("font-weight","600")
+    .style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("font-weight","600")
     .style("fill","#fff").style("pointer-events","none")
     .text(d=>d.label);
 
@@ -1121,7 +1165,7 @@ function initScatter(){
   const lg = svg.append("g").attr("class","scatter-size-legend")
     .attr("transform", `translate(${m.left + 6}, ${H - m.bottom - 56})`);
   lg.append("text").attr("x", 0).attr("y", 0)
-    .style("font-family","'Outfit',sans-serif").style("font-size","7px").style("fill","#94a3b8")
+    .style("font-family","'Outfit',sans-serif").style("font-size","10px").style("fill","#94a3b8")
     .text("Spending (total)");
   let cursorX = 4;
   legendData.forEach(d => {
@@ -1134,7 +1178,7 @@ function initScatter(){
     lg.append("text")
       .attr("x", cursorX).attr("y", 18 + rad + 8)
       .attr("text-anchor","middle")
-      .style("font-family","'JetBrains Mono',monospace").style("font-size","7px").style("fill","#94a3b8")
+      .style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("fill","#94a3b8")
       .text(d.label);
     cursorX += rad + 10;
   });
@@ -1181,7 +1225,7 @@ function initDonut(){
   center.append("text").attr("class","donut-pct").attr("text-anchor","middle").attr("dy","-0.1em")
     .style("font-family","'JetBrains Mono',monospace").style("font-size","18px").style("font-weight","600");
   center.append("text").attr("class","donut-name").attr("text-anchor","middle").attr("dy","1.05em")
-    .style("font-family","'Outfit',sans-serif").style("font-size","9px").style("fill","var(--text-secondary)");
+    .style("font-family","'Outfit',sans-serif").style("font-size","11px").style("fill","var(--text-secondary)");
 
   // legend
   const legend = svg.append("g").attr("class","donut-legend").attr("transform",`translate(${cx + outerR + 12},${cy - outerR})`);
@@ -1240,7 +1284,7 @@ function updateDonut(s){
     .on("mouseleave",(e,d)=> applyHover(null));
   enter.append("rect").attr("width",7).attr("height",7).attr("rx",1.5);
   enter.append("text").attr("x",11).attr("y",6.5)
-    .style("font-family","'Outfit',sans-serif").style("font-size","8.5px");
+    .style("font-family","'Outfit',sans-serif").style("font-size","11px");
 
   legend.selectAll("g.li")
     .attr("transform",(d,i)=>`translate(0,${i*13})`)
@@ -1325,8 +1369,8 @@ function updateTreemap(s){
     .attr("stroke-width", d => (s.selectedDrug === d.data.drugId || (s.selectedRegion===d.data.region && s.selectedRegion!=="National")) ? 1.5 : 0);
 
   all.select(".cell-name")
-    .attr("x", 6).attr("y", 12)
-    .style("font-family","'Outfit',sans-serif").style("font-size","9.5px").style("font-weight","600")
+    .attr("x", 6).attr("y", 14)
+    .style("font-family","'Outfit',sans-serif").style("font-size","11px").style("font-weight","600")
     .style("fill", d => s.selectedDrug===d.data.drugId ? "#fff" : d.data.color)
     .style("pointer-events","none")
     .style("display", d => ((d.x1-d.x0) > 40 && (d.y1-d.y0) > 20) ? null : "none")
@@ -1405,16 +1449,16 @@ function updateLollipop(s){
   const hintEl  = document.querySelector("#card-lollipop .card-hint");
   if(titleEl){
     titleEl.textContent = locationLabel
-      ? `WHAT WILL I PAY? · ${locationLabel.toUpperCase()}`
-      : "WHAT WILL I PAY?";
+      ? `What will you actually pay per year? · ${locationLabel}`
+      : "What will you actually pay per year?";
   }
   if(hintEl){
     hintEl.textContent = locationLabel
-      ? `What will I pay in ${locationLabel}? · click plan above to personalize`
-      : "annual cost · reacts to plan + drug selection";
+      ? `Costs adjusted for ${locationLabel} · includes intl comparison below`
+      : "US & international plans shown · click a plan bar above to personalize";
   }
 
-  const m = {top:6,right:60,bottom:6,left:90};
+  const m = {top:6,right:60,bottom:6,left:120};
   const y = d3.scaleBand().domain(displayData.map(d=>d.scenario)).range([m.top, H-m.bottom]).padding(0.3);
   const x = d3.scaleLinear().domain([0, d3.max(displayData,d=>d.cost)*1.15]).range([m.left, W-m.right]);
 
@@ -1427,7 +1471,7 @@ function updateLollipop(s){
   // scenario label
   rows.append("text")
     .attr("x", m.left-6).attr("y",0).attr("dy","0.34em").attr("text-anchor","end")
-    .style("font-family","'Outfit',sans-serif").style("font-size","9px")
+    .style("font-family","'Outfit',sans-serif").style("font-size","11px")
     .style("fill", d=>d.color)
     .style("font-style", d=>d.isReference ? "italic" : null)
     .text(d=>d.isReference ? `${d.scenario} (national avg)` : d.scenario);
@@ -1437,20 +1481,19 @@ function updateLollipop(s){
     .attr("x1", m.left).attr("x2", m.left).attr("y1",0).attr("y2",0)
     .attr("stroke", d=>d.color).attr("stroke-width",1.4)
     .attr("stroke-dasharray", d=>d.isReference ? "4,3" : null)
-    .transition(T()).attr("x2", d=>x(d.cost));
+    .attr("x2", d=>x(d.cost));
 
   // circle
   rows.append("circle")
-    .attr("cx", m.left).attr("cy",0)
+    .attr("cx", d=>x(d.cost)).attr("cy",0)
     .attr("r", d=>d.isReference ? 3.5 : 5)
     .attr("fill", d=>d.isReference ? "#94a3b8" : d.color)
-    .attr("class", d => d.scenario === "No Insurance" ? "lollipop-pulse" : "")
-    .transition(T()).attr("cx", d=>x(d.cost));
+    .attr("class", d => d.scenario === "No Insurance" ? "lollipop-pulse" : "");
 
   // value
   rows.append("text")
     .attr("y",0).attr("dy","0.34em")
-    .style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("font-weight","600")
+    .style("font-family","'JetBrains Mono',monospace").style("font-size","11px").style("font-weight","600")
     .style("fill", d=>d.color)
     .style("font-style", d=>d.isReference ? "italic" : null)
     .attr("x", d=>x(d.cost)+10)
@@ -1462,7 +1505,7 @@ function updateLollipop(s){
     svg.append("text").attr("class","intl-footnote")
       .attr("x", m.left-6).attr("y", H-1)
       .attr("text-anchor","start")
-      .style("font-family","'Outfit',sans-serif").style("font-size","7px")
+      .style("font-family","'Outfit',sans-serif").style("font-size","10px")
       .style("fill","#94a3b8").style("font-style","italic")
       .text("† International costs shown as USD equivalents (OECD 2023)");
   }
@@ -1487,10 +1530,10 @@ function initTrend(){
 
   // x axis years (sparse)
   svg.append("text").attr("x",x("2019")).attr("y",H-2)
-    .style("font-family","'JetBrains Mono',monospace").style("font-size","7px").style("fill","var(--text-muted)")
+    .style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("fill","var(--text-muted)")
     .text("19");
   svg.append("text").attr("x",x("2023")).attr("y",H-2)
-    .style("font-family","'JetBrains Mono',monospace").style("font-size","7px").style("fill","var(--text-muted)")
+    .style("font-family","'JetBrains Mono',monospace").style("font-size","9px").style("fill","var(--text-muted)")
     .text("23");
 
   const line = id => d3.line().x(d=>x(d.year)).y(d=>y(d[id])).curve(d3.curveMonotoneX);
@@ -1820,8 +1863,8 @@ function updateAllHover(s){
     parState.lineG.selectAll("path.par-line").transition().duration(dur)
       .attr("opacity", d => {
         if(d.id === s.selectedDrug) return 1;
-        if(d.id === h) return 0.45;
-        return 0.18;
+        if(d.id === h) return 0.75;
+        return 0.45;
       })
       .attr("stroke-width", d => {
         if(d.id === s.selectedDrug) return 2.5;

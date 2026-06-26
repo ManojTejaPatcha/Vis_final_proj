@@ -27,7 +27,7 @@
 <!-- Soft hint banner when no analysis context (dismissble) -->
 <div id="pitchHintBanner" style="display:none; background:#fff8ec; border-bottom:1px solid #e8a317; padding:10px 24px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px;">
   <span style="font-weight:600; color:#8a6d00">💡 Tip:</span>
-  <span style="color:var(--ink-2)">Run a <strong>Pitch Decoder</strong> analysis first and your drug &amp; insurer will be pre-highlighted in these charts.</span>
+  <span style="color:var(--ink-2)">This dashboard compares drug costs across insurers, states, and countries. Run a <strong>Pitch Decoder</strong> analysis first and your drug &amp; insurer will be pre-highlighted here.</span>
   <a href="admin.html" style="margin-left:auto; color:#8a6d00; font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">Go to Pitch Decoder &rarr;</a>
   <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;">&#x2715;</button>
 </div>
@@ -110,8 +110,8 @@
     <span class="kpi-row-vals"><span class="kpi-value" id="kpi-3-val">0.9M</span><span class="kpi-sub" id="kpi-3-sub">Medicare Part D patients</span></span>
   </div>
   <div class="kpi-card" id="kpi-4">
-    <span class="kpi-label" title="5-year compound annual growth rate of unit cost. Green (↓) = costs falling = good for patients. Red (↑) = costs rising = higher burden.">5-YR CAGR</span>
-    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-4-val">+6.1%</span><span class="kpi-sub" id="kpi-4-sub">unit cost 2019→2023 · ↓ green = falling</span></span>
+    <span class="kpi-label" title="Annual growth rate of this drug's unit cost. Green = costs falling (good). Red = costs rising (higher burden).">Cost Growth</span>
+    <span class="kpi-row-vals"><span class="kpi-value" id="kpi-4-val">+6.1%</span><span class="kpi-sub" id="kpi-4-sub">how fast this drug's cost is growing per year</span></span>
   </div>
 </section>
 
@@ -134,7 +134,7 @@
   <div class="chart-card">
     <div class="card-header">
       <span class="card-title">How do these drugs compare across price, coverage &amp; usage?</span>
-      <span class="card-hint">5 drugs × 5 axes · brush an axis to filter</span>
+      <span class="card-hint">5 drugs × 5 axes · brush an axis to filter · click a drug name below to select</span>
     </div>
     <div class="chart-area" id="chart-parallel"></div>
   </div>
@@ -152,7 +152,7 @@
   <div class="chart-card chart-card-split" id="card-lollipop">
     <div class="card-header">
       <span class="card-title">What will you actually pay per year?</span>
-      <span class="card-hint">reacts to your selected plan + drug</span>
+      <span class="card-hint">US & international plans shown · click a plan bar above to personalize</span>
     </div>
     <div class="chart-area chart-area-split">
       <div class="split-left" id="chart-lollipop"></div>
