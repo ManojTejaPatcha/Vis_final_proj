@@ -269,6 +269,15 @@ function passesFilter(drugId){
 
 const T = () => d3.transition().duration(180).ease(d3.easeCubicOut);
 
+/* Safe dimension reader — getBoundingClientRect > clientWidth > fallback.
+   Prevents 0×0 SVG viewBoxes when the container hasn't fully laid out yet. */
+function getDims(el, fallbackW = 400, fallbackH = 190) {
+  const r = el.getBoundingClientRect();
+  const W = r.width  > 4 ? r.width  : (el.clientWidth  > 4 ? el.clientWidth  : fallbackW);
+  const H = r.height > 4 ? r.height : (el.clientHeight > 4 ? el.clientHeight : fallbackH);
+  return { W, H };
+}
+
 function pixelToYear(px, xScale){
   const years = MULTI_TREND.map(d => d.year);
   const pos = years.map(y => xScale(y));
@@ -462,7 +471,7 @@ function initGeoMap(us){
   // Update card hint to reflect state-level color encoding
   const geoCardHint = container.closest(".chart-card")?.querySelector(".card-hint");
   if(geoCardHint) geoCardHint.textContent = "cost/refill by state · click any state to filter all charts";
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 295, 190);
   const svg = d3.select("#chart-geomap").append("svg").attr("viewBox", `0 0 ${W} ${H}`);
   const states = topojson.feature(us, us.objects.states).features;
 
@@ -619,7 +628,7 @@ function updateGeoMap(s){
 let streamState = null;
 function initStream(){
   const container = document.getElementById("chart-stream");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 400, 190);
   const m = {top:8,right:60,bottom:18,left:10};
   const svg = d3.select("#chart-stream").append("svg").attr("viewBox",`0 0 ${W} ${H}`);
 
@@ -776,7 +785,7 @@ function updateStream(s){
 let parState = null;
 function initParallel(){
   const container = document.getElementById("chart-parallel");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 400, 190);
   const m = {top:18,right:14,bottom:14,left:14};
   const svg = d3.select("#chart-parallel").append("svg").attr("viewBox",`0 0 ${W} ${H}`);
 
@@ -995,7 +1004,7 @@ function updateParallel(s){
 let plansState = null;
 function initPlans(){
   const container = document.getElementById("chart-plans");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 300, 190);
   const svg = d3.select("#chart-plans").append("svg").attr("viewBox",`0 0 ${W} ${H}`);
   plansState = { svg, W, H };
   dispatch.on("stateChange.plans", updatePlans);
@@ -1114,7 +1123,7 @@ function updatePlans(s){
 let scatterState = null;
 function initScatter(){
   const container = document.getElementById("chart-scatter");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 400, 190);
   const m = {top:10,right:14,bottom:24,left:32};
   const svg = d3.select("#chart-scatter").append("svg").attr("viewBox",`0 0 ${W} ${H}`);
 
@@ -1220,7 +1229,7 @@ function updateScatter(s){
 let donutState = null;
 function initDonut(){
   const container = document.getElementById("chart-donut");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 240, 190);
   const cx = W*0.46, cy = H*0.5;
   const outerR = Math.min(W,H)*0.42 - 4;
   const innerR = outerR*0.55;
@@ -1310,7 +1319,7 @@ function updateDonut(s){
 let treemapState = null;
 function initTreemap(){
   const container = document.getElementById("chart-treemap");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 295, 190);
   const svg = d3.select("#chart-treemap").append("svg").attr("viewBox",`0 0 ${W} ${H}`);
   treemapState = { svg, W, H };
   dispatch.on("stateChange.treemap", updateTreemap);
@@ -1404,7 +1413,7 @@ function updateTreemap(s){
 let lolliState = null;
 function initLollipop(){
   const container = document.getElementById("chart-lollipop");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 300, 190);
   const svg = d3.select("#chart-lollipop").append("svg").attr("viewBox",`0 0 ${W} ${H}`);
   lolliState = { svg, W, H };
   dispatch.on("stateChange.lollipop", updateLollipop);
@@ -1521,7 +1530,7 @@ function updateLollipop(s){
 let trendState = null;
 function initTrend(){
   const container = document.getElementById("chart-trend");
-  const W = container.clientWidth, H = container.clientHeight;
+  const {W, H} = getDims(container, 130, 190);
   const m = {top:6,right:30,bottom:14,left:6};
   const svg = d3.select("#chart-trend").append("svg").attr("viewBox",`0 0 ${W} ${H}`);
 

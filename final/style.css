@@ -47,6 +47,7 @@ html,body{
   body{grid-template-rows:auto auto auto auto 4px auto 4px auto 4px auto;padding:0 8px 16px 8px;}
   #row-a,#row-b,#row-c{grid-template-columns:1fr;height:auto;}
   .chart-card{height:240px;}
+  .chart-card .chart-area{height:190px;flex:none;}
   #kpi-row{height:auto;}
 }
 
@@ -216,6 +217,7 @@ body > nav.nav {
   body{grid-template-rows:auto auto auto auto 4px auto 4px auto 4px auto;padding:0 8px 16px 8px;}
   #row-a,#row-b,#row-c{grid-template-columns:1fr;height:auto;}
   .chart-card{height:240px;}
+  .chart-card .chart-area{height:190px;flex:none;}
   #kpi-row{height:auto;}
 }
 
