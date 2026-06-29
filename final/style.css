@@ -44,7 +44,7 @@ html,body{
 /* Scrollable on short viewports — prevents chart compression below 780px tall */
 @media (max-height:780px){
   html,body{height:auto;overflow:auto;}
-  body{grid-template-rows:auto auto auto 4px auto 4px auto 4px auto;padding:0 8px 16px 8px;}
+  body{grid-template-rows:auto auto auto auto 4px auto 4px auto 4px auto;padding:0 8px 16px 8px;}
   #row-a,#row-b,#row-c{grid-template-columns:1fr;height:auto;}
   .chart-card{height:240px;}
   #kpi-row{height:auto;}
@@ -52,7 +52,7 @@ html,body{
 
 body{
   display:grid;
-  grid-template-rows:var(--nav-h,56px) 44px 52px 8px 1fr 8px 1fr 8px 1fr;
+  grid-template-rows:var(--nav-h,56px) auto 44px 52px 8px 1fr 8px 1fr 8px 1fr;
   grid-template-columns:1fr;
   padding:0 12px 10px 12px;
   gap:0;
@@ -70,9 +70,16 @@ body > nav.nav {
   z-index: 50;
 }
 
+/* optional banners row */
+#pitchContextBanner,
+#pitchHintBanner{
+  grid-row:2;
+  align-items:center;
+}
+
 /* ── HEADER ───────────────────────────────────────────── */
 #header{
-  grid-row:2;
+  grid-row:3;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -114,7 +121,7 @@ body > nav.nav {
 
 /* ── KPI ROW ──────────────────────────────────────────── */
 #kpi-row{
-  grid-row:3;
+  grid-row:4;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:8px;
@@ -138,9 +145,9 @@ body > nav.nav {
 
 /* ── CHART ROWS ───────────────────────────────────────── */
 .chart-row{display:grid;gap:8px;height:100%;min-height:0;}
-#row-a{grid-row:5;grid-template-columns:295px 1fr 1fr;}
-#row-b{grid-row:7;grid-template-columns:300px 1fr 240px;}
-#row-c{grid-row:9;grid-template-columns:295px 1fr 260px;}
+#row-a{grid-row:6;grid-template-columns:295px 1fr 1fr;}
+#row-b{grid-row:8;grid-template-columns:300px 1fr 240px;}
+#row-c{grid-row:10;grid-template-columns:295px 1fr 260px;}
 
 .chart-card{
   background:var(--bg-card);
@@ -204,7 +211,7 @@ body > nav.nav {
 /* ── RESPONSIVE FALLBACK ────────────────────────────────── */
 @media (max-width:1100px){
   html,body{height:auto;overflow:auto;}
-  body{grid-template-rows:auto auto auto 4px auto 4px auto 4px auto;padding:0 8px 16px 8px;}
+  body{grid-template-rows:auto auto auto auto 4px auto 4px auto 4px auto;padding:0 8px 16px 8px;}
   #row-a,#row-b,#row-c{grid-template-columns:1fr;height:auto;}
   .chart-card{height:240px;}
   #kpi-row{height:auto;}
