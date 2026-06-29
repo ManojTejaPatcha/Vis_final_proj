@@ -56,6 +56,7 @@ body{
   grid-template-columns:1fr;
   padding:0 12px 10px 12px;
   gap:0;
+  min-height:100vh;
 }
 
 /* nav bar inserted by nav.js sits in its own row */
@@ -71,10 +72,11 @@ body > nav.nav {
 }
 
 /* optional banners row */
-#pitchContextBanner,
+#pitchResultsPanel,
 #pitchHintBanner{
   grid-row:2;
   align-items:center;
+  margin:0 -12px;
 }
 
 /* ── HEADER ───────────────────────────────────────────── */
@@ -224,3 +226,18 @@ body > nav.nav {
 
 /* state transitions */
 path,rect,circle,line{transition:opacity .28s ease,fill .28s ease,stroke .2s ease;}
+
+/* when pitch results panel is open the body needs to scroll */
+body:has(#pitchResultsPanel[style*="block"]){
+  height:auto;
+  overflow:auto;
+}
+body:has(#pitchResultsPanel[style*="block"]) #row-a,
+body:has(#pitchResultsPanel[style*="block"]) #row-b,
+body:has(#pitchResultsPanel[style*="block"]) #row-c{
+  height:320px;
+  min-height:320px;
+}
+body:has(#pitchResultsPanel[style*="block"]) .chart-card{
+  height:320px;
+}

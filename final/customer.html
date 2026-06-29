@@ -16,18 +16,92 @@
 
 <div data-nav="customer"></div>
 
-<!-- Soft context banner (dismissble, charts always visible) -->
-<div id="pitchContextBanner" style="display:none; background:var(--accent-soft); border-bottom:1px solid var(--accent); padding:10px 24px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px;">
-  <span style="font-weight:600; color:var(--accent-ink)">&#8594; From your analysis:</span>
-  <span id="pitchContextText" style="color:var(--ink-2)"></span>
-  <a href="decoder.html" style="margin-left:auto; color:var(--accent); font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">&#8592; Back to Pitch Decoder</a>
-  <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;">&#x2715;</button>
+<!-- ═══════════════════════════════════════════════════════════════
+     PITCH ANALYSIS RESULTS PANEL (shown only when decoder context exists)
+     Structured flow: Pitch Decoder → this panel → explore charts below
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="pitchResultsPanel" style="display:none; background:#fff; border-bottom:2px solid var(--accent); padding:16px 24px 18px; font-family:'Outfit',sans-serif;">
+
+  <!-- Top bar -->
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); background:var(--accent-soft); padding:3px 10px; border-radius:20px;">✓ Pitch Decoded</span>
+      <span id="prp-drug-label" style="font-size:13px; font-weight:600; color:var(--ink);"></span>
+      <span style="font-size:12px; color:var(--muted);">· Use the charts below to explore further</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="decoder.html" style="font-size:12px; font-weight:600; color:var(--accent); text-decoration:none;">← Back to Pitch Decoder</a>
+      <button onclick="document.getElementById('pitchResultsPanel').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;padding:0 2px;" title="Dismiss">&#x2715;</button>
+    </div>
+  </div>
+
+  <!-- Verdict row -->
+  <div id="prp-verdict" style="display:flex; align-items:center; gap:14px; padding:10px 16px; border-radius:8px; margin-bottom:14px; background:#f0fdf4; border:1px solid #86efac;">
+    <div id="prp-verdict-icon" style="font-size:22px; flex-shrink:0;">💰</div>
+    <div>
+      <div id="prp-verdict-headline" style="font-size:13px; font-weight:700; color:#166534;"></div>
+      <div id="prp-verdict-sub" style="font-size:12px; color:#15803d; margin-top:2px;"></div>
+    </div>
+  </div>
+
+  <!-- 3-column comparison table -->
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+
+    <!-- Pitched plan column (highlighted as suspect) -->
+    <div id="prp-pitched-col" style="background:#fff8f8; border:1.5px solid #fca5a5; border-radius:8px; padding:12px;">
+      <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#dc2626; margin-bottom:4px;">⚠ Pitched Plan</div>
+      <div id="prp-pitched-name" style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:8px;"></div>
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Monthly copay</span><span id="prp-pitched-copay" style="font-weight:600; color:#dc2626; font-family:'JetBrains Mono',monospace;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Annual cost</span><span id="prp-pitched-annual" style="font-weight:600; color:#dc2626; font-family:'JetBrains Mono',monospace;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Prior auth</span><span id="prp-pitched-priorauth" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Step therapy</span><span id="prp-pitched-steptherapy" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Mail order</span><span id="prp-pitched-mailorder" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Network</span><span id="prp-pitched-network" style="font-weight:600; font-size:11px;"></span></div>
+      </div>
+    </div>
+
+    <!-- Best alternative column -->
+    <div id="prp-best-col" style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:8px; padding:12px;">
+      <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#16a34a; margin-bottom:4px;">★ Best Alternative</div>
+      <div id="prp-best-name" style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:8px;"></div>
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Monthly copay</span><span id="prp-best-copay" style="font-weight:600; color:#16a34a; font-family:'JetBrains Mono',monospace;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Annual cost</span><span id="prp-best-annual" style="font-weight:600; color:#16a34a; font-family:'JetBrains Mono',monospace;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Prior auth</span><span id="prp-best-priorauth" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Step therapy</span><span id="prp-best-steptherapy" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Mail order</span><span id="prp-best-mailorder" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Network</span><span id="prp-best-network" style="font-weight:600; font-size:11px;"></span></div>
+      </div>
+    </div>
+
+    <!-- Premium option column -->
+    <div id="prp-premium-col" style="background:#f8faff; border:1.5px solid #bfdbfe; border-radius:8px; padding:12px;">
+      <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#2563eb; margin-bottom:4px;">◆ Premium Option</div>
+      <div id="prp-premium-name" style="font-size:14px; font-weight:700; color:var(--ink); margin-bottom:8px;"></div>
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Monthly copay</span><span id="prp-premium-copay" style="font-weight:600; color:#2563eb; font-family:'JetBrains Mono',monospace;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Annual cost</span><span id="prp-premium-annual" style="font-weight:600; color:#2563eb; font-family:'JetBrains Mono',monospace;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Prior auth</span><span id="prp-premium-priorauth" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Step therapy</span><span id="prp-premium-steptherapy" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Mail order</span><span id="prp-premium-mailorder" style="font-weight:600;"></span></div>
+        <div style="display:flex; justify-content:space-between; font-size:12px;"><span style="color:var(--muted);">Network</span><span id="prp-premium-network" style="font-weight:600; font-size:11px;"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detected tactics row -->
+  <div id="prp-tactics-row" style="display:none; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px;">
+    <span style="font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:10px;">Detected tactics:</span>
+    <div id="prp-tactics-tags"></div>
+    <span style="margin-left:auto; font-size:11px; color:var(--muted);">Scroll down to explore insurer costs &amp; state data in the charts below ↓</span>
+  </div>
 </div>
 
 <!-- Soft hint banner when no analysis context (dismissble) -->
 <div id="pitchHintBanner" style="display:none; background:#fff8ec; border-bottom:1px solid #e8a317; padding:10px 24px; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px;">
   <span style="font-weight:600; color:#8a6d00">💡 Tip:</span>
-  <span style="color:var(--ink-2)">This dashboard compares drug costs across insurers, states, and countries. Run a <strong>Pitch Decoder</strong> analysis first and your drug &amp; insurer will be pre-highlighted here.</span>
+  <span style="color:var(--ink-2)">This dashboard compares drug costs across insurers, states, and countries. Run a <strong>Pitch Decoder</strong> analysis first and your results will appear here.</span>
   <a href="decoder.html" style="margin-left:auto; color:#8a6d00; font-weight:600; text-decoration:none; font-size:12px; white-space:nowrap;">Go to Pitch Decoder &rarr;</a>
   <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:0 4px;">&#x2715;</button>
 </div>
@@ -35,20 +109,98 @@
 <script>
 (function () {
   try {
-    const ctx = JSON.parse(localStorage.getItem("planpilot_context") || "null");
-    const hasCtx = ctx && ctx.primaryMed && (Date.now() - ctx.timestamp < 3600000);
+    var ctx = JSON.parse(localStorage.getItem("planpilot_context") || "null");
+    var hasCtx = ctx && ctx.primaryMed && (Date.now() - ctx.timestamp < 3600000);
 
     if (hasCtx) {
-      // Show context banner with analysis details
-      const banner = document.getElementById("pitchContextBanner");
-      const textEl = document.getElementById("pitchContextText");
-      const savings = ctx.savings > 0
-        ? " You could save <strong>$" + ctx.savings.toLocaleString() + "/yr</strong> by switching to <strong>" + ctx.bestInsurer + "</strong>."
-        : "";
-      textEl.innerHTML = "Analyzing <strong>" + (ctx.primaryMedName || ctx.primaryMed) + "</strong> pitched by <strong>" + ctx.pitchedInsurer + "</strong>." + savings;
-      banner.style.display = "flex";
+      // ── Show the full Pitch Results Panel ──────────────────────────
+      var panel = document.getElementById("pitchResultsPanel");
+      panel.style.display = "block";
 
-      // Auto-select drug pill once DOM is ready
+      // Drug label
+      document.getElementById("prp-drug-label").textContent =
+        (ctx.primaryMedName || ctx.primaryMed) + " · pitched by " + ctx.pitchedInsurer;
+
+      // Verdict
+      var verdictEl = document.getElementById("prp-verdict");
+      var verdictHeadline = document.getElementById("prp-verdict-headline");
+      var verdictSub = document.getElementById("prp-verdict-sub");
+      var verdictIcon = document.getElementById("prp-verdict-icon");
+      if (ctx.savings > 500) {
+        verdictEl.style.background = "#f0fdf4"; verdictEl.style.borderColor = "#86efac";
+        verdictIcon.textContent = "💰";
+        verdictHeadline.textContent = "You could save $" + ctx.savings.toLocaleString() + "/yr by switching to " + ctx.bestInsurer + ".";
+        verdictHeadline.style.color = "#166534";
+        verdictSub.textContent = "The plan being pitched is $" + ((ctx.pitchedCopay || 0) - (ctx.bestCopay || 0)) + "/mo more expensive than the best available alternative.";
+        verdictSub.style.color = "#15803d";
+      } else if (ctx.savings > 0) {
+        verdictEl.style.background = "#fffbeb"; verdictEl.style.borderColor = "#fcd34d";
+        verdictIcon.textContent = "⚠️";
+        verdictHeadline.textContent = "Modest savings available — $" + ctx.savings.toLocaleString() + "/yr with " + ctx.bestInsurer + ".";
+        verdictHeadline.style.color = "#78350f";
+        verdictSub.textContent = "The pitched plan is not the cheapest option for your drug.";
+        verdictSub.style.color = "#92400e";
+      } else {
+        verdictEl.style.background = "#f8faff"; verdictEl.style.borderColor = "#bfdbfe";
+        verdictIcon.textContent = "ℹ️";
+        verdictHeadline.textContent = "The pitched plan appears competitively priced.";
+        verdictHeadline.style.color = "#1e40af";
+        verdictSub.textContent = "Use the charts below to verify state-level pricing and coverage details.";
+        verdictSub.style.color = "#3730a3";
+      }
+
+      // ── Helper: flag text ──────────────────────────────────────────
+      function flagYN(val, warnIfTrue) {
+        if (val === undefined || val === null) return '<span style="color:var(--muted)">—</span>';
+        if (val) {
+          return warnIfTrue
+            ? '<span style="color:#dc2626; font-weight:700;">⚠ Yes</span>'
+            : '<span style="color:#16a34a;">Yes</span>';
+        } else {
+          return warnIfTrue
+            ? '<span style="color:#16a34a;">No</span>'
+            : '<span style="color:#dc2626;">No</span>';
+        }
+      }
+
+      // ── Pitched plan ───────────────────────────────────────────────
+      document.getElementById("prp-pitched-name").textContent = ctx.pitchedInsurer || "—";
+      document.getElementById("prp-pitched-copay").textContent = ctx.pitchedCopay ? "$" + ctx.pitchedCopay + "/mo" : "—";
+      document.getElementById("prp-pitched-annual").textContent = ctx.pitchedAnnual ? "$" + ctx.pitchedAnnual.toLocaleString() + "/yr" : "—";
+      document.getElementById("prp-pitched-priorauth").innerHTML = flagYN(ctx.pitchedPriorAuth, true);
+      document.getElementById("prp-pitched-steptherapy").innerHTML = flagYN(ctx.pitchedStepTherapy, true);
+      document.getElementById("prp-pitched-mailorder").innerHTML = flagYN(ctx.pitchedMailOrder, false);
+      document.getElementById("prp-pitched-network").textContent = ctx.pitchedNetwork || "—";
+
+      // ── Best alternative ───────────────────────────────────────────
+      document.getElementById("prp-best-name").textContent = ctx.bestInsurer || "—";
+      document.getElementById("prp-best-copay").textContent = ctx.bestCopay ? "$" + ctx.bestCopay + "/mo" : "—";
+      document.getElementById("prp-best-annual").textContent = ctx.bestCopay ? "$" + (ctx.bestCopay * 12).toLocaleString() + "/yr" : "—";
+      document.getElementById("prp-best-priorauth").innerHTML = flagYN(ctx.bestPriorAuth, true);
+      document.getElementById("prp-best-steptherapy").innerHTML = flagYN(ctx.bestStepTherapy, true);
+      document.getElementById("prp-best-mailorder").innerHTML = flagYN(ctx.bestMailOrder, false);
+      document.getElementById("prp-best-network").textContent = ctx.bestNetwork || "—";
+
+      // ── Premium option ─────────────────────────────────────────────
+      document.getElementById("prp-premium-name").textContent = ctx.premiumInsurer || "—";
+      document.getElementById("prp-premium-copay").textContent = ctx.premiumCopay ? "$" + ctx.premiumCopay + "/mo" : "—";
+      document.getElementById("prp-premium-annual").textContent = ctx.premiumCopay ? "$" + (ctx.premiumCopay * 12).toLocaleString() + "/yr" : "—";
+      document.getElementById("prp-premium-priorauth").innerHTML = flagYN(ctx.premiumPriorAuth, true);
+      document.getElementById("prp-premium-steptherapy").innerHTML = flagYN(ctx.premiumStepTherapy, true);
+      document.getElementById("prp-premium-mailorder").innerHTML = flagYN(ctx.premiumMailOrder, false);
+      document.getElementById("prp-premium-network").textContent = ctx.premiumNetwork || "—";
+
+      // ── Detected tactics tags ──────────────────────────────────────
+      if (ctx.topAngles && ctx.topAngles.length > 0) {
+        var tacticsRow = document.getElementById("prp-tactics-row");
+        var tacticsContainer = document.getElementById("prp-tactics-tags");
+        tacticsRow.style.display = "flex";
+        tacticsContainer.innerHTML = ctx.topAngles.map(function (t) {
+          return '<span style="display:inline-flex;align-items:center;gap:4px;background:#fff8f8;border:1px solid #fca5a5;color:#dc2626;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;margin-right:4px;">⚠ ' + t + '</span>';
+        }).join("");
+      }
+
+      // ── Auto-select the drug pill once charts are ready ───────────────
       var trySelect = setInterval(function () {
         var pill = document.querySelector('[data-drug="' + ctx.primaryMed + '"]');
         if (pill) {
@@ -57,7 +209,8 @@
           pill.classList.add("active");
           pill.dispatchEvent(new Event("click", { bubbles: true }));
         }
-      }, 100);
+      }, 200);
+
     } else {
       // Show soft hint banner
       var hint = document.getElementById("pitchHintBanner");

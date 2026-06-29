@@ -947,15 +947,34 @@
       vulnEl.textContent = generateVulnExplanation(vulnScore, state.customer);
     }
 
-    // Cross-page localStorage persistence (P7)
+    // Cross-page localStorage persistence (P7) — full context for Plan Comparison page
     try {
       localStorage.setItem("planpilot_context", JSON.stringify({
         primaryMed: rec.primaryDrugId,
         primaryMedName: rec.primaryDrugName,
         pitchedInsurer: rec.targetInsurer,
+        pitchedCopay: rec.monthlyCopay,
+        pitchedAnnual: rec.annualOOP,
+        pitchedPriorAuth: rec.pitchedPriorAuth,
+        pitchedStepTherapy: rec.pitchedStepTherapy,
+        pitchedMailOrder: rec.pitchedMailOrder,
+        pitchedNetwork: rec.network,
         bestInsurer: rec.decoys.economy.insurer,
         bestCopay: rec.decoys.economy.copay,
+        bestMailOrder: rec.decoys.economy.mailOrder,
+        bestPriorAuth: rec.decoys.economy.priorAuth,
+        bestStepTherapy: rec.decoys.economy.stepTherapy,
+        bestNetwork: rec.decoys.economy.network,
+        premiumInsurer: rec.decoys.premium.insurer,
+        premiumCopay: rec.decoys.premium.copay,
+        premiumMailOrder: rec.decoys.premium.mailOrder,
+        premiumPriorAuth: rec.decoys.premium.priorAuth,
+        premiumStepTherapy: rec.decoys.premium.stepTherapy,
+        premiumNetwork: rec.decoys.premium.network,
         savings: rec.annualSavings,
+        segment: rec.segment,
+        riskScore: rec.predictedConversion ? Math.round(rec.predictedConversion * 100) : null,
+        topAngles: rec.angles.slice(0, 3).map(a => a.principle),
         timestamp: Date.now()
       }));
     } catch (e) { /* localStorage not available */ }

@@ -2004,15 +2004,21 @@ window.addEventListener("DOMContentLoaded", async () => {
   // Load real pricing data before initializing charts
   await loadInsurerPricing();
 
-  fetchTopo();
-  initStream();
-  initParallel();
-  initPlans();
-  initScatter();
-  initDonut();
-  initTreemap();
-  initLollipop();
-  initTrend();
-  initSplom();
-  dispatch.call("stateChange", null, state);
+  // Defer chart init to after first paint so grid/flex containers have real pixel dimensions.
+  // Without this, clientWidth/clientHeight = 0 and all SVG viewBoxes are "0 0 0 0".
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      fetchTopo();
+      initStream();
+      initParallel();
+      initPlans();
+      initScatter();
+      initDonut();
+      initTreemap();
+      initLollipop();
+      initTrend();
+      initSplom();
+      dispatch.call("stateChange", null, state);
+    });
+  });
 });
