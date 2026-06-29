@@ -23,10 +23,30 @@
 }
 
 .sidebar-inner {
-  padding: var(--s5);
+  padding: var(--s5) var(--s5) var(--s6);
   display: flex;
   flex-direction: column;
   gap: var(--s5);
+  min-height: 100%;
+}
+
+/* Dark scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 .sidebar-section {
@@ -133,6 +153,7 @@
   margin-top: auto;
   padding-top: var(--s5);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .btn-full {
@@ -689,7 +710,7 @@
     position: relative;
     top: 0;
     height: auto;
-    max-height: 400px;
+    max-height: 600px;
     border-right: none;
     border-bottom: 1px solid var(--line);
   }
@@ -874,6 +895,55 @@
   background: var(--accent-soft);
 }
 
+/* Debrief Tactic Chips — scenario-based checkboxes */
+.debrief-tactics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.debrief-tactic-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+
+.debrief-tactic-chip:hover {
+  border-color: var(--line-strong);
+  background: var(--surface);
+}
+
+.debrief-tactic-chip input[type="checkbox"] {
+  display: none;
+}
+
+.debrief-tactic-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.debrief-tactic-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.debrief-tactic-chip:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.debrief-tactic-chip:has(input:checked) .debrief-tactic-title {
+  color: var(--accent);
+}
+
 .slider-group {
   display: flex;
   flex-direction: column;
@@ -962,39 +1032,7 @@
 }
 .verdict-cta:hover { background: var(--ink-2); }
 
-/* ----------------------------- Quick Mode Toggle (P4) -------------------- */
-.mode-toggle-bar {
-  display: flex;
-  gap: 0;
-  background: rgba(255,255,255,0.08);
-  border-radius: var(--r-sm);
-  padding: 3px;
-}
-.mode-btn {
-  flex: 1;
-  padding: 7px 10px;
-  font-size: 12px;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  background: transparent;
-  border: none;
-  border-radius: var(--r-xs);
-  color: var(--faint);
-  cursor: pointer;
-  transition: background .15s ease, color .15s ease;
-  white-space: nowrap;
-}
-.mode-btn--active {
-  background: var(--accent);
-  color: #fff;
-}
-.mode-btn:hover:not(.mode-btn--active) { color: rgba(255,255,255,0.7); }
-
-/* Quick Mode field visibility rules */
-.sidebar.mode--quick .full-mode-field { display: none; }
-.sidebar.mode--full .quick-mode-field { display: none; }
-
-/* Quick Budget Buttons (P4) */
+/* Quick Budget Buttons */
 .quick-budget-btns {
   display: flex;
   gap: var(--s2);
@@ -1014,6 +1052,28 @@
 }
 .qb-btn:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); }
 .qb-btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Context question buttons (Step 3) */
+.ctx-btn {
+  flex: 1;
+  padding: 9px 6px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--r-sm);
+  background: rgba(255,255,255,0.08);
+  color: var(--faint);
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.ctx-btn:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); }
+.ctx-btn--active {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
@@ -1075,6 +1135,72 @@
   font-style: italic;
 }
 
+/* ----------------------------- Tactic Scenario + Confirm ------------------ */
+.angle-scenario {
+  margin-top: var(--s2);
+  padding: var(--s3) var(--s4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+}
+.angle-scenario-quote {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.4;
+}
+.angle-scenario-summary {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.angle-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--s3);
+  padding: 6px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  transition: border-color .15s ease, background .15s ease;
+}
+.angle-confirm:hover {
+  border-color: var(--line-strong);
+}
+.angle-confirm input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+}
+.angle-confirm:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+/* Quick Feedback Bar */
+.quick-feedback-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  margin-top: var(--s4);
+  padding: var(--s3) var(--s4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+.quick-feedback-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
 /* ----------------------------- Vulnerability Explanation (P8) ------------ */
 .vuln-explanation {
   font-size: 12px;
@@ -1090,7 +1216,7 @@
 @media print {
   .nav, .sidebar, .footer, #emptyState, .sidebar-actions,
   #debriefModal, .verdict-cta, #saveReportBtn, #debriefBtn,
-  #loadDemoBtn, .mode-toggle-bar { display: none !important; }
+  #loadDemoBtn, #quickFeedbackBar { display: none !important; }
 
   .admin-layout { display: block; }
   .main-content { overflow: visible; }

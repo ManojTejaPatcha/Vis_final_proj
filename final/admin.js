@@ -12,26 +12,26 @@
   const state = {
     targetInsurer: null,
     customer: {
-      name: "",
       age: null,
-      state: "",
-      conditions: "",
-      medications: "",
+      region: "",
       primaryMed: "",
       budgetSensitivity: "",
-      valuesConvenience: false
-    },
-    principles: {
-      anchoring: true,
-      lossAversion: true,
-      framing: true,
-      socialProof: true,
-      decoy: true,
-      default: true,
-      authority: true
+      valuesConvenience: false,
+      contextQ1: "",
+      contextQ2: "",
+      contextQ3: ""
     },
     recommendation: null,
     pricingData: null
+  };
+
+  // Reverse map: drug ID → conditions (derived from feature-engineering CONDITION_DRUGS)
+  const DRUG_CONDITIONS = {
+    ozempic: ["Type 2 Diabetes", "Weight Management"],
+    jardiance: ["Type 2 Diabetes", "Heart Failure"],
+    trulicity: ["Type 2 Diabetes"],
+    eliquis: ["Atrial Fibrillation", "DVT/PE"],
+    xarelto: ["Atrial Fibrillation", "DVT/PE"]
   };
 
   // ============================================================================
@@ -39,37 +39,37 @@
   // ============================================================================
   const DEMO_PROFILES = [
     {
-      name: "Grace Williams",
       age: 67,
-      state: "OH",
-      conditions: "Type 2 Diabetes, Atrial Fibrillation",
-      medications: "Jardiance, Eliquis",
+      region: "Midwest",
       budgetSensitivity: "medium",
       valuesConvenience: true,
       primaryMed: "eliquis",
-      targetInsurer: "WellCare"
+      targetInsurer: "WellCare",
+      contextQ1: "yes",
+      contextQ2: "yes",
+      contextQ3: "no"
     },
     {
-      name: "Robert Chen",
       age: 72,
-      state: "CA",
-      conditions: "Hypertension, High Cholesterol",
-      medications: "Lisinopril, Atorvastatin",
+      region: "West",
       budgetSensitivity: "high",
       valuesConvenience: false,
-      primaryMed: "",
-      targetInsurer: "Blue Cross Blue Shield"
+      primaryMed: "ozempic",
+      targetInsurer: "Blue Cross Blue Shield",
+      contextQ1: "yes",
+      contextQ2: "unsure",
+      contextQ3: "yes"
     },
     {
-      name: "Maria Garcia",
       age: 58,
-      state: "FL",
-      conditions: "Type 2 Diabetes",
-      medications: "Ozempic, Metformin",
+      region: "South",
       budgetSensitivity: "low",
       valuesConvenience: true,
       primaryMed: "ozempic",
-      targetInsurer: "UnitedHealthcare"
+      targetInsurer: "UnitedHealthcare",
+      contextQ1: "no",
+      contextQ2: "yes",
+      contextQ3: "no"
     }
   ];
 
@@ -79,23 +79,10 @@
   const elements = {
     // Form inputs
     targetInsurer: document.getElementById("targetInsurer"),
-    customerName: document.getElementById("customerName"),
     customerAge: document.getElementById("customerAge"),
-    customerState: document.getElementById("customerState"),
-    customerConditions: document.getElementById("customerConditions"),
-    customerMeds: document.getElementById("customerMeds"),
-    budgetSensitivity: document.getElementById("budgetSensitivity"),
+    customerRegion: document.getElementById("customerRegion"),
     valuesConvenience: document.getElementById("valuesConvenience"),
     primaryMed: document.getElementById("primaryMed"),
-
-    // Principle toggles
-    principleAnchoring: document.getElementById("principle-anchoring"),
-    principleLossAversion: document.getElementById("principle-lossAversion"),
-    principleFraming: document.getElementById("principle-framing"),
-    principleSocialProof: document.getElementById("principle-socialProof"),
-    principleDecoy: document.getElementById("principle-decoy"),
-    principleDefault: document.getElementById("principle-default"),
-    principleAuthority: document.getElementById("principle-authority"),
 
     // Buttons
     generateBtn: document.getElementById("generateBtn"),
@@ -170,7 +157,9 @@
     economyAnnual: document.getElementById("economyAnnual"),
     recommendedAnnual: document.getElementById("recommendedAnnual"),
     premiumAnnual: document.getElementById("premiumAnnual"),
-    nextStepsList: document.getElementById("nextStepsList")
+    nextStepsList: document.getElementById("nextStepsList"),
+    quickFeedbackBar: document.getElementById("quickFeedbackBar"),
+    quickFeedbackBtn: document.getElementById("quickFeedbackBtn")
   };
 
   // ============================================================================
@@ -178,22 +167,11 @@
   // ============================================================================
   function updateStateFromForm() {
     state.targetInsurer = elements.targetInsurer.value || null;
-    state.customer.name = elements.customerName.value.trim();
     state.customer.age = elements.customerAge.value ? parseInt(elements.customerAge.value, 10) : null;
-    state.customer.state = elements.customerState.value;
-    state.customer.conditions = elements.customerConditions.value.trim();
-    state.customer.medications = elements.customerMeds.value.trim();
-    state.customer.budgetSensitivity = elements.budgetSensitivity.value;
+    state.customer.region = elements.customerRegion ? elements.customerRegion.value : "";
     state.customer.valuesConvenience = elements.valuesConvenience.checked;
     state.customer.primaryMed = elements.primaryMed ? elements.primaryMed.value : "";
-
-    state.principles.anchoring = elements.principleAnchoring.checked;
-    state.principles.lossAversion = elements.principleLossAversion.checked;
-    state.principles.framing = elements.principleFraming.checked;
-    state.principles.socialProof = elements.principleSocialProof.checked;
-    state.principles.decoy = elements.principleDecoy.checked;
-    state.principles.default = elements.principleDefault.checked;
-    state.principles.authority = elements.principleAuthority.checked;
+    state.customer.budgetSensitivity = state.customer.budgetSensitivity || "";
   }
 
   function validateForm() {
@@ -202,18 +180,11 @@
     if (!state.targetInsurer) {
       errors.push("Please select the plan being pitched to you");
     }
-    if (!state.customer.name) {
-      state.customer.name = "You";
-    }
-    const isQuickMode = document.querySelector(".sidebar.mode--quick") !== null;
-    if (!state.customer.age && !isQuickMode) {
-      errors.push("Please enter your age");
-    }
     if (!state.customer.budgetSensitivity) {
-      errors.push("Please select your budget sensitivity (Tight / Moderate / Flexible)");
+      errors.push("Please select your budget priority (Tight / Moderate / Flexible)");
     }
-    if (!state.customer.medications && !state.customer.primaryMed) {
-      errors.push("Please select a primary drug or enter your medications");
+    if (!state.customer.primaryMed) {
+      errors.push("Please select your primary medication");
     }
 
     return errors;
@@ -241,14 +212,29 @@
     if (!profile) return;
 
     elements.targetInsurer.value = profile.targetInsurer;
-    elements.customerName.value = profile.name;
     elements.customerAge.value = profile.age;
-    elements.customerState.value = profile.state;
-    elements.customerConditions.value = profile.conditions;
-    elements.customerMeds.value = profile.medications;
-    elements.budgetSensitivity.value = profile.budgetSensitivity;
+    if (elements.customerRegion) elements.customerRegion.value = profile.region;
     elements.valuesConvenience.checked = profile.valuesConvenience;
     if (elements.primaryMed) elements.primaryMed.value = profile.primaryMed || "";
+    state.customer.budgetSensitivity = profile.budgetSensitivity;
+    state.customer.contextQ1 = profile.contextQ1 || "";
+    state.customer.contextQ2 = profile.contextQ2 || "";
+    state.customer.contextQ3 = profile.contextQ3 || "";
+
+    // Highlight active budget button
+    document.querySelectorAll(".qb-btn").forEach(b => {
+      b.classList.toggle("qb-btn--active", b.dataset.budget === profile.budgetSensitivity);
+    });
+
+    // Highlight active context buttons
+    ["q1", "q2", "q3"].forEach(q => {
+      const group = document.querySelector(`[data-context="${q}"]`);
+      if (group) {
+        group.querySelectorAll(".ctx-btn").forEach(b => {
+          b.classList.toggle("ctx-btn--active", b.dataset.value === state.customer["context" + q.toUpperCase()]);
+        });
+      }
+    });
 
     updateStateFromForm();
   }
@@ -407,11 +393,44 @@
     const factors = [];
     if (customer.budgetSensitivity === "high") factors.push("price-sensitive profile (makes anchoring more effective)");
     if (customer.age && customer.age >= 70) factors.push("70+ age cohort (frequently targeted)");
-    const medCount = (customer.medications || "").split(",").filter(s => s.trim()).length;
-    if (medCount >= 2 || customer.primaryMed) factors.push("high-cost or multiple medications (increases urgency framing)");
+    if (customer.primaryMed) factors.push("high-cost medication (increases urgency framing)");
     if (customer.valuesConvenience) factors.push("convenience preference (can be exploited via mail-order upsells)");
+    if (customer.contextQ1 === "yes") factors.push("agent used daily-cost framing (classic micro-commitment tactic)");
+    if (customer.contextQ2 === "yes") factors.push("agent claimed social proof (\"most people choose this\")");
     if (factors.length === 0) return "Your profile has average exposure to sales pressure.";
     return "Intensity elevated by: " + factors.join("; ") + ".";
+  }
+
+  // ============================================================================
+  // Auto-Detect Tactics from Data + Context Answers
+  // ============================================================================
+  function autoDetectTactics(pitchedEntry, bestEntry, copay, bestCopay, marketShare) {
+    const detected = {};
+
+    // Anchoring: pitched copay is higher than best alternative
+    detected.anchoring = copay > bestCopay;
+
+    // Framing: user said agent quoted daily/weekly cost, or prior auth wasn't mentioned
+    detected.framing = state.customer.contextQ1 === "yes" ||
+      (pitchedEntry && pitchedEntry.prior_auth_required && state.customer.contextQ1 !== "no");
+
+    // Social Proof: user said agent claimed "most people choose this", or market share is high
+    detected.socialProof = state.customer.contextQ2 === "yes" ||
+      (marketShare && marketShare >= 15);
+
+    // Decoy Effect: user said agent showed a worse plan, or there's a clear premium decoy in data
+    detected.decoy = state.customer.contextQ3 === "yes";
+
+    // Authority: step therapy required (CMS star rating doesn't reflect this burden)
+    detected.authority = pitchedEntry ? pitchedEntry.step_therapy : false;
+
+    // Loss Aversion: always include if savings exist (fear of losing coverage)
+    detected.lossAversion = copay > bestCopay;
+
+    // Default Effect: pitched plan has high market share (positioned as "standard")
+    detected.default = marketShare && marketShare >= 20;
+
+    return detected;
   }
 
   // ============================================================================
@@ -451,19 +470,20 @@
   }
 
   async function generateLearningRecommendation() {
+    // Derive conditions and medications from primary drug selection
+    const drugId = state.customer.primaryMed;
+    const conditions = DRUG_CONDITIONS[drugId] || ["Type 2 Diabetes"];
+    const medications = drugId ? [drugId] : [];
+    const region = state.customer.region || "South";
+
     // Build customer profile for feature engineering
-    const STATE_REGIONS = {
-      CA: "West", TX: "South", FL: "South", NY: "Northeast",
-      OH: "Midwest", PA: "Northeast", IL: "Midwest", GA: "South",
-      NC: "South", MI: "Midwest"
-    };
     const customerProfile = {
-      name: state.customer.name,
+      name: "You",
       age: state.customer.age,
-      state: state.customer.state,
-      region: STATE_REGIONS[state.customer.state] || "South",
-      conditions: state.customer.conditions.split(",").map(s => s.trim()).filter(s => s),
-      medications: state.customer.medications.split(",").map(s => s.trim()).filter(s => s),
+      state: "",
+      region: region,
+      conditions: conditions,
+      medications: medications,
       budgetSensitivity: state.customer.budgetSensitivity,
       valuesConvenience: state.customer.valuesConvenience
     };
@@ -491,7 +511,6 @@
 
     // Build recommendation object using real pricing data where available
     const insurer = state.targetInsurer;
-    const drugId = state.customer.primaryMed;
     const pitchedEntry = getPricingEntry(drugId, insurer);
     const copay = pitchedEntry ? pitchedEntry.patient_copay : Math.floor(Math.random() * 40) + 120;
     const dailyCost = (copay / 30).toFixed(2);
@@ -515,10 +534,13 @@
       authority: "CMS ratings or formulary rankings are being cited to sound official — check whether those ratings actually apply to your specific medication."
     };
 
-    // Map stats to detected tactic cards, filter by enabled scans
+    // Auto-detect tactics from data + context answers
+    const detectedTactics = autoDetectTactics(pitchedEntry, bestEntry, copay, bestCopay, marketShareReal);
+
+    // Map stats to detected tactic cards, filtered by auto-detection
     const topAngleKeys = cohortSummary.topAngles.map(a => a.key);
     const angles = stats
-      .filter(s => state.principles[s.angle])
+      .filter(s => detectedTactics[s.angle])
       .slice(0, 4)
       .map(s => ({
         principle: toDisplayName(s.angle),
@@ -529,9 +551,23 @@
           : "Pattern detected from segment analysis"
       }));
 
+    // If no tactics detected from bandit stats, build from auto-detected directly
+    if (angles.length === 0) {
+      Object.keys(detectedTactics).forEach(angle => {
+        if (detectedTactics[angle] && angleDescriptions[angle]) {
+          angles.push({
+            principle: toDisplayName(angle),
+            score: 75,
+            description: angleDescriptions[angle],
+            evidence: "Auto-detected from your sales call answers and plan data"
+          });
+        }
+      });
+    }
+
     // Build analysis narrative
     const predText = prediction != null ? `${Math.round(prediction * 100)}%` : "N/A";
-    const narrative = `Analysis for ${state.customer.name} (${segment} segment): ${insurer} is being pitched at $${copay}/month. ${neighbors.length > 0 ? `Of ${neighbors.length} similar consumers who were pitched this way, ${Math.round(cohortSummary.conversionRate * 100)}% ended up enrolling — many before seeing better alternatives.` : ""} The sales intensity is ${predText} — this measures how aggressively the pitch uses psychological framing to steer your decision based on your profile.`;
+    const narrative = `Analysis (${segment} segment): ${insurer} is being pitched at $${copay}/month. ${neighbors.length > 0 ? `Of ${neighbors.length} similar consumers who were pitched this way, ${Math.round(cohortSummary.conversionRate * 100)}% ended up enrolling — many before seeing better alternatives.` : ""} The sales intensity is ${predText} — this measures how aggressively the pitch uses psychological framing to steer your decision based on your profile.`;
 
     return {
       targetInsurer: insurer,
@@ -592,6 +628,29 @@
     const marketShare = pitchedEntry ? pitchedEntry.market_share : Math.floor(Math.random() * 20) + 5;
     const drugName = pitchedEntry ? pitchedEntry.drug_name : (drugId || "your medication");
 
+    // Auto-detect tactics from data + context answers
+    const detectedTactics = autoDetectTactics(pitchedEntry, bestEntry, copay, bestCopay, marketShare);
+
+    const angleDescriptions = {
+      anchoring: `The agent is likely comparing the $${copay}/month copay against a catastrophic "no insurance" number. The real benchmark is ~$${bestCopay}/month (${bestEntry ? bestEntry.insurer : "market average"}).`,
+      lossAversion: `Fear framing detected: the pitch may emphasize you'll lose $${savings}/year without this plan, instead of showing you cheaper alternatives that exist.`,
+      framing: "Micro-commitment trick: breaking the cost into a tiny daily amount ($X/day) to obscure the true annual financial impact.",
+      socialProof: `The agent may claim ${marketShare}% of people chose this plan — but that statistic likely doesn't account for your specific medications and profile.`,
+      decoy: "A worse plan is likely shown alongside this one to make it look like the smart, obvious choice — a deliberate comparison trick.",
+      default: "This plan is being positioned as the \"standard\" or \"default\" choice for your profile to make switching away feel like extra effort.",
+      authority: "CMS star ratings may be cited, but verify they apply to YOUR specific drugs, not the plan overall."
+    };
+
+    const angles = Object.keys(detectedTactics)
+      .filter(a => detectedTactics[a])
+      .slice(0, 4)
+      .map(a => ({
+        principle: toDisplayName(a),
+        score: 75 + Math.floor(Math.random() * 20),
+        description: angleDescriptions[a] || "",
+        evidence: "Auto-detected from your sales call answers and plan data"
+      }));
+
     return {
       targetInsurer: insurer,
       segment: "fallback",
@@ -608,31 +667,13 @@
       pitchedMailOrder: pitchedEntry ? pitchedEntry.mail_order_available : true,
       primaryDrugName: drugName,
       primaryDrugId: drugId || "",
-      narrative: `Analysis for ${state.customer.name}: ${insurer} is being pitched at $${copay}/month for your medications (${state.customer.medications}). The market average for comparable coverage is significantly lower. ${state.customer.valuesConvenience ? "The pitch may emphasize mail-order convenience to distract from price." : "The pitch may emphasize network breadth to justify a premium."} With ${state.customer.budgetSensitivity} budget sensitivity, the sales tactics are ${state.customer.budgetSensitivity === "high" ? "especially" : "moderately"} likely to influence your decision.`,
-      angles: [
+      narrative: `Analysis: ${insurer} is being pitched at $${copay}/month for ${drugName}. The best alternative is $${bestCopay}/month — a difference of $${savings}/year. ${state.customer.valuesConvenience ? "The pitch may emphasize mail-order convenience to distract from price." : "The pitch may emphasize network breadth to justify a premium."} With ${state.customer.budgetSensitivity} budget sensitivity, the sales tactics are ${state.customer.budgetSensitivity === "high" ? "especially" : "moderately"} likely to influence your decision.`,
+      angles: angles.length > 0 ? angles : [
         {
           principle: "Anchoring",
           score: 92,
-          description: `The agent is likely comparing the $${copay}/month copay against a catastrophic "no insurance" number. The real benchmark is ~$${bestCopay}/month (${bestEntry ? bestEntry.insurer : "market average"}).`,
-          evidence: "Industry average for similar medications is $215/month"
-        },
-        {
-          principle: "Loss Aversion",
-          score: 88,
-          description: `Fear framing detected: the pitch may emphasize you'll lose $${savings}/year without this plan, instead of showing you cheaper alternatives that exist.`,
-          evidence: `Better alternatives could save you $${savings}/year`
-        },
-        {
-          principle: "Social Proof",
-          score: 85,
-          description: `The agent may claim ${marketShare}% of people chose this plan — but that statistic likely doesn't account for your specific medications and profile.`,
-          evidence: `General adoption rate for age ${state.customer.age} demographic, not your specific drug regimen`
-        },
-        {
-          principle: "Authority",
-          score: 78,
-          description: "CMS star ratings may be cited, but verify they apply to YOUR specific drugs, not the plan overall.",
-          evidence: "Formulary placement varies by specific medication — check individually"
+          description: angleDescriptions.anchoring,
+          evidence: "Auto-detected: pitched copay exceeds best alternative"
         }
       ],
       decoys: {
@@ -707,6 +748,50 @@
     Decoy: '"I\'d like to see all plans covering my medications, not just the three you\'ve shown me."',
     Default: '"I\'d like 48 hours to compare at least one other plan before I decide."',
     Authority: '"Do those CMS ratings apply specifically to my medications, or is that the plan\'s overall rating?"',
+  };
+
+  // Scenario examples shown on each detected tactic card so the user can confirm
+  // without knowing the technical name. Keys match the internal angle keys.
+  const TACTIC_SCENARIOS = {
+    anchoring: {
+      quote: '"Without insurance, this would cost you $900/month"',
+      summary: 'They compared the plan price to a scary full-price number to make it look like a great deal'
+    },
+    lossAversion: {
+      quote: '"You\'ll lose coverage if you don\'t sign up today"',
+      summary: 'They made you feel like you\'d lose something important if you didn\'t enroll now'
+    },
+    framing: {
+      quote: '"It\'s only about $4 a day"',
+      summary: 'They broke the cost into a tiny daily or weekly amount instead of telling you the yearly total'
+    },
+    socialProof: {
+      quote: '"Most people in your area choose this plan"',
+      summary: 'They claimed the plan is popular in your area or age group to make it seem like the obvious choice'
+    },
+    decoy: {
+      quote: 'They showed me another plan that was clearly worse',
+      summary: 'A bad option was presented alongside this one to make it look like the smart pick by comparison'
+    },
+    default: {
+      quote: '"This is the standard plan for someone in your situation"',
+      summary: 'They positioned this as the default or automatic choice, making switching feel like extra effort'
+    },
+    authority: {
+      quote: '"This plan has a 4.5-star CMS rating"',
+      summary: 'They cited official-sounding ratings or rankings — but those may not apply to your specific medication'
+    }
+  };
+
+  // Map display name back to internal angle key for quick feedback
+  const DISPLAY_TO_KEY = {
+    "Anchoring": "anchoring",
+    "Loss Aversion": "lossAversion",
+    "Framing": "framing",
+    "Social Proof": "socialProof",
+    "Decoy": "decoy",
+    "Default": "default",
+    "Authority": "authority"
   };
 
   function generateQuestions(angles) {
@@ -784,47 +869,58 @@
     elements.premiumStepTherapy.textContent = rec.decoys.premium.stepTherapy ? "Yes" : "No";
     elements.premiumNetwork.textContent = rec.decoys.premium.network;
 
-    // Update detected manipulation tactics (P9: adds 'What to say back')
+    // Update detected manipulation tactics (with scenario examples + confirm checkbox)
+    const angleKey = (displayName) => DISPLAY_TO_KEY[displayName] || displayName.toLowerCase();
     elements.anglesGrid.innerHTML = rec.angles
       .map((angle) => {
         const reply = tacticReplyBack[angle.principle] || null;
+        const key = angleKey(angle.principle);
+        const scenario = TACTIC_SCENARIOS[key] || null;
         return `
-      <div class="angle-card">
+      <div class="angle-card" data-angle="${key}">
         <div class="angle-header">
           <span class="angle-title">⚠ ${angle.principle}</span>
           <span class="angle-score">${angle.score}% confidence</span>
         </div>
+        ${scenario ? `
+        <div class="angle-scenario">
+          <div class="angle-scenario-quote">${scenario.quote}</div>
+          <div class="angle-scenario-summary">${scenario.summary}</div>
+        </div>` : ""}
         <p class="angle-description">${angle.description}</p>
         <p class="angle-evidence">${angle.evidence}</p>
         ${reply ? `<div class="tactic-say-back"><span class="say-back-label">What to say:</span> <span class="say-back-text">${reply}</span></div>` : ""}
+        <label class="angle-confirm">
+          <input type="checkbox" class="angle-confirm-check" data-angle="${key}">
+          <span>Yes, this happened to me</span>
+        </label>
       </div>`;
       })
       .join("");
 
+    // Show quick feedback bar
+    if (elements.quickFeedbackBar) elements.quickFeedbackBar.classList.remove("hidden");
+
     // Update profile summary
     elements.profileSummary.innerHTML = `
       <div class="profile-item">
-        <span class="profile-item-label">Name</span>
-        <span class="profile-item-value">${state.customer.name}</span>
+        <span class="profile-item-label">Age</span>
+        <span class="profile-item-value">${state.customer.age || '—'}</span>
       </div>
       <div class="profile-item">
-        <span class="profile-item-label">Age / State</span>
-        <span class="profile-item-value">${state.customer.age || '—'} / ${state.customer.state || '—'}</span>
+        <span class="profile-item-label">Region</span>
+        <span class="profile-item-value">${state.customer.region || '—'}</span>
       </div>
       <div class="profile-item">
-        <span class="profile-item-label">Medications</span>
-        <span class="profile-item-value">${state.customer.medications || rec.primaryDrugName || '—'}</span>
-      </div>
-      <div class="profile-item">
-        <span class="profile-item-label">Conditions</span>
-        <span class="profile-item-value">${state.customer.conditions || "None specified"}</span>
+        <span class="profile-item-label">Medication</span>
+        <span class="profile-item-value">${rec.primaryDrugName || '—'}</span>
       </div>
       <div class="profile-item">
         <span class="profile-item-label">Budget</span>
         <span class="profile-item-value">${({high:"Tight (price-sensitive)", medium:"Moderate", low:"Flexible"})[state.customer.budgetSensitivity] || state.customer.budgetSensitivity || "\u2014"}</span>
       </div>
       <div class="profile-item">
-        <span class="profile-item-label">Convenience</span>
+        <span class="profile-item-label">Mail Order</span>
         <span class="profile-item-value">${state.customer.valuesConvenience ? "Prefers" : "Neutral"}</span>
       </div>
     `;
@@ -850,7 +946,7 @@
 
     // Update best plan banner
     if (elements.bestPlanName) {
-      const medLabel = rec.primaryDrugName || state.customer.medications || "your medications";
+      const medLabel = rec.primaryDrugName || "your medication";
       elements.bestPlanName.textContent = rec.decoys.economy.insurer;
       elements.bestPlanSavings.textContent = rec.annualSavings > 0 ? `Save $${rec.annualSavings.toLocaleString()}/yr` : "Competitive pricing";
       elements.bestPlanDetail.textContent = `Based on ${medLabel}, ${rec.decoys.economy.insurer} offers comparable coverage at $${rec.decoys.economy.copay}/month vs. $${rec.monthlyCopay}/month for ${rec.targetInsurer}. That's $${rec.annualSavings.toLocaleString()} less per year.`;
@@ -873,54 +969,24 @@
       `).join("");
     }
 
-    // Render "What Do I Do Next?" section (Fix #10)
+    // Render "What Do I Do Next?" section — 3 specific action steps
     if (elements.nextStepsList) {
-      const bestInsurer = rec.decoys.economy.insurer;
-      const drugName = rec.primaryDrugName || "your medication";
-      const steps = [];
+      const steps = [
+        {
+          title: "Get it in writing",
+          detail: "Ask the agent to email you a Summary of Benefits for this plan. If they hesitate, that itself is a red flag."
+        },
+        {
+          title: "Verify on Medicare.gov",
+          detail: "Go to medicare.gov/plan-compare and enter your drug to see all available plans in your ZIP code ranked by your actual out-of-pocket cost."
+        },
+        {
+          title: "Wait 24 hours",
+          detail: "Medicare Open Enrollment runs Oct 15 – Dec 7. You are never required to decide on the spot. Any agent who pressures you to sign today is using a high-pressure tactic."
+        }
+      ];
 
-      if (rec.annualSavings > 100) {
-        steps.push({
-          icon: "compare",
-          title: "Compare the pitched plan side-by-side with " + bestInsurer,
-          detail: "Use the Plan Comparison tool to see exactly how " + rec.targetInsurer + " stacks up against " + bestInsurer + " for " + drugName + ". You could save $" + rec.annualSavings.toLocaleString() + "/year.",
-          cta: "Open Plan Comparison \u2192",
-          ctaHref: "customer.html"
-        });
-      }
-
-      steps.push({
-        icon: "ask",
-        title: "Ask your agent these " + generateQuestions(rec.angles).length + " questions",
-        detail: "The questions above are designed to shift the conversation back to objective data. Print them out or screenshot them before your next call.",
-        cta: null
-      });
-
-      if (rec.pitchedPriorAuth || rec.pitchedStepTherapy) {
-        steps.push({
-          icon: "warn",
-          title: "Verify hidden requirements with your doctor",
-          detail: (rec.pitchedPriorAuth ? "This plan requires prior authorization" : "This plan requires step therapy") + " for " + drugName + ". Ask your doctor if they'll support the approval process, or if " + bestInsurer + " would be simpler.",
-          cta: null
-        });
-      }
-
-      steps.push({
-        icon: "time",
-        title: "Take 48 hours before deciding",
-        detail: "You are not obligated to enroll during the sales call. Tell the agent you need time to review the options. Any plan that pressures you to decide immediately is a red flag.",
-        cta: null
-      });
-
-      steps.push({
-        icon: "enroll",
-        title: "Ready to switch? Here's how.",
-        detail: "Visit Medicare Plan Finder at medicare.gov/find-plans to compare and enroll in " + bestInsurer + " or any other plan. You can also call 1-800-MEDICARE (1-800-633-4227) for free, unbiased help.",
-        cta: "Go to medicare.gov \u2192",
-        ctaHref: "https://www.medicare.gov/find-plans"
-      });
-
-      elements.nextStepsList.innerHTML = steps.map(s => `
+      elements.nextStepsList.innerHTML = steps.map((s, i) => `
         <div class="next-step-item">
           <span class="next-step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -928,9 +994,8 @@
             </svg>
           </span>
           <div class="next-step-body">
-            <div class="next-step-title">${s.title}</div>
+            <div class="next-step-title">Step ${i + 1} — ${s.title}</div>
             <div class="next-step-detail">${s.detail}</div>
-            ${s.cta ? `<a class="btn btn-primary btn-sm" href="${s.ctaHref}" target="${s.ctaHref.startsWith('http') ? '_blank' : ''}" rel="${s.ctaHref.startsWith('http') ? 'noopener' : ''}" style="margin-top:8px">${s.cta}</a>` : ""}
           </div>
         </div>`).join("");
     }
@@ -985,6 +1050,109 @@
 
     // Scroll to top of dashboard
     elements.recommendationDashboard.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ============================================================================
+  // Quick Feedback (inline on tactic cards)
+  // ============================================================================
+  function submitQuickFeedback() {
+    if (!state.recommendation) {
+      showError("Please analyze a pitch first.");
+      return;
+    }
+
+    // Collect confirmed tactics from checkboxes
+    const confirmedAngles = Array.from(
+      document.querySelectorAll(".angle-confirm-check:checked")
+    ).map(cb => cb.dataset.angle);
+
+    if (confirmedAngles.length === 0) {
+      showError("Check at least one tactic that happened to you, or skip this step.");
+      return;
+    }
+
+    try {
+      // Build a minimal interaction record for the bandit update
+      const drugId = state.customer.primaryMed;
+      const conditions = DRUG_CONDITIONS[drugId] || ["Type 2 Diabetes"];
+      const medications = drugId ? [drugId] : [];
+      const region = state.customer.region || "South";
+      const interaction = {
+        id: `interaction-${Date.now()}`,
+        timestamp: Date.now(),
+        source: "admin-quick",
+        customer: {
+          name: "You",
+          age: state.customer.age,
+          state: "",
+          region: region,
+          conditions: conditions,
+          medications: medications,
+          budgetSensitivity: state.customer.budgetSensitivity,
+          valuesConvenience: state.customer.valuesConvenience,
+          numMedications: medications.length
+        },
+        segment: state.recommendation.segment,
+        targetInsurer: state.targetInsurer,
+        pitch: {
+          anglesUsed: state.recommendation.angles.map(a => DISPLAY_TO_KEY[a.principle] || a.principle.toLowerCase()),
+          insurerSuggested: state.targetInsurer,
+          predictedConversion: state.recommendation.predictedConversion || 0.5
+        },
+        debrief: {
+          converted: null,
+          resonatedAngles: confirmedAngles,
+          objections: [],
+          priceConcern: 3,
+          decisionSpeed: "deliberate",
+          competitorMentioned: "none",
+          notes: ""
+        },
+        outcome: {
+          converted: null,
+          reward: 0.5
+        }
+      };
+
+      if (dataStore) {
+        dataStore.addInteraction(interaction);
+
+        // Update bandit with confirmed angles (credit assignment)
+        if (window.PPLearn) {
+          const banditState = dataStore.getBanditState();
+          window.PPLearn.updateBandit(
+            banditState,
+            interaction.segment,
+            interaction.pitch.anglesUsed,
+            confirmedAngles,
+            true // treat confirmation as a soft positive signal
+          );
+          dataStore.saveBanditState(banditState);
+        }
+
+        // Retrain model periodically
+        if (window.PPModel && dataStore.getInteractions().length % 10 === 0) {
+          mlModelParams = window.PPModel.trainModel(dataStore.getInteractions());
+        }
+      }
+
+      // Show success toast
+      showError("Thank you — your feedback helps PlanPilot improve its detection accuracy.");
+      const errorEl = document.getElementById("inlineError");
+      if (errorEl) {
+        errorEl.style.background = "#0f6b58";
+        setTimeout(() => { errorEl.style.background = "#b3261e"; }, 5000);
+      }
+
+      // Hide the feedback bar, show thank-you state
+      if (elements.quickFeedbackBar) {
+        elements.quickFeedbackBar.innerHTML = "<span style=\"color:var(--accent);font-size:13px\">✓ Feedback recorded — thank you for helping improve detection accuracy.</span>";
+      }
+
+    } catch (error) {
+      console.error("Quick feedback failed:", error);
+      showError("Failed to submit feedback. Please try again.");
+    }
   }
 
   // ============================================================================
@@ -1051,25 +1219,24 @@
 
     try {
       // Create interaction record
-      const STATE_REGIONS = {
-        CA: "West", TX: "South", FL: "South", NY: "Northeast",
-        OH: "Midwest", PA: "Northeast", IL: "Midwest", GA: "South",
-        NC: "South", MI: "Midwest"
-      };
+      const drugId = state.customer.primaryMed;
+      const conditions = DRUG_CONDITIONS[drugId] || ["Type 2 Diabetes"];
+      const medications = drugId ? [drugId] : [];
+      const region = state.customer.region || "South";
       const interaction = {
         id: `interaction-${Date.now()}`,
         timestamp: Date.now(),
         source: "admin",
         customer: {
-          name: state.customer.name,
+          name: "You",
           age: state.customer.age,
-          state: state.customer.state,
-          region: STATE_REGIONS[state.customer.state] || "South",
-          conditions: state.customer.conditions.split(",").map(s => s.trim()).filter(s => s),
-          medications: state.customer.medications.split(",").map(s => s.trim()).filter(s => s),
+          state: "",
+          region: region,
+          conditions: conditions,
+          medications: medications,
           budgetSensitivity: state.customer.budgetSensitivity,
           valuesConvenience: state.customer.valuesConvenience,
-          numMedications: state.customer.medications.split(",").filter(s => s.trim()).length
+          numMedications: medications.length
         },
         segment: state.recommendation.segment,
         targetInsurer: state.targetInsurer,
@@ -1145,7 +1312,7 @@
       e.preventDefault();
       // Cycle through demo profiles
       const currentDemo = DEMO_PROFILES.findIndex(
-        (p) => p.name === state.customer.name && p.targetInsurer === state.targetInsurer
+        (p) => p.primaryMed === state.customer.primaryMed && p.targetInsurer === state.targetInsurer
       );
       const nextIndex = (currentDemo + 1) % DEMO_PROFILES.length;
       loadDemoProfile(nextIndex);
@@ -1181,12 +1348,8 @@
     // Add input change listeners for real-time state updates
     const inputs = [
       elements.targetInsurer,
-      elements.customerName,
       elements.customerAge,
-      elements.customerState,
-      elements.customerConditions,
-      elements.customerMeds,
-      elements.budgetSensitivity,
+      elements.customerRegion,
       elements.valuesConvenience,
       elements.primaryMed
     ].filter(Boolean);
@@ -1202,55 +1365,39 @@
       });
     });
 
-    // Principle toggle listeners
-    const toggles = [
-      elements.principleAnchoring,
-      elements.principleLossAversion,
-      elements.principleFraming,
-      elements.principleSocialProof,
-      elements.principleDecoy,
-      elements.principleDefault,
-      elements.principleAuthority
-    ];
-
-    toggles.forEach((toggle) => {
-      toggle.addEventListener("change", updateStateFromForm);
-    });
-
-    // Quick / Full Mode toggle (P4)
-    const quickModeBtn = document.getElementById("quickModeBtn");
-    const fullModeBtn = document.getElementById("fullModeBtn");
-    const sidebarEl = document.querySelector(".sidebar");
-    if (quickModeBtn && fullModeBtn && sidebarEl) {
-      quickModeBtn.addEventListener("click", () => {
-        sidebarEl.classList.add("mode--quick");
-        sidebarEl.classList.remove("mode--full");
-        quickModeBtn.classList.add("mode-btn--active");
-        fullModeBtn.classList.remove("mode-btn--active");
-      });
-      fullModeBtn.addEventListener("click", () => {
-        sidebarEl.classList.remove("mode--quick");
-        sidebarEl.classList.add("mode--full");
-        fullModeBtn.classList.add("mode-btn--active");
-        quickModeBtn.classList.remove("mode-btn--active");
-      });
-    }
-
-    // Quick budget buttons (P4)
+    // Quick budget buttons
     document.querySelectorAll(".qb-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".qb-btn").forEach(b => b.classList.remove("qb-btn--active"));
         btn.classList.add("qb-btn--active");
-        if (elements.budgetSensitivity) {
-          elements.budgetSensitivity.value = btn.dataset.budget;
-          updateStateFromForm();
-        }
+        state.customer.budgetSensitivity = btn.dataset.budget;
+        updateStateFromForm();
+      });
+    });
+
+    // Context question buttons (Step 3)
+    document.querySelectorAll("[data-context]").forEach(group => {
+      const qKey = group.dataset.context; // "q1", "q2", "q3"
+      group.querySelectorAll(".ctx-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          group.querySelectorAll(".ctx-btn").forEach(b => b.classList.remove("ctx-btn--active"));
+          btn.classList.add("ctx-btn--active");
+          state.customer["context" + qKey.toUpperCase()] = btn.dataset.value;
+        });
       });
     });
 
     // Save Report = browser print (P6)
     if (elements.saveReportBtn) {
       elements.saveReportBtn.addEventListener("click", () => window.print());
+    }
+
+    // Quick feedback submit (inline tactic confirmation)
+    if (elements.quickFeedbackBtn) {
+      elements.quickFeedbackBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        submitQuickFeedback();
+      });
     }
   }
 
@@ -1259,9 +1406,6 @@
   // ============================================================================
   async function init() {
     initEventListeners();
-    // Initialize sidebar in Quick Mode
-    const sidebarEl = document.querySelector(".sidebar");
-    if (sidebarEl) sidebarEl.classList.add("mode--quick");
     await loadPricingData();
     await initializeLearningEngine();
     console.log("Pitch Decoder initialized");
