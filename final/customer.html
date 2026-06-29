@@ -212,9 +212,10 @@
       }, 200);
 
     } else {
-      // Show soft hint banner
-      var hint = document.getElementById("pitchHintBanner");
-      if (hint) hint.style.display = "flex";
+      // No analysis context — redirect to decoder since this page
+      // is only accessible after running a Pitch Decoder analysis
+      window.location.href = "decoder.html";
+      return;
     }
   } catch (e) {
     // If anything fails, silently continue — charts are still visible

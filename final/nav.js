@@ -8,7 +8,6 @@
   const LINKS = [
     { id: "landing", label: "Overview", href: "index.html" },
     { id: "decoder", label: "Pitch Decoder", href: "decoder.html" },
-    { id: "customer", label: "Plan Comparison", href: "customer.html" },
     { id: "devdocs", label: "For Dev", href: "devdocs.html" },
   ];
 
